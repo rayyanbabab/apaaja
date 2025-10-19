@@ -1,0 +1,103 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-D2S6pCoW.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/font/Geist-Black.woff2": {
+    "file": "assets/Geist-Black-DyTs4Xsi.woff2",
+    "src": "resources/font/Geist-Black.woff2"
+  },
+  "resources/font/Geist-BlackItalic.woff2": {
+    "file": "assets/Geist-BlackItalic-CPS9l-3s.woff2",
+    "src": "resources/font/Geist-BlackItalic.woff2"
+  },
+  "resources/font/Geist-Bold.woff2": {
+    "file": "assets/Geist-Bold-BOY-3Qy9.woff2",
+    "src": "resources/font/Geist-Bold.woff2"
+  },
+  "resources/font/Geist-BoldItalic.woff2": {
+    "file": "assets/Geist-BoldItalic-C2LhqTrV.woff2",
+    "src": "resources/font/Geist-BoldItalic.woff2"
+  },
+  "resources/font/Geist-ExtraBold.woff2": {
+    "file": "assets/Geist-ExtraBold-ztj6LZjM.woff2",
+    "src": "resources/font/Geist-ExtraBold.woff2"
+  },
+  "resources/font/Geist-ExtraBoldItalic.woff2": {
+    "file": "assets/Geist-ExtraBoldItalic-B0_SaO0z.woff2",
+    "src": "resources/font/Geist-ExtraBoldItalic.woff2"
+  },
+  "resources/font/Geist-ExtraLight.woff2": {
+    "file": "assets/Geist-ExtraLight-C6TSGS2X.woff2",
+    "src": "resources/font/Geist-ExtraLight.woff2"
+  },
+  "resources/font/Geist-ExtraLightItalic.woff2": {
+    "file": "assets/Geist-ExtraLightItalic-B4TItSvg.woff2",
+    "src": "resources/font/Geist-ExtraLightItalic.woff2"
+  },
+  "resources/font/Geist-Light.woff2": {
+    "file": "assets/Geist-Light-C3vZ2nps.woff2",
+    "src": "resources/font/Geist-Light.woff2"
+  },
+  "resources/font/Geist-LightItalic.woff2": {
+    "file": "assets/Geist-LightItalic-CpnA7AuN.woff2",
+    "src": "resources/font/Geist-LightItalic.woff2"
+  },
+  "resources/font/Geist-Medium.woff2": {
+    "file": "assets/Geist-Medium-t5LLWK2i.woff2",
+    "src": "resources/font/Geist-Medium.woff2"
+  },
+  "resources/font/Geist-MediumItalic.woff2": {
+    "file": "assets/Geist-MediumItalic-D20OUGW6.woff2",
+    "src": "resources/font/Geist-MediumItalic.woff2"
+  },
+  "resources/font/Geist-Regular.woff2": {
+    "file": "assets/Geist-Regular-C6H5Y334.woff2",
+    "src": "resources/font/Geist-Regular.woff2"
+  },
+  "resources/font/Geist-SemiBold.woff2": {
+    "file": "assets/Geist-SemiBold-C7DNikzb.woff2",
+    "src": "resources/font/Geist-SemiBold.woff2"
+  },
+  "resources/font/Geist-SemiBoldItalic.woff2": {
+    "file": "assets/Geist-SemiBoldItalic-BDU_9tED.woff2",
+    "src": "resources/font/Geist-SemiBoldItalic.woff2"
+  },
+  "resources/font/Geist-Thin.woff2": {
+    "file": "assets/Geist-Thin-BeHGVWDJ.woff2",
+    "src": "resources/font/Geist-Thin.woff2"
+  },
+  "resources/font/Geist-ThinItalic.woff2": {
+    "file": "assets/Geist-ThinItalic-DiKf-btW.woff2",
+    "src": "resources/font/Geist-ThinItalic.woff2"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-KUBWchS-.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "css": [
+      "assets/app-D2S6pCoW.css"
+    ],
+    "assets": [
+      "assets/Geist-Thin-BeHGVWDJ.woff2",
+      "assets/Geist-ThinItalic-DiKf-btW.woff2",
+      "assets/Geist-ExtraLight-C6TSGS2X.woff2",
+      "assets/Geist-ExtraLightItalic-B4TItSvg.woff2",
+      "assets/Geist-Light-C3vZ2nps.woff2",
+      "assets/Geist-LightItalic-CpnA7AuN.woff2",
+      "assets/Geist-Regular-C6H5Y334.woff2",
+      "assets/Geist-Medium-t5LLWK2i.woff2",
+      "assets/Geist-MediumItalic-D20OUGW6.woff2",
+      "assets/Geist-SemiBold-C7DNikzb.woff2",
+      "assets/Geist-SemiBoldItalic-BDU_9tED.woff2",
+      "assets/Geist-Bold-BOY-3Qy9.woff2",
+      "assets/Geist-BoldItalic-C2LhqTrV.woff2",
+      "assets/Geist-ExtraBold-ztj6LZjM.woff2",
+      "assets/Geist-ExtraBoldItalic-B0_SaO0z.woff2",
+      "assets/Geist-Black-DyTs4Xsi.woff2",
+      "assets/Geist-BlackItalic-CPS9l-3s.woff2"
+    ]
+  }
+}
