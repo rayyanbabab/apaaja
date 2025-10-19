@@ -1,9 +1,7 @@
-@extends('admin.layouts.dashboard')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    {{-- Header Section --}}
+    
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Profil Admin</h1>
@@ -15,35 +13,36 @@
         </div>
     </div>
 
-    {{-- Success Message --}}
-    @if(session('success'))
+    
+    <?php if(session('success')): ?>
         <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-            {{ session('success') }}
+            <?php echo e(session('success')); ?>
+
         </div>
-    @endif
+    <?php endif; ?>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {{-- Profile Avatar Section --}}
+        
         <div class="col-span-1">
             <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Foto Profil</h3>
 
                 <div class="flex flex-col items-center space-y-4">
-                    {{-- Gambar Profil --}}
+                    
                     <div class="relative">
-                        <img src="{{ $user->profil ? asset($user->profil) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=EBF4FF&color=7F9CF5&size=96' }}"
-                             alt="{{ $user->name }}"
+                        <img src="<?php echo e($user->profil ? asset($user->profil) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=EBF4FF&color=7F9CF5&size=96'); ?>"
+                             alt="<?php echo e($user->name); ?>"
                              class="h-24 w-24 rounded-full object-cover ring-4 ring-gray-100"
                              id="profilePhoto">
 
-                        {{-- Status --}}
+                        
                         <div class="absolute -bottom-1 -right-1 h-6 w-6 animate-ping rounded-full bg-green-400"></div>
                         <div class="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-green-400 ring-2 ring-white"></div>
                     </div>
 
                     <div class="text-center">
-                        <h4 class="text-lg font-semibold text-gray-900">{{ $user->name }}</h4>
-                        <p class="text-sm text-gray-600">{{ $user->email }}</p>
+                        <h4 class="text-lg font-semibold text-gray-900"><?php echo e($user->name); ?></h4>
+                        <p class="text-sm text-gray-600"><?php echo e($user->email); ?></p>
 
                         <span class="mt-2 inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
                             <svg class="mr-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
@@ -53,10 +52,10 @@
                         </span>
                     </div>
 
-                    {{-- Upload Foto Profil --}}
-                    <form action="{{ route('admin.profile.update-photo') }}" method="POST" enctype="multipart/form-data" id="photoForm" class="w-full text-center">
-                        @csrf
-                        @method('PATCH')
+                    
+                    <form action="<?php echo e(route('admin.profile.update-photo')); ?>" method="POST" enctype="multipart/form-data" id="photoForm" class="w-full text-center">
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PATCH'); ?>
                         <input type="file" name="profil" id="profilInput" accept="image/*" class="hidden" onchange="handlePhotoUpload(this)">
                         <button type="button"
                                 onclick="document.getElementById('profilInput').click()"
@@ -69,13 +68,20 @@
                             </svg>
                             Ganti Foto
                         </button>
-                        @error('profil')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                        <?php $__errorArgs = ['profil'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <p class="mt-1 text-sm text-red-600"><?php echo e($message); ?></p>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </form>
                 </div>
 
-                {{-- Info Akun --}}
+                
                 <div class="mt-6 border-t border-gray-200 pt-4 text-sm space-y-2">
                     <div class="flex justify-between">
                         <span class="text-gray-600">Role</span>
@@ -83,35 +89,42 @@
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Terakhir login</span>
-                        <span class="font-medium text-gray-900">{{ now()->format('d M Y') }}</span>
+                        <span class="font-medium text-gray-900"><?php echo e(now()->format('d M Y')); ?></span>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- Profile Form --}}
+        
         <div class="col-span-2 space-y-6">
 
-            {{-- Update Email --}}
+            
             <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div class="border-b border-gray-200 px-6 py-4">
                     <h3 class="text-lg font-medium text-gray-900">Update Email</h3>
                     <p class="text-sm text-gray-600">Ubah alamat email Anda dengan konfirmasi password</p>
                 </div>
 
-                <form action="{{ route('admin.profile.update-email') }}" method="POST" class="p-6 space-y-6">
-                    @csrf
-                    @method('PATCH')
+                <form action="<?php echo e(route('admin.profile.update-email')); ?>" method="POST" class="p-6 space-y-6">
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('PATCH'); ?>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Baru</label>
-                            <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}"
+                            <input type="email" name="email" id="email" value="<?php echo e(old('email', $user->email)); ?>"
                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
                                    placeholder="Masukkan email baru">
-                            @error('email')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
+                            <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <p class="text-sm text-red-600 mt-1"><?php echo e($message); ?></p>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div>
@@ -119,9 +132,16 @@
                             <input type="password" name="current_password" id="current_password_email"
                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
                                    placeholder="Masukkan password saat ini">
-                            @error('current_password')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
+                            <?php $__errorArgs = ['current_password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <p class="text-sm text-red-600 mt-1"><?php echo e($message); ?></p>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
 
@@ -138,31 +158,38 @@
                 </form>
             </div>
 
-            {{-- Edit Profile --}}
+            
             <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div class="border-b border-gray-200 px-6 py-4">
                     <h3 class="text-lg font-medium text-gray-900">Edit Profil</h3>
                     <p class="text-sm text-gray-600">Ubah nama, bio, dan password</p>
                 </div>
 
-                <form action="{{ route('admin.profile.update') }}" method="POST" class="p-6 space-y-6">
-                    @csrf
-                    @method('PATCH')
+                <form action="<?php echo e(route('admin.profile.update')); ?>" method="POST" class="p-6 space-y-6">
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('PATCH'); ?>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Nama</label>
-                            <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}"
+                            <input type="text" name="name" id="name" value="<?php echo e(old('name', $user->name)); ?>"
                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
                                    placeholder="Masukkan nama Anda">
-                            @error('name')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
+                            <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <p class="text-sm text-red-600 mt-1"><?php echo e($message); ?></p>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div>
                             <label for="bio" class="block text-sm font-medium text-gray-700 mb-2">Bio (opsional)</label>
-                            <input type="text" name="bio" id="bio" value="{{ old('bio', $user->bio) }}"
+                            <input type="text" name="bio" id="bio" value="<?php echo e(old('bio', $user->bio)); ?>"
                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-gray-900 focus:ring-gray-900 sm:text-sm"
                                    placeholder="Tulis sesuatu tentang Anda">
                         </div>
@@ -211,4 +238,6 @@
         }
     }
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layouts.dashboard', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\DILAN\my-project\resources\views/admin/pages/profile.blade.php ENDPATH**/ ?>

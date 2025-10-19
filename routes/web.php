@@ -73,9 +73,9 @@ Route::prefix('admin')->middleware('auth', RoleMiddleware::class.':admin')->name
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('index');
         Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('edit');
-        Route::put('/profile/update', [ProfileController::class, 'update'])->name('update');
-        Route::put('/profile/update-photo', [ProfileController::class, 'updatePhoto'])->name('updatePhoto');
-        Route::delete('/profile/destroy', [ProfileController::class, 'destroy'])->name('destroy');
+        Route::patch('/profile/update', [ProfileController::class, 'update'])->name('update');
+        Route::patch('/profile/update-email', [ProfileController::class, 'updateEmail'])->name('update-email');
+        Route::patch('/profile/update-photo', [ProfileController::class, 'updatePhoto'])->name('update-photo');
     });
 
 

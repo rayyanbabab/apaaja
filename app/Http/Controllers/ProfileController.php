@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
@@ -37,7 +38,26 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return back()->with('success', 'Profile updated successfully.');
+        return back()->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    public function updateEmail(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email', Rule::unique('users')->ignore(auth()->id())],
+            'current_password' => 'required',
+        ]);
+
+        $user = auth()->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Password saat ini tidak benar.']);
+        }
+
+        $user->email = $request->email;
+        $user->save();
+
+        return back()->with('success', 'Email berhasil diperbarui.');
     }
 
     public function updatePhoto(Request $request)
@@ -67,7 +87,7 @@ class ProfileController extends Controller
         $user->profil = 'images/profiles/'.$filename;
         $user->save();
 
-        return back()->with('success', 'Profile photo updated successfully.');
+        return back()->with('success', 'Foto profil berhasil diperbarui.');
     }
 
     private function resizeImage($sourcePath, $destinationPath, $width, $height)

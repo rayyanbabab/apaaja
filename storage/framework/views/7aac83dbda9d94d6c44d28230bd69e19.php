@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
     <link rel="icon" href="/artilia.png">
 
     <!-- Alpine.js -->
@@ -14,10 +14,10 @@
     <script>
         function sidebarData() {
             return {
-                masterDataOpen: {{ Route::is('admin.categories.*', 'admin.suppliers.*') ? 'true' : 'false' }},
-                inventoryOpen: {{ Route::is('admin.inventory.*', 'admin.incoming.*', 'admin.outgoing.*') ? 'true' : 'false' }},
-                borrowingOpen: {{ Route::is('admin.borrowings.*', 'admin.borrowing-requests.*') ? 'true' : 'false' }},
-                usersOpen: {{ Route::is('admin.content.listusers', 'admin.content.createusers') ? 'true' : 'false' }},
+                masterDataOpen: <?php echo e(Route::is('admin.categories.*', 'admin.suppliers.*') ? 'true' : 'false'); ?>,
+                inventoryOpen: <?php echo e(Route::is('admin.inventory.*', 'admin.incoming.*', 'admin.outgoing.*') ? 'true' : 'false'); ?>,
+                borrowingOpen: <?php echo e(Route::is('admin.borrowings.*', 'admin.borrowing-requests.*') ? 'true' : 'false'); ?>,
+                usersOpen: <?php echo e(Route::is('admin.content.listusers', 'admin.content.createusers') ? 'true' : 'false'); ?>,
                 init() {
                     console.log("✅ Sidebar Alpine.js siap dipakai");
                 }
@@ -30,11 +30,11 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
 
-    {{-- PWA --}}
+    
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#0d6efd">
 
-    @stack('styles')
+    <?php echo $__env->yieldPushContent('styles'); ?>
 
     <style>
         /* Scrollbar */
@@ -105,24 +105,43 @@
 <body class="bg-gray-50 min-h-screen">
 
     <!-- Mobile Hamburger Menu (outside sidebar container) -->
-    @include('admin.components.mobile-hamburger')
+    <?php echo $__env->make('admin.components.mobile-hamburger', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
     <!-- Sidebar -->
     <aside class="sidebar-container">
-        @include('admin.components.sidebar-new')
+        <?php echo $__env->make('admin.components.sidebar-new', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
     </aside>
 
     <!-- Header -->
     <header>
-        <x-header />
+        <?php if (isset($component)) { $__componentOriginalfd1f218809a441e923395fcbf03e4272 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalfd1f218809a441e923395fcbf03e4272 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'admin.components.header','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('header'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalfd1f218809a441e923395fcbf03e4272)): ?>
+<?php $attributes = $__attributesOriginalfd1f218809a441e923395fcbf03e4272; ?>
+<?php unset($__attributesOriginalfd1f218809a441e923395fcbf03e4272); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalfd1f218809a441e923395fcbf03e4272)): ?>
+<?php $component = $__componentOriginalfd1f218809a441e923395fcbf03e4272; ?>
+<?php unset($__componentOriginalfd1f218809a441e923395fcbf03e4272); ?>
+<?php endif; ?>
     </header>
 
     <!-- Main Content -->
     <main class="main-content p-4">
-        @yield('content')
+        <?php echo $__env->yieldContent('content'); ?>
     </main>
 
-    @stack('scripts')
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 
     <script>
         if ('serviceWorker' in navigator) {
@@ -133,3 +152,4 @@
     </script>
 </body>
 </html>
+<?php /**PATH C:\Users\DILAN\my-project\resources\views/admin/layouts/dashboard.blade.php ENDPATH**/ ?>
