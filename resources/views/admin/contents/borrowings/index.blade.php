@@ -6,7 +6,7 @@
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Barang Sedang Dipinjam</h1>
+                    <h1 class="text-2xl font-bold text-gray-900">Peminjaman Barang</h1>
                     <p class="text-sm text-gray-600 mt-1">Daftar barang yang sedang dalam status peminjaman aktif</p>
                 </div>
                 <a href="{{ route('admin.borrowings.create') }}" 
@@ -124,7 +124,7 @@
                                     @if($isOverdue)
                                         <div class="text-xs text-red-600 font-medium">Terlambat {{ abs($daysLeft) }} hari</div>
                                     @else
-                                        <div class="text-xs text-green-600">{{ $daysLeft }} hari lagi</div>
+                                   
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">

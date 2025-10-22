@@ -126,7 +126,7 @@
                             <svg class="w-4 h-4 mr-3 {{ Route::is('admin.borrowings.index') ? 'text-blue-600' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                             </svg>
-                            <span>Sedang Dipinjam</span>
+                            <span>Peminjaman Barang</span>
                         </div>
                         @php
                             $activeBorrowingCount = \App\Models\Borrowing::whereIn('status', ['dipinjam', 'terlambat'])->count();
