@@ -122,7 +122,7 @@
                                         $daysLeft = $borrowing->tanggal_kembali_rencana->diffInDays(now(), false);
                                     @endphp
                                     @if($isOverdue)
-                                        <div class="text-xs text-red-600 font-medium">Terlambat {{ abs($daysLeft) }} hari</div>
+                                        <div class="text-xs text-red-600 font-medium">Terlambat </div>
                                     @else
                                    
                                     @endif

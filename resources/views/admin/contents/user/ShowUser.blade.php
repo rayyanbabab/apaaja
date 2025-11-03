@@ -120,19 +120,10 @@
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Email Verified</dt>
-                        <dd class="mt-1 text-sm text-gray-900">
-                            @if($user->email_verified_at)
-                                <span class="text-green-600">Verified on {{ $user->email_verified_at->format('F j, Y') }}</span>
-                            @else
-                                <span class="text-red-600">Not verified</span>
-                            @endif
-                        </dd>
                     </div>
                 </dl>
             </div>
         </div>
-
 
         {{-- Action Buttons --}}
         <div class="flex justify-end space-x-3">

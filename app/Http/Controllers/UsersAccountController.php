@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class UsersAccountController extends Controller
 {
@@ -119,7 +120,7 @@ class UsersAccountController extends Controller
 
             return redirect()->route('admin.content.listusers')->with('success', 'User created successfully');
         } catch (\Exception $e) {
-            \Log::error('User creation failed: '.$e->getMessage());
+            Log::error('User creation failed: '.$e->getMessage());
 
             return redirect()->back()->withErrors(['error' => 'Failed to create user: '.$e->getMessage()])->withInput();
         }
@@ -241,7 +242,7 @@ class UsersAccountController extends Controller
     public function toggleStatus($id)
     {
         $user = User::findOrFail($id);
-        $user->is_active = ! $user->is_active;
+        $user->is_active = !$user->is_active;
         $user->save();
 
         $status = $user->is_active ? 'activated' : 'deactivated';
