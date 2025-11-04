@@ -9,27 +9,38 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
-
     public function login(array $credentials): ?string
     {
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
+        $user = User::where('email', $credentials['email'])->first();
 
-            LoginLog::create([
-                'user_id' => $user->id,
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent(),
-                'logged_in_at' => now(),
-            ]);
-
-            return match ($user->role->value) {
-                'admin' => route('admin.dashboard'),
-                'user' => route('user.dashboard'),
-                default => '/',
-            };
-
+        // Jika user tidak ditemukan atau password salah
+        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+            return null;
         }
 
-        return null;
+        // ❌ Jika user tidak aktif, tolak login
+        if (! $user->is_active) {
+            return 'inactive';
+        }
+
+        // ✅ Login berhasil
+        Auth::login($user);
+
+        LoginLog::create([
+            'user_id' => $user->id,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'logged_in_at' => now(),
+        ]);
+
+        $role = $user->role instanceof \App\Enums\UsersRole
+            ? $user->role->value
+            : $user->role;
+
+        return match ($role) {
+            'admin' => route('admin.dashboard'),
+            'user'  => route('user.dashboard'),
+            default => '/',
+        };
     }
 }

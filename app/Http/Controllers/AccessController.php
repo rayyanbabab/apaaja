@@ -9,7 +9,6 @@ use App\Models\User;
 use App\Models\Supplier;
 use App\Models\Category;
 use App\Models\BorrowingRequest;
-
 use App\Models\LoginLog;
 use App\Services\AuthService;
 use Carbon\Carbon;
@@ -25,17 +24,23 @@ class AccessController extends Controller
         return view('admin.authentication.Authentication');
     }
 
-
     public function login(LoginRequest $request, AuthService $authService)
-    {
-        $redirect = $authService->login($request->validated());
+{
+    $redirect = $authService->login($request->validated());
 
-        if ($redirect) {
-            return Inertia::location($redirect);
-        }
-
-        return back()->withErrors(['email' => 'Email atau password salah.'])->withInput();
+    if ($redirect === 'inactive') {
+        return back()->withErrors([
+            'email' => 'Akun Anda tidak aktif. Silakan hubungi administrator.',
+        ])->withInput();
     }
+
+    if ($redirect) {
+        return Inertia::location($redirect);
+    }
+
+    return back()->withErrors(['email' => 'Email atau password salah.'])->withInput();
+}
+
 
     public function logout(Request $request)
     {
@@ -57,7 +62,7 @@ class AccessController extends Controller
         $updatedItem = session('updatedItem');
 
         $totalValue = Item::all()->sum(function ($item) {
-            return $item->stok_total * $item->harga;
+            return ($item->stok_total ?? 0) * ($item->harga ?? 0);
         });
 
         $jumlahJenisBarang = Item::count();
@@ -91,15 +96,18 @@ class AccessController extends Controller
             ->take(5)
             ->get()
             ->map(function ($transaksi) {
+                // safe access to related item (in case item was deleted)
+                $item = $transaksi->item;
                 return (object) [
                     'created_at' => $transaksi->created_at,
                     'tipe' => $transaksi->tipe,
-                    'nama' => $transaksi->item->nama,
+                    'nama' => $item ? $item->nama : '-',
                     'jumlah' => $transaksi->jumlah,
-                    'stok_sekarang' => $transaksi->item->stok_total,
+                    'stok_sekarang' => $item ? ($item->stok_total ?? 0) : 0,
                 ];
             });
 
+        // Last 7 days summary
         $sevenDays = collect();
         $startDate = now()->subDays(6);
 
@@ -128,10 +136,10 @@ class AccessController extends Controller
         $chartDates = [];
 
         if ($range === 'weekly') {
-            $start = now()->startOfWeek(); // Senin
+            $start = now()->startOfWeek(); // Monday
             for ($i = 0; $i < 7; $i++) {
                 $date = $start->copy()->addDays($i)->format('Y-m-d');
-                $chartDates[] = $start->copy()->addDays($i)->format('D'); // Sen, Sel, Rab...
+                $chartDates[] = $start->copy()->addDays($i)->format('D'); // Mon, Tue...
 
                 $chartMasuk[] = Inventory::where('tipe', 'masuk')->whereDate('created_at', $date)->sum('jumlah');
                 $chartKeluar[] = Inventory::where('tipe', 'keluar')->whereDate('created_at', $date)->sum('jumlah');
@@ -153,8 +161,15 @@ class AccessController extends Controller
                 $monthLabel = Carbon::create()->month($month)->format('M');
                 $chartDates[] = $monthLabel;
 
-                $chartMasuk[] = Inventory::where('tipe', 'masuk')->whereMonth('created_at', $month)->whereYear('created_at', now()->year)->sum('jumlah');
-                $chartKeluar[] = Inventory::where('tipe', 'keluar')->whereMonth('created_at', $month)->whereYear('created_at', now()->year)->sum('jumlah');
+                $chartMasuk[] = Inventory::where('tipe', 'masuk')
+                    ->whereMonth('created_at', $month)
+                    ->whereYear('created_at', now()->year)
+                    ->sum('jumlah');
+
+                $chartKeluar[] = Inventory::where('tipe', 'keluar')
+                    ->whereMonth('created_at', $month)
+                    ->whereYear('created_at', now()->year)
+                    ->sum('jumlah');
             }
         }
 
@@ -214,34 +229,37 @@ class AccessController extends Controller
         $user = auth()->user();
 
         // Borrowing Statistics
+        // total_borrowed => all approved + completed (total that has been borrowed historically)
+        $totalBorrowed = \App\Models\BorrowingRequest::where('user_id', $user->id)
+            ->whereIn('status', ['approved', 'completed'])
+            ->sum('jumlah');
+
+        // unreturned_items => approved but not yet completed (still with user)
+        $unreturnedItems = \App\Models\BorrowingRequest::where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->sum('jumlah');
+
+        $pendingRequestsCount = \App\Models\BorrowingRequest::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->count();
+
+        $totalRequests = \App\Models\BorrowingRequest::where('user_id', $user->id)->count();
+
+        $rejectedRequests = \App\Models\BorrowingRequest::where('user_id', $user->id)
+            ->where('status', 'rejected')
+            ->count();
+
+        $availableItems = \App\Models\Item::where('type', 'peminjaman')
+            ->where('stok_peminjaman', '>', 0)
+            ->count();
+
         $borrowingStats = [
-            // Total items borrowed (approved requests)
-            'total_borrowed' => \App\Models\BorrowingRequest::where('user_id', $user->id)
-                ->where('status', 'approved')
-                ->sum('jumlah'),
-
-            // Items not returned yet (approved but not completed)
-            'unreturned_items' => \App\Models\BorrowingRequest::where('user_id', $user->id)
-                ->where('status', 'approved')
-                ->sum('jumlah'),
-
-            // Pending requests waiting for approval
-            'pending_requests' => \App\Models\BorrowingRequest::where('user_id', $user->id)
-                ->where('status', 'pending')
-                ->count(),
-
-            // Total requests made
-            'total_requests' => \App\Models\BorrowingRequest::where('user_id', $user->id)->count(),
-
-            // Rejected requests
-            'rejected_requests' => \App\Models\BorrowingRequest::where('user_id', $user->id)
-                ->where('status', 'rejected')
-                ->count(),
-
-            // Available items for borrowing
-            'available_items' => \App\Models\Item::where('type', 'peminjaman')
-                ->where('stok_peminjaman', '>', 0)
-                ->count(),
+            'total_borrowed' => $totalBorrowed,
+            'unreturned_items' => $unreturnedItems,
+            'pending_requests' => $pendingRequestsCount,
+            'total_requests' => $totalRequests,
+            'rejected_requests' => $rejectedRequests,
+            'available_items' => $availableItems,
         ];
 
         // Recent borrowing activities (last 5)
@@ -258,12 +276,14 @@ class AccessController extends Controller
                     'completed' => 'Selesai',
                 ];
 
+                $userPhoto = $user->profil ? asset($user->profil) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&color=7F9CF5&background=EBF4FF&size=40';
+
                 return [
-                    'action' => "Meminjam {$request->item->nama} ({$request->jumlah} unit)",
+                    'action' => "Meminjam " . ($request->item?->nama ?? 'Item tidak ditemukan') . " ({$request->jumlah} unit)",
                     'status' => $statusText[$request->status] ?? $request->status,
                     'timestamp' => $request->created_at->setTimezone('Asia/Jakarta')->format('d M Y H:i'),
                     'status_class' => $this->getStatusClass($request->status),
-                    'user_photo' => $user->profil ? asset($user->profil) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&color=7F9CF5&background=EBF4FF&size=40',
+                    'user_photo' => $userPhoto,
                     'user_name' => $user->name,
                 ];
             });

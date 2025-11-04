@@ -138,7 +138,7 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-900">Riwayat Peminjaman</p>
+                    <p class="text-sm font-medium text-gray-900">Status Peminjaman</p>
                     <p class="text-xs text-gray-600">Lihat status peminjaman Anda</p>
                 </div>
             </a>
