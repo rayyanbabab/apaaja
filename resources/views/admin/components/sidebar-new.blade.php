@@ -1,8 +1,5 @@
-{{-- Desktop Sidebar --}}
 <div class="desktop-sidebar hidden md:flex md:flex-shrink-0 md:w-64" x-data="sidebarData()" x-init="init()">
     <div class="sidebar-container w-64 bg-white fixed top-0 left-0 z-40 shadow-xl border-r border-gray-200 flex flex-col h-full">
-        
-        {{-- Header --}}
         <div class="flex items-center h-16 px-6 border-b border-gray-200 bg-white flex-shrink-0">
             <div class="flex items-center space-x-3">
                 <img src="/inc.png" alt="CHEMI-CON Logo" class="h-12 w-auto">
@@ -11,11 +8,8 @@
                 </div>
             </div>
         </div>
-
-        {{-- Scrollable Navigation --}}
         <nav class="sidebar-navigation px-4 py-6 space-y-1 flex-1 overflow-y-auto">
 
-            {{-- Dashboard --}}
             <a href="{{ route('admin.dashboard') }}"
                class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ Route::is('admin.dashboard') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                 <svg class="w-5 h-5 mr-3 {{ Route::is('admin.dashboard') ? 'text-blue-600' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -24,7 +18,6 @@
                 Dashboard
             </a>
 
-            {{-- Master Data --}}
             <div class="pt-4">
                 <button @click="masterDataOpen = !masterDataOpen" 
                         class="flex items-center justify-between w-full px-4 py-2 text-sm font-semibold text-gray-500 transition-colors"
@@ -59,7 +52,6 @@
                 </div>
             </div>
 
-            {{-- Inventory Management --}}
             <div class="pt-4">
                 <button @click="inventoryOpen = !inventoryOpen" 
                         class="flex items-center justify-between w-full px-4 py-2 text-sm font-semibold text-gray-500 transition-colors"
@@ -101,7 +93,6 @@
                 </div>
             </div>
 
-            {{-- Borrowing Management --}}
             <div class="pt-4">
                 <button @click="borrowingOpen = !borrowingOpen" 
                         class="flex items-center justify-between w-full px-4 py-2 text-sm font-semibold text-gray-500 transition-colors"
@@ -165,7 +156,6 @@
                 </div>
             </div>
 
-            {{-- User Management --}}
             <div class="pt-4">
                 <button @click="usersOpen = !usersOpen" 
                         class="flex items-center justify-between w-full px-4 py-2 text-sm font-semibold text-gray-500 transition-colors"
@@ -200,7 +190,6 @@
                 </div>
             </div>
 
-            {{-- Reports --}}
             <div class="pt-4">
                 <a href="{{ route('admin.reports.index') }}"
                    class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ Route::is('admin.reports.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
@@ -211,7 +200,6 @@
                 </a>
             </div>
 
-            {{-- Recent Activities --}}
             <div class="pt-4">
                 <a href="{{ route('admin.activities.index') }}"
                    class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ Route::is('admin.activities.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
@@ -222,7 +210,6 @@
                 </a>
             </div>
 
-            {{-- Account --}}
             <div class="pt-4">
                 <a href="{{ route('admin.profile.index') }}"
                    class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ Route::is('admin.profile.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
@@ -234,7 +221,6 @@
             </div>
         </nav>
 
-        {{-- Footer with Sign Out --}}
         <div class="flex-shrink-0 p-4 border-t border-gray-200 bg-gray-50">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf

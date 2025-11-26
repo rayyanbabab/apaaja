@@ -42,11 +42,35 @@
                 </button>
                 <div x-show="borrowingOpen" x-collapse class="mt-1 ml-4 space-y-1">
                     <a href="{{ route('user.borrowing.index') }}"
-                       class="flex items-center px-3 py-2 text-sm rounded-lg {{ Route::is('user.borrowing.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                        <svg class="w-4 h-4 mr-2 {{ Route::is('user.borrowing.*') ? 'text-blue-600' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                       class="flex items-center px-3 py-2 text-sm rounded-lg {{ Route::is('user.borrowing.index') || Route::is('user.borrowing.create') || Route::is('user.borrowing.show-item') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <svg class="w-4 h-4 mr-2 {{ Route::is('user.borrowing.index') || Route::is('user.borrowing.create') || Route::is('user.borrowing.show-item') ? 'text-blue-600' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                         </svg>
                         Peminjaman Barang
+                    </a>
+                    
+                    <a href="{{ route('user.borrowing.cart') }}"
+                       class="flex items-center justify-between px-3 py-2 text-sm rounded-lg {{ Route::is('user.borrowing.cart') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 {{ Route::is('user.borrowing.cart') ? 'text-blue-600' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            Keranjang
+                        </div>
+                        @php
+                            $cartCount = \App\Models\BorrowingCart::where('user_id', auth()->id())->count();
+                        @endphp
+                        @if($cartCount > 0)
+                        <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">{{ $cartCount }}</span>
+                        @endif
+                    </a>
+                    
+                    <a href="{{ route('user.borrowing.my-requests') }}"
+                       class="flex items-center px-3 py-2 text-sm rounded-lg {{ Route::is('user.borrowing.my-requests') || Route::is('user.borrowing.show') ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <svg class="w-4 h-4 mr-2 {{ Route::is('user.borrowing.my-requests') || Route::is('user.borrowing.show') ? 'text-blue-600' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                        </svg>
+                        Status Peminjaman
                     </a>
                 </div>
             </div>

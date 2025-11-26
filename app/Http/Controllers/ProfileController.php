@@ -67,13 +67,9 @@ class ProfileController extends Controller
         ]);
 
         $user = auth()->user();
-
-        // Hapus foto lama jika ada
         if ($user->profil && file_exists(public_path($user->profil))) {
             unlink(public_path($user->profil));
         }
-
-        // Simpan foto baru
         $file = $request->file('profil');
         $filename = time().'_'.uniqid().'.jpg';
 

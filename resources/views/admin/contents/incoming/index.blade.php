@@ -1,8 +1,6 @@
 @extends('admin.layouts.dashboard')
-
 @section('content')
 <div class="space-y-6">
-    {{-- Header --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
@@ -20,7 +18,6 @@
             </div>
         </div>
 
-        {{-- Statistics --}}
         <div class="px-6 py-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -90,7 +87,6 @@
         </div>
     </div>
 
-    {{-- Flash Messages --}}
     @if (session('success'))
         <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-4">
             <div class="flex">
@@ -132,7 +128,6 @@
         </div>
     @endif
 
-    {{-- Filters --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4">
             <form method="GET" action="{{ route('admin.incoming.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -194,7 +189,6 @@
         </div>
     </div>
 
-    {{-- Table --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         @if($incomingItems->count() > 0)
             <div class="px-6 py-4 border-b border-gray-200">

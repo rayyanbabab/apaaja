@@ -89,8 +89,6 @@ Route::prefix('admin')->middleware('auth', RoleMiddleware::class.':admin')->name
     // Activities Routes
     Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::get('/activities/export', [ActivityController::class, 'export'])->name('activities.export');
-    Route::get('/settings', [CompanyController::class, 'index'])->name('Settings');
-    Route::put('/settings/company', [CompanyController::class, 'update'])->name('company.update');
 
     // Categories Management
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
@@ -167,6 +165,14 @@ Route::prefix('user')->middleware('auth', RoleMiddleware::class.':user')->name('
         Route::post('/store', [UserBorrowingController::class, 'store'])->name('store');
         Route::get('/show/{id}', [UserBorrowingController::class, 'show'])->name('show');
         Route::get('/item/{id}', [UserBorrowingController::class, 'showItem'])->name('show-item');
+        
+        // Cart routes
+        Route::get('/cart', [\App\Http\Controllers\BorrowingCartController::class, 'index'])->name('cart');
+        Route::post('/cart/add', [\App\Http\Controllers\BorrowingCartController::class, 'add'])->name('cart.add');
+        Route::patch('/cart/{id}', [\App\Http\Controllers\BorrowingCartController::class, 'update'])->name('cart.update');
+        Route::delete('/cart/{id}', [\App\Http\Controllers\BorrowingCartController::class, 'remove'])->name('cart.remove');
+        Route::delete('/cart', [\App\Http\Controllers\BorrowingCartController::class, 'clear'])->name('cart.clear');
+        Route::post('/cart/checkout', [\App\Http\Controllers\BorrowingCartController::class, 'checkout'])->name('cart.checkout');
     });
 
     Route::prefix('profile')->name('profile.')->group(function () {

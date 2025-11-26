@@ -15,26 +15,19 @@ class IncomingItemsController extends Controller
             ->where('tipe', 'masuk')
             ->whereHas('item') // Only show inventories where item still exists
             ->latest();
-
-        // Search functionality
         if ($request->filled('search')) {
             $search = $request->search;
             $query->whereHas('item', function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%");
             });
         }
-
-        // Filter by date range
         if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
         if ($request->filled('date_to')) {
             $query->whereDate('created_at', '<=', $request->date_to);
         }
-
         $incomingItems = $query->paginate(15);
-
-        // Get statistics
         $stats = [
             'total_items' => Inventory::where('tipe', 'masuk')->whereHas('item')->count(),
             'total_quantity' => Inventory::where('tipe', 'masuk')->whereHas('item')->sum('jumlah'),
@@ -47,7 +40,6 @@ class IncomingItemsController extends Controller
 
     public function create()
     {
-        // Get all items (both stok and peminjaman)
         $items = Item::with(['supplier:id,nama', 'category:id,name'])
         ->select('id', 'nama', 'stok_total', 'stok_reguler', 'stok_peminjaman', 'supplier_id', 'category_id', 'type', 'harga')
         ->orderBy('nama')    
@@ -66,9 +58,6 @@ class IncomingItemsController extends Controller
             );
             return $item;
         });
-    
-            
-        // Pre-select item if coming from inventory page
         $selectedItemId = request()->query('item_id');
 
         return view('admin.contents.incoming.create', [
@@ -88,7 +77,7 @@ class IncomingItemsController extends Controller
                 'required',
                 'integer',
                 'min:1',
-                'max:10000' // Prevent unreasonably large numbers
+                'max:10000'
             ],
             'keterangan' => 'nullable|string|max:500',
         ]);
@@ -98,16 +87,12 @@ class IncomingItemsController extends Controller
             \Log::info('Transaction started');
 
             foreach ($validated['items'] as $itemData) {
-                // Lock the item row for update to prevent race conditions
                 $item = Item::lockForUpdate()->findOrFail($itemData['item_id']);
                 \Log::info('Item retrieved', ['item' => $item->toArray()]);
-
-                // Determine stock type based on item type
                 $itemType = $item->type->value;
                 $jumlah = (int)$itemData['quantity'];
                 
                 if ($itemType === 'stok') {
-                    // For regular stock items
                     $oldStokReguler = (int)$item->stok_reguler;
                     $oldStokTotal = (int)$item->stok_total;
                     $newStokReguler = $oldStokReguler + $jumlah;
@@ -123,8 +108,6 @@ class IncomingItemsController extends Controller
                         'new_stok_reguler' => $newStokReguler,
                         'new_stok_total' => $newStokTotal
                     ]);
-                    
-                    // Update regular stock
                     $updateResult = DB::table('items')
                         ->where('id', $item->id)
                         ->update([
@@ -134,7 +117,6 @@ class IncomingItemsController extends Controller
                         ]);
                         
                 } elseif ($itemType === 'peminjaman') {
-                    // For borrowing items
                     $oldStokPeminjaman = (int)$item->stok_peminjaman;
                     $oldStokTotal = (int)$item->stok_total;
                     $newStokPeminjaman = $oldStokPeminjaman + $jumlah;
@@ -150,8 +132,6 @@ class IncomingItemsController extends Controller
                         'new_stok_peminjaman' => $newStokPeminjaman,
                         'new_stok_total' => $newStokTotal
                     ]);
-                    
-                    // Update borrowing stock
                     $updateResult = DB::table('items')
                         ->where('id', $item->id)
                         ->update([
@@ -163,8 +143,6 @@ class IncomingItemsController extends Controller
                     \Log::error('Invalid item type', ['item_type' => $itemType]);
                     return back()->with('error', 'Tipe item tidak valid.');
                 }
-                
-                // Create incoming inventory record for each item
                 $inventoryData = [
                     'item_id' => $item->id,
                     'user_id' => auth()->id(),
@@ -178,8 +156,6 @@ class IncomingItemsController extends Controller
                 
                 $inventory = Inventory::create($inventoryData);
                 \Log::info('Inventory record created', ['inventory' => $inventory->toArray()]);
-                
-                // Refresh the item model to get updated values
                 $item = $item->fresh();
                 
                 \Log::info('Item stock update result', [
@@ -224,8 +200,6 @@ class IncomingItemsController extends Controller
     public function edit($id)
     {
         $incomingItem = Inventory::where('tipe', 'masuk')->findOrFail($id);
-        
-        // Get all items (both stok and peminjaman) with proper relationships
         $items = Item::with(['supplier:id,nama,company_name', 'category:id,name'])
             ->select('id', 'nama', 'stok_total', 'stok_reguler', 'stok_peminjaman', 'supplier_id', 'category_id', 'type', 'harga', 'keterangan')
             ->orderBy('nama')
@@ -249,38 +223,26 @@ class IncomingItemsController extends Controller
 
             $oldItem = Item::lockForUpdate()->findOrFail($incomingItem->item_id);
             $newItem = Item::lockForUpdate()->findOrFail($validated['item_id']);
-
-            // Only allow updating stock items
             if ($newItem->type->value !== 'stok') {
                 return back()->with('error', 'Hanya barang bertipe stok yang dapat diperbarui melalui menu ini.');
             }
-
-            // If changing items, restore old item's stock
             if ($oldItem->id != $newItem->id) {
                 $oldItem->reduceStok($incomingItem->jumlah, 'reguler');
             }
-
-            // Calculate stock difference if quantity changed
             $quantityDiff = $validated['jumlah'] - $incomingItem->jumlah;
-            
-            // Update the incoming record
             $incomingItem->update([
                 'item_id' => $validated['item_id'],
                 'jumlah' => $validated['jumlah'],
                 'keterangan' => $validated['keterangan'] ?? $incomingItem->keterangan,
                 'updated_at' => now(),
             ]);
-
-            // Update the new item's stock
             if ($oldItem->id == $newItem->id) {
-                // Same item, adjust stock based on quantity difference
                 if ($quantityDiff > 0) {
                     $newItem->addStok($quantityDiff, 'reguler');
                 } elseif ($quantityDiff < 0) {
                     $newItem->reduceStok(abs($quantityDiff), 'reguler');
                 }
             } else {
-                // Different item, add full new quantity
                 $newItem->addStok($validated['jumlah'], 'reguler');
             }
 
@@ -304,22 +266,14 @@ class IncomingItemsController extends Controller
             DB::beginTransaction();
 
             $item = Item::lockForUpdate()->findOrFail($incomingItem->item_id);
-            
-            // Determine stock type based on item type
             $itemType = $item->type->value;
             $stockType = $itemType === 'stok' ? 'reguler' : 'peminjaman';
             $currentStock = $itemType === 'stok' ? $item->stok_reguler : $item->stok_peminjaman;
-            
-            // Only allow deletion if there's enough stock
             if ($currentStock < $incomingItem->jumlah) {
                 $stockTypeName = $itemType === 'stok' ? 'reguler' : 'peminjaman';
                 return back()->with('error', "Tidak dapat menghapus stok masuk untuk {$item->nama} - Stok {$stockTypeName} tidak mencukupi (tersedia: {$currentStock}, diperlukan: {$incomingItem->jumlah})");
             }
-
-            // Reduce stock using the model's method
             $item->reduceStok($incomingItem->jumlah, $stockType);
-            
-            // Delete the record
             $incomingItem->delete();
 
             DB::commit();
@@ -355,23 +309,15 @@ class IncomingItemsController extends Controller
             foreach ($incomingItems as $incomingItem) {
                 try {
                     $item = Item::lockForUpdate()->findOrFail($incomingItem->item_id);
-                    
-                    // Determine stock type based on item type
                     $itemType = $item->type->value;
                     $stockType = $itemType === 'stok' ? 'reguler' : 'peminjaman';
                     $currentStock = $itemType === 'stok' ? $item->stok_reguler : $item->stok_peminjaman;
-                    
-                    // Only allow deletion if there's enough stock
                     if ($currentStock < $incomingItem->jumlah) {
                         $stockTypeName = $itemType === 'stok' ? 'reguler' : 'peminjaman';
                         $errors[] = "Tidak dapat menghapus stok masuk untuk {$item->nama} - Stok {$stockTypeName} tidak mencukupi";
                         continue;
                     }
-
-                    // Reduce stock using the model's method
                     $item->reduceStok($incomingItem->jumlah, $stockType);
-                    
-                    // Delete the record
                     $incomingItem->delete();
                     $deletedCount++;
 

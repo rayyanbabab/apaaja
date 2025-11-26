@@ -21,14 +21,11 @@ class StoreItemRequest extends FormRequest
             'images' => 'nullable|array|max:10',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
         ];
-
-        // If type is 'stok', require category, supplier and price
         if ($this->input('type') === 'stok') {
             $rules['category_id'] = 'required|exists:categories,id';
             $rules['supplier_id'] = 'required|exists:suppliers,id';
             $rules['harga'] = 'required|numeric|min:0|max:999999999';
         } else {
-            // If type is 'peminjaman', make category, supplier and price optional
             $rules['category_id'] = 'nullable|exists:categories,id';
             $rules['supplier_id'] = 'nullable|exists:suppliers,id';
             $rules['harga'] = 'nullable|numeric|min:0|max:999999999';

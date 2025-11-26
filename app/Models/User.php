@@ -46,11 +46,13 @@ class User extends Authenticatable
         'is_active' => true,
     ];
 
-    /**
-     * Get the inventories for the user.
-     */
     public function inventories()
     {
         return $this->hasMany(Inventory::class);
+    }
+
+    public function borrowingRequests()
+    {
+        return $this->hasMany(BorrowingRequest::class);
     }
 }

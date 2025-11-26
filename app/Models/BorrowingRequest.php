@@ -11,6 +11,7 @@ class BorrowingRequest extends Model
 
     protected $fillable = [
         'user_id',
+        'batch_id',
         'item_id',
         'jumlah',
         'tanggal_pinjam',
@@ -59,5 +60,16 @@ class BorrowingRequest extends Model
     public function scopeRejected($query)
     {
         return $query->where('status', 'rejected');
+    }
+
+    public function scopeBatch($query, $batchId)
+    {
+        return $query->where('batch_id', $batchId);
+    }
+
+    public function batchRequests()
+    {
+        return $this->hasMany(BorrowingRequest::class, 'batch_id', 'batch_id')
+            ->where('id', '!=', $this->id);
     }
 }

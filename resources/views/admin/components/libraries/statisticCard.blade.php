@@ -1,5 +1,4 @@
 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
-    {{-- Total Items In --}}
     <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
         <div class="p-6">
             <div class="flex items-center">
@@ -59,7 +58,6 @@
         </div>
     </div>
 
-    {{-- Total Items Out --}}
     <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
         <div class="p-6">
             <div class="flex items-center">
@@ -88,7 +86,6 @@
         </div>
     </div>
 
-    {{-- Total Stock Value --}}
     <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
         <div class="p-6">
             <div class="flex items-center">
@@ -115,7 +112,6 @@
         </div>
     </div>
 
-    {{-- Users Count --}}
     <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
         <div class="p-6">
             <div class="flex items-center">
@@ -132,7 +128,6 @@
         </div>
     </div>
 
-    {{-- Suppliers Count --}}
     <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
         <div class="p-6">
             <div class="flex items-center">
@@ -149,7 +144,6 @@
         </div>
     </div>
 
-    {{-- Categories Count --}}
     <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
         <div class="p-6">
             <div class="flex items-center">
@@ -166,7 +160,6 @@
         </div>
     </div>
 
-    {{-- Borrowable Items Count --}}
     <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
         <div class="p-6">
             <div class="flex items-center">

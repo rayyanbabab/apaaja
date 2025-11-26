@@ -9,7 +9,6 @@
 <body class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
 
     <div class="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <!-- Header -->
         <div class="text-center mb-8">
             <div class="mb-6">
                 <img src="/inc.png" alt="CHEMI-CON Logo" class="h-30 mx-auto">
@@ -17,19 +16,13 @@
             <h1 class="text-2xl font-semibold text-gray-900">Sign In</h1>
             <p class="text-gray-600 mt-2">Welcome back to Inventory</p>
         </div>
-
-        <!-- Error Messages -->
         @if ($errors->any())
             <div class="mb-6 p-3 bg-red-50 border border-red-200 rounded-md">
                 <p class="text-sm text-red-600">{{ $errors->first() }}</p>
             </div>
         @endif
-
-        <!-- Login Form -->
         <form method="POST" action="{{ route('login') }}" class="space-y-4">
             @csrf
-            
-            <!-- Email Field -->
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
                     Email
@@ -45,8 +38,6 @@
                     autocomplete="email"
                 >
             </div>
-
-            <!-- Password Field -->
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
                     Password
@@ -73,8 +64,6 @@
                     </button>
                 </div>
             </div>
-
-            <!-- Remember Me -->
             <div class="flex items-center">
                 <input 
                     type="checkbox" 
@@ -86,8 +75,6 @@
                     Remember me
                 </label>
             </div>
-
-            <!-- Submit Button -->
             <button 
                 type="submit"
                 class="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
@@ -98,7 +85,6 @@
     </div>
 
     <script>
-        // Toggle password visibility
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
             const eyeIcon = document.getElementById(inputId + '_eye');

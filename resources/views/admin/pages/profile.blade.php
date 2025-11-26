@@ -3,7 +3,6 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    {{-- Header Section --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Profil Admin</h1>
@@ -15,7 +14,6 @@
         </div>
     </div>
 
-    {{-- Success Message --}}
     @if(session('success'))
         <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
             {{ session('success') }}
@@ -23,20 +21,17 @@
     @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {{-- Profile Avatar Section --}}
         <div class="col-span-1">
             <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Foto Profil</h3>
 
                 <div class="flex flex-col items-center space-y-4">
-                    {{-- Gambar Profil --}}
                     <div class="relative">
                         <img src="{{ $user->profil ? asset($user->profil) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=EBF4FF&color=7F9CF5&size=96' }}"
                              alt="{{ $user->name }}"
                              class="h-24 w-24 rounded-full object-cover ring-4 ring-gray-100"
                              id="profilePhoto">
 
-                        {{-- Status --}}
                         <div class="absolute -bottom-1 -right-1 h-6 w-6 animate-ping rounded-full bg-green-400"></div>
                         <div class="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-green-400 ring-2 ring-white"></div>
                     </div>
@@ -53,7 +48,6 @@
                         </span>
                     </div>
 
-                    {{-- Upload Foto Profil --}}
                     <form action="{{ route('admin.profile.update-photo') }}" method="POST" enctype="multipart/form-data" id="photoForm" class="w-full text-center">
                         @csrf
                         @method('PATCH')
@@ -75,7 +69,6 @@
                     </form>
                 </div>
 
-                {{-- Info Akun --}}
                 <div class="mt-6 border-t border-gray-200 pt-4 text-sm space-y-2">
                     <div class="flex justify-between">
                         <span class="text-gray-600">Role</span>
@@ -89,10 +82,8 @@
             </div>
         </div>
 
-        {{-- Profile Form --}}
         <div class="col-span-2 space-y-6">
 
-            {{-- Update Email --}}
             <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div class="border-b border-gray-200 px-6 py-4">
                     <h3 class="text-lg font-medium text-gray-900">Update Email</h3>
@@ -137,8 +128,7 @@
                     </div>
                 </form>
             </div>
-
-            {{-- Edit Profile --}}
+            
             <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div class="border-b border-gray-200 px-6 py-4">
                     <h3 class="text-lg font-medium text-gray-900">Edit Profil</h3>

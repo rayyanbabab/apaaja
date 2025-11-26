@@ -1,5 +1,4 @@
         <header class="fixed top-0 left-10 right-0 z-50 flex h-16 items-center justify-between border-b border-gray-300 bg-white/95 backdrop-blur-sm px-4 shadow-sm ml-0 md:ml-64">
-            <!-- Left Side: User Profile -->
             <div class="flex items-center space-x-3">
                 <div class="h-12 w-12">
                     <img src="{{ Auth::user()->profil ? asset(Auth::user()->profil) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&color=7F9CF5&background=EBF4FF&size=48' }}"
@@ -31,9 +30,6 @@
                     <p class="max-w-[200px] truncate text-sm text-slate-500">{{ Auth::user()->email }}</p>
                 </div>
             </div>
-
-            <!-- Right Side: Empty for now -->
             <div class="flex items-center space-x-4">
-                <!-- Future navigation items can be added here -->
             </div>
         </header>

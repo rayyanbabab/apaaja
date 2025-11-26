@@ -1,8 +1,6 @@
 @extends('admin.layouts.dashboard')
-
 @section('content')
 <div class="space-y-6">
-    <!-- ===== PAGE HEADER ===== -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div class="mb-4 sm:mb-0">
@@ -26,9 +24,7 @@
         </div>
     </div>
 
-    <!-- ===== STATISTICS CARDS ===== -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Total Categories -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -44,8 +40,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Total Items -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -62,7 +56,6 @@
             </div>
         </div>
 
-        <!-- Average per Category -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
@@ -82,9 +75,7 @@
         </div>
     </div>
 
-    <!-- ===== MAIN CONTENT CARD ===== -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-        <!-- Card Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                 <div class="mb-4 sm:mb-0">
@@ -118,7 +109,6 @@
             </div>
         </div>
 
-        <!-- Alert Messages -->
                     @if(session('success'))
             <div class="mx-6 mt-4 bg-green-50 border border-green-200 rounded-md p-4">
                 <div class="flex">
@@ -153,7 +143,6 @@
                         </div>
                     @endif
 
-        <!-- Data Table -->
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200" id="categoriesTable">
                 <thead class="bg-gray-50">
@@ -205,7 +194,6 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($categories as $category)
                     <tr class="hover:bg-gray-50">
-                        <!-- Category Name -->
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10">
@@ -222,7 +210,6 @@
                                         </div>
                                     </td>
 
-                        <!-- Description -->
                         <td class="px-6 py-4">
                             <div class="text-sm text-gray-900">
                                         @if($category->description)
@@ -233,7 +220,6 @@
                             </div>
                         </td>
 
-                        <!-- Items Count -->
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -242,8 +228,6 @@
                                 {{ $category->items->count() }}
                             </span>
                                     </td>
-
-                        <!-- Status -->
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                                         @if($category->status == 'active')
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -261,8 +245,6 @@
                                             </span>
                                         @endif
                                     </td>
-
-                        <!-- Actions -->
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                             <div class="flex items-center justify-center space-x-2">
                                             <a href="{{ route('admin.categories.show', $category) }}" 
@@ -298,7 +280,6 @@
                                     </td>
                                 </tr>
                                 @empty
-                    <!-- Empty State -->
                     <tr>
                         <td colspan="5" class="px-6 py-12 text-center">
                             <div class="text-center">
@@ -325,7 +306,6 @@
         </div>
                     </div>
 
-    <!-- ===== PAGINATION ===== -->
                     @if($categories->hasPages())
         <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-lg shadow-sm border border-gray-200">
             <div class="flex-1 flex justify-between sm:hidden">
@@ -338,7 +318,6 @@
     @endif
 </div>
 
-<!-- ===== STYLES ===== -->
 <style>
     .delete-category-button {
         display: inline-flex !important;
@@ -410,11 +389,8 @@
         background-color: #1e40af !important;
     }
 </style>
-
-<!-- ===== SCRIPTS ===== -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Search functionality
     const searchInput = document.getElementById('searchInput');
     const table = document.getElementById('categoriesTable');
     const rows = table.querySelectorAll('tbody tr');

@@ -5,21 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ItemImage extends Model
+class BorrowingCart extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'item_id',
-        'image_path',
-        'sort_order',
-        'is_primary'
+        'jumlah',
     ];
 
     protected $casts = [
-        'is_primary' => 'boolean',
+        'jumlah' => 'integer',
     ];
-    
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function item()
     {
         return $this->belongsTo(Item::class);

@@ -121,6 +121,24 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <p class="font-medium mb-1">Terjadi kesalahan:</p>
+                            <ul class="list-disc list-inside space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             @if($requests->count() > 0)
                 <div class="overflow-x-auto rounded-lg">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -193,13 +211,27 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($requests as $request)
+                            @foreach($requests as $requestGroup)
+                                @php
+                                    $request = $requestGroup['main_request'];
+                                    $isBatch = $requestGroup['is_batch'] ?? false;
+                                    $batchItems = $requestGroup['items'] ?? collect();
+                                @endphp
+                                
                                 <tr class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 {{ $request->status === 'pending' ? 'bg-yellow-50 border-l-4 border-yellow-400' : '' }}">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
-                                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                                <span class="text-xs font-bold text-blue-600">#{{ $request->id }}</span>
-                                            </div>
+                                            @if($isBatch)
+                                                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                                                    <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                                    </svg>
+                                                </div>
+                                            @else
+                                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                                    <span class="text-xs font-bold text-blue-600">#{{ $request->id }}</span>
+                                                </div>
+                                            @endif
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -213,23 +245,49 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-green-600 rounded-lg flex items-center justify-center mr-3">
-                                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                                                </svg>
+                                    <td class="px-6 py-4">
+                                        @if($isBatch)
+                                            <div class="space-y-2">
+                                                <div class="flex items-center mb-2">
+                                                    <span class="inline-flex items-center px-3 py-1 text-xs font-bold rounded-full bg-purple-100 text-purple-800 border border-purple-300">
+                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                                        </svg>
+                                                        PAKET {{ $batchItems->count() }} BARANG
+                                                    </span>
+                                                </div>
+                                                @foreach($batchItems as $item)
+                                                    <div class="flex items-center text-sm py-1 border-l-2 border-gray-200 pl-3">
+                                                        <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                                        </svg>
+                                                        <span class="font-medium text-gray-700">{{ $item->item->nama }}</span>
+                                                        <span class="ml-2 text-xs text-gray-500">({{ $item->jumlah }} pcs)</span>
+                                                    </div>
+                                                @endforeach
                                             </div>
-                                            <div>
-                                                <div class="text-sm font-semibold text-gray-900">{{ $request->item->nama }}</div>
-                                                <div class="text-xs text-gray-500">{{ $request->item->supplier->nama ?? 'N/A' }}</div>
+                                        @else
+                                            <div class="flex items-center">
+                                                <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-green-600 rounded-lg flex items-center justify-center mr-3">
+                                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <div class="text-sm font-semibold text-gray-900">{{ $request->item->nama }}</div>
+                                                    <div class="text-xs text-gray-500">{{ $request->item->supplier->nama ?? 'N/A' }}</div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <div class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                                {{ $request->jumlah }} pcs
+                                                @if($isBatch)
+                                                    {{ $batchItems->sum('jumlah') }} pcs total
+                                                @else
+                                                    {{ $request->jumlah }} pcs
+                                                @endif
                                             </div>
                                         </div>
                                     </td>
@@ -321,7 +379,6 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center space-x-2">
-                                            <!-- View Button -->
                                             <a href="{{ route('admin.borrowing-requests.show', $request->id) }}" 
                                                class="group relative inline-flex items-center justify-center p-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-700 transition-all duration-200">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -332,27 +389,24 @@
                                             </a>
                                             
                                             @if($request->status === 'pending')
-                                                <!-- Approve Button -->
                                                 <button type="button" 
                                                         class="group relative inline-flex items-center justify-center p-2 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-500 focus:text-green-700 transition-all duration-200"
-                                                        onclick="openApproveModal({{ $request->id }}, '{{ $request->user->name }}', '{{ $request->item->nama }}')">
+                                                        onclick="openApproveModal({{ $request->id }}, '{{ $request->user->name }}', '{{ $isBatch ? 'PAKET '.$batchItems->count().' BARANG' : $request->item->nama }}', {{ $isBatch ? 'true' : 'false' }})">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                                     </svg>
                                                    
                                                 </button>
                                                 
-                                                <!-- Reject Button -->
                                                 <button type="button" 
                                                         class="group relative inline-flex items-center justify-center p-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:text-red-700 focus:z-10 focus:ring-2 focus:ring-red-500 focus:text-red-700 transition-all duration-200"
-                                                        onclick="openRejectModal({{ $request->id }}, '{{ $request->user->name }}', '{{ $request->item->nama }}')">
+                                                        onclick="openRejectModal({{ $request->id }}, '{{ $request->user->name }}', '{{ $isBatch ? 'PAKET '.$batchItems->count().' BARANG' : $request->item->nama }}', {{ $isBatch ? 'true' : 'false' }})">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                                     </svg>
                                             
                                                 </button>
                                             @elseif($request->status === 'approved')
-                                                <!-- Complete Button -->
                                                 <form action="{{ route('admin.borrowing-requests.complete', $request->id) }}" 
                                                       method="POST" 
                                                       class="inline"
@@ -375,7 +429,6 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
                 <div class="flex justify-center mt-8">
                     <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
                         {{ $requests->links() }}
@@ -402,11 +455,9 @@
     </div>
 </div>
 
-<!-- Approve Modal -->
 <div id="approveModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 backdrop-blur-sm">
     <div class="relative top-20 mx-auto p-0 border-0 w-full max-w-md shadow-2xl">
         <div class="bg-white rounded-2xl overflow-hidden">
-            <!-- Modal Header -->
             <div class="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
@@ -429,6 +480,7 @@
             <div class="p-6">
                 <form id="approveForm" method="POST">
                     @csrf
+                    <input type="hidden" id="approve_batch" name="approve_batch" value="0">
                     <div class="mb-6">
                         <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
                             <p id="approveText" class="text-sm text-green-800 font-medium"></p>
@@ -488,10 +540,10 @@
                 </div>
             </div>
             
-            <!-- Modal Body -->
             <div class="p-6">
                 <form id="rejectForm" method="POST">
                     @csrf
+                    <input type="hidden" id="reject_batch" name="reject_batch" value="0">
                     <div class="mb-6">
                         <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                             <p id="rejectText" class="text-sm text-red-800 font-medium"></p>
@@ -532,26 +584,30 @@
 
 @push('scripts')
 <script>
-function openApproveModal(id, userName, itemName) {
+function openApproveModal(id, userName, itemName, isBatch = false) {
     document.getElementById('approveForm').action = `/admin/borrowing-requests/${id}/approve`;
-    document.getElementById('approveText').textContent = `Setujui permintaan peminjaman dari ${userName} untuk barang ${itemName}?`;
+    document.getElementById('approveText').textContent = `Setujui permintaan peminjaman dari ${userName} untuk ${itemName}?`;
+    document.getElementById('approve_batch').value = isBatch ? '1' : '0';
     document.getElementById('approveModal').classList.remove('hidden');
 }
 
 function closeApproveModal() {
     document.getElementById('approveModal').classList.add('hidden');
     document.getElementById('approve_admin_notes').value = '';
+    document.getElementById('approve_batch').value = '0';
 }
 
-function openRejectModal(id, userName, itemName) {
+function openRejectModal(id, userName, itemName, isBatch = false) {
     document.getElementById('rejectForm').action = `/admin/borrowing-requests/${id}/reject`;
-    document.getElementById('rejectText').textContent = `Tolak permintaan peminjaman dari ${userName} untuk barang ${itemName}?`;
+    document.getElementById('rejectText').textContent = `Tolak permintaan peminjaman dari ${userName} untuk ${itemName}?`;
+    document.getElementById('reject_batch').value = isBatch ? '1' : '0';
     document.getElementById('rejectModal').classList.remove('hidden');
 }
 
 function closeRejectModal() {
     document.getElementById('rejectModal').classList.add('hidden');
     document.getElementById('reject_admin_notes').value = '';
+    document.getElementById('reject_batch').value = '0';
 }
 </script>
 @endpush

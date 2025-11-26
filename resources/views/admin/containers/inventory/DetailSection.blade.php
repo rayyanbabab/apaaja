@@ -4,7 +4,6 @@
     <x-inventory-form>
         <x-heading-section title="Details items" title-color="text-base text-gray-700" subtitle="Manage items, see the detail information" subtitle-color="text-xs text-gray-400" />
 
-        {{-- Filter Section --}}
         <div class="mb-6 bg-white rounded-lg border border-gray-200 shadow-sm p-4">
             <form method="GET" action="{{ route('admin.inventory.tab.detail') }}" class="space-y-4">
                 <div class="flex items-center justify-between">
@@ -15,7 +14,6 @@
                 </div>
                 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {{-- Search --}}
                     <div>
                         <label for="search" class="block text-xs font-medium text-gray-700 mb-1">Search</label>
                         <input type="text" 
@@ -26,7 +24,6 @@
                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                     </div>
 
-                    {{-- Type Filter --}}
                     <div>
                         <label for="type" class="block text-xs font-medium text-gray-700 mb-1">Tipe Barang</label>
                         <select id="type" name="type" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
@@ -36,7 +33,6 @@
                         </select>
                     </div>
 
-                    {{-- Category Filter --}}
                     <div>
                         <label for="category_id" class="block text-xs font-medium text-gray-700 mb-1">Kategori</label>
                         <select id="category_id" name="category_id" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
@@ -49,7 +45,6 @@
                         </select>
                     </div>
 
-                    {{-- Supplier Filter --}}
                     <div>
                         <label for="supplier_id" class="block text-xs font-medium text-gray-700 mb-1">Supplier</label>
                         <select id="supplier_id" name="supplier_id" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
@@ -245,7 +240,6 @@
                                                     </svg>
                                             </div>
 
-                                            {{-- Delete form + modal --}}
                                             <form id="delete-form-{{ $item->id }}" method="POST"
                                                 action="{{ route('admin.inventory.destroy', $item->id) }}">
                                                 @csrf
@@ -280,17 +274,14 @@
 
     <script>
         function resetFilters() {
-            // Reset all form inputs
             document.getElementById('search').value = '';
             document.getElementById('type').value = '';
             document.getElementById('category_id').value = '';
             document.getElementById('supplier_id').value = '';
             
-            // Submit the form to reload without filters
             window.location.href = '{{ route("admin.inventory.tab.detail") }}';
         }
 
-        // Auto-submit form when filter changes (optional)
         document.addEventListener('DOMContentLoaded', function() {
             const filterInputs = ['type', 'category_id', 'supplier_id'];
             
@@ -298,13 +289,11 @@
                 const input = document.getElementById(inputId);
                 if (input) {
                     input.addEventListener('change', function() {
-                        // Auto-submit form when select changes
                         this.form.submit();
                     });
                 }
             });
 
-            // Search input with debounce
             const searchInput = document.getElementById('search');
             if (searchInput) {
                 let timeout;
@@ -312,7 +301,7 @@
                     clearTimeout(timeout);
                     timeout = setTimeout(() => {
                         this.form.submit();
-                    }, 500); // 500ms delay
+                    }, 500); 
                 });
             }
         });

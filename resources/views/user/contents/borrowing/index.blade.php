@@ -24,6 +24,20 @@
     <!-- Content -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="p-6">
+            @if(session('success'))
+                <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                    @foreach ($errors->all() as $error)
+                        <p>{{ $error }}</p>
+                    @endforeach
+                </div>
+            @endif
+            
             @if($items->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($items as $item)
@@ -64,6 +78,23 @@
                                 @if($item->keterangan)
                                     <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ Str::limit($item->keterangan, 100) }}</p>
                                 @endif
+                                
+                                <!-- Quick Add to Cart Form -->
+                                <form action="{{ route('user.borrowing.cart.add') }}" method="POST" class="mb-4">
+                                    @csrf
+                                    <input type="hidden" name="item_id" value="{{ $item->id }}">
+                                    <div class="flex items-center space-x-2">
+                                        <label class="text-sm text-gray-600">Jumlah:</label>
+                                        <input type="number" name="jumlah" value="1" min="1" max="{{ $item->stok_peminjaman }}" 
+                                               class="w-20 px-2 py-1 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                            </svg>
+                                            <span class="text-sm">Keranjang</span>
+                                        </button>
+                                    </div>
+                                </form>
                                 
                                 <div class="flex space-x-2">
                                     <a href="{{ route('user.borrowing.show-item', $item->id) }}" 

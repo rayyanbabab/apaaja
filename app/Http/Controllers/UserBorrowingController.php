@@ -11,7 +11,6 @@ class UserBorrowingController extends Controller
 {
     public function index()
     {
-        // Show available items for borrowing (type = peminjaman)
         $items = Item::with(['supplier', 'category'])
             ->where('type', 'peminjaman')
             ->where('stok_peminjaman', '>', 0)
@@ -22,7 +21,6 @@ class UserBorrowingController extends Controller
 
     public function myRequests()
     {
-        // Show user's borrowing requests
         $requests = BorrowingRequest::with(['item', 'item.supplier', 'approvedBy'])
             ->where('user_id', Auth::id())
             ->latest()
@@ -51,14 +49,10 @@ class UserBorrowingController extends Controller
             'keterangan' => 'nullable|string|max:1000',
             'kondisi_pinjam' => 'nullable|string|max:500',
         ]);
-
-        // Check if item has enough borrowing stock
         $item = Item::findOrFail($validated['item_id']);
         if ($item->stok_peminjaman < $validated['jumlah']) {
             return back()->withErrors(['jumlah' => 'Stok peminjaman tidak mencukupi. Stok tersedia: '.$item->stok_peminjaman]);
         }
-
-        // Create borrowing request
         BorrowingRequest::create([
             'user_id' => Auth::id(),
             'item_id' => $validated['item_id'],
@@ -76,7 +70,7 @@ class UserBorrowingController extends Controller
 
     public function show($id)
     {
-        $request = BorrowingRequest::with(['item', 'user'])
+        $request = BorrowingRequest::with(['item.category', 'item.supplier', 'user', 'approvedBy'])
             ->where('id', $id)
             ->where('user_id', Auth::id())
             ->firstOrFail();

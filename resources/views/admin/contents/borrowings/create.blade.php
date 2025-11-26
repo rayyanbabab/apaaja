@@ -1,8 +1,6 @@
 @extends('admin.layouts.dashboard')
-
 @section('content')
 <div class="space-y-6">
-    {{-- Header --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
@@ -21,7 +19,6 @@
         </div>
     </div>
 
-    {{-- Form --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Form Peminjaman</h3>
@@ -31,7 +28,6 @@
                 @csrf
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {{-- Item Selection --}}
                     <div>
                         <label for="item_id" class="block text-sm font-medium text-gray-700 mb-2">Barang <span class="text-red-500">*</span></label>
                         <select name="item_id" id="item_id" required class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('item_id') border-red-300 @enderror">
@@ -56,7 +52,6 @@
                         </div>
                     </div>
 
-                    {{-- User Selection --}}
                     <div>
                         <label for="user_id" class="block text-sm font-medium text-gray-700 mb-2">Peminjam <span class="text-red-500">*</span></label>
                         <select name="user_id" id="user_id" required class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('user_id') border-red-300 @enderror">
@@ -72,7 +67,6 @@
                         @enderror
                     </div>
 
-                    {{-- Quantity --}}
                     <div>
                         <label for="jumlah" class="block text-sm font-medium text-gray-700 mb-2">Jumlah <span class="text-red-500">*</span></label>
                         <input type="number" name="jumlah" id="jumlah" min="1" value="{{ old('jumlah', 0) }}" required 
@@ -82,7 +76,6 @@
                         @enderror
                     </div>
 
-                    {{-- Borrow Date --}}
                     <div>
                         <label for="tanggal_pinjam" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Pinjam <span class="text-red-500">*</span></label>
                         <input type="date" name="tanggal_pinjam" id="tanggal_pinjam" value="{{ old('tanggal_pinjam', date('Y-m-d')) }}" required 
@@ -92,7 +85,6 @@
                         @enderror
                     </div>
 
-                    {{-- Return Date Plan --}}
                     <div>
                         <label for="tanggal_kembali_rencana" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Rencana Kembali <span class="text-red-500">*</span></label>
                         <input type="date" name="tanggal_kembali_rencana" id="tanggal_kembali_rencana" value="{{ old('tanggal_kembali_rencana') }}" required 
@@ -102,7 +94,6 @@
                         @enderror
                     </div>
 
-                    {{-- Condition When Borrowed --}}
                     <div>
                         <label for="kondisi_pinjam" class="block text-sm font-medium text-gray-700 mb-2">Kondisi Saat Dipinjam</label>
                         <textarea name="kondisi_pinjam" id="kondisi_pinjam" rows="3" 
@@ -114,7 +105,6 @@
                     </div>
                 </div>
 
-                {{-- Item Details Display --}}
                 <div id="itemDetails" class="hidden bg-purple-50 border border-purple-200 rounded-lg p-4">
                     <h4 class="text-sm font-medium text-purple-900 mb-3">Detail Barang</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
@@ -151,7 +141,6 @@
                     </div>
                 </div>
 
-                {{-- Notes --}}
                 <div>
                     <label for="keterangan" class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
                     <textarea name="keterangan" id="keterangan" rows="3" 
@@ -162,7 +151,6 @@
                     @enderror
                 </div>
 
-                {{-- Submit Buttons --}}
                 <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
                     <a href="{{ route('admin.borrowings.index') }}" 
                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -183,7 +171,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM elements
     const elements = {
         itemSelect: document.getElementById('item_id'),
         stockInfo: document.getElementById('stock-info'),
@@ -199,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {
         returnDate: document.getElementById('tanggal_kembali_rencana')
     };
 
-    // Item selection handler
     function handleItemSelection() {
         const selectedOption = elements.itemSelect.options[elements.itemSelect.selectedIndex];
         const stock = selectedOption.getAttribute('data-stock');
@@ -212,12 +198,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showItemDetails(option, stock) {
-        // Basic stock info
         elements.availableStock.textContent = stock;
         elements.stockInfo.classList.remove('hidden');
         elements.quantityInput.setAttribute('max', stock);
-        
-        // Detailed information
+    
         elements.itemDetails.classList.remove('hidden');
         elements.itemCode.textContent = option.getAttribute('data-code') || 'N/A';
         elements.supplierName.textContent = option.getAttribute('data-supplier') || 'N/A';
@@ -232,7 +216,6 @@ document.addEventListener('DOMContentLoaded', function() {
         elements.quantityInput.removeAttribute('max');
     }
 
-    // Date validation handler
     function handleDateValidation() {
         const borrowDateValue = new Date(elements.borrowDate.value);
         borrowDateValue.setDate(borrowDateValue.getDate() + 1);
@@ -245,11 +228,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Event listeners
     elements.itemSelect.addEventListener('change', handleItemSelection);
     elements.borrowDate.addEventListener('change', handleDateValidation);
 
-    // Initialize if item already selected
     if (elements.itemSelect.value) {
         handleItemSelection();
     }

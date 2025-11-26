@@ -1,8 +1,6 @@
 @extends('admin.layouts.dashboard')
-
 @section('content')
 <div class="space-y-6">
-    {{-- Header --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
@@ -20,8 +18,6 @@
             </div>
         </div>
     </div>
-
-    {{-- Current Item Info --}}
     <div class="bg-blue-50 rounded-lg border border-blue-200">
         <div class="px-6 py-4">
             <h3 class="text-lg font-medium text-blue-900 mb-2">Informasi Saat Ini</h3>
@@ -42,7 +38,6 @@
         </div>
     </div>
 
-    {{-- Form --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <form action="{{ route('admin.incoming.update', $incomingItem) }}" method="POST">
             @csrf
@@ -53,7 +48,6 @@
             </div>
 
             <div class="px-6 py-6 space-y-6">
-                {{-- Item Selection --}}
                 <div>
                     <label for="item_id" class="block text-sm font-medium text-gray-700 mb-2">
                         Pilih Barang <span class="text-red-500">*</span>
@@ -86,8 +80,6 @@
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
-
-                {{-- Item Details Display --}}
                 <div id="itemDetails" class="hidden bg-green-50 border border-green-200 rounded-lg p-4">
                     <h4 class="text-sm font-medium text-green-900 mb-3">Detail Barang</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
@@ -126,7 +118,6 @@
                     </div>
                 </div>
 
-                {{-- Quantity --}}
                 <div>
                     <label for="jumlah" class="block text-sm font-medium text-gray-700 mb-2">
                         Jumlah Masuk <span class="text-red-500">*</span>
@@ -143,7 +134,6 @@
                     </p>
                 </div>
 
-                {{-- Stock Impact Display --}}
                 <div id="stockImpact" class="hidden bg-yellow-50 rounded-lg p-4">
                     <h4 class="text-sm font-medium text-yellow-800 mb-2">Dampak Perubahan Stok</h4>
                     <div class="text-sm text-yellow-700">
@@ -153,7 +143,6 @@
                     </div>
                 </div>
 
-                {{-- Total Value Display --}}
                 <div id="totalValue" class="hidden bg-green-50 rounded-lg p-4">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium text-green-700">Total Nilai Barang Masuk:</span>
@@ -161,7 +150,6 @@
                     </div>
                 </div>
 
-                {{-- Keterangan --}}
                 <div>
                     <label for="keterangan" class="block text-sm font-medium text-gray-700 mb-2">
                         Keterangan (Opsional)
@@ -175,7 +163,6 @@
                 </div>
             </div>
 
-            {{-- Form Footer --}}
             <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
                 <div class="flex items-center justify-end space-x-3">
                     <a href="{{ route('admin.incoming.index') }}" 
@@ -197,7 +184,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM elements
     const elements = {
         itemSelect: document.getElementById('item_id'),
         itemDetails: document.getElementById('itemDetails'),
@@ -223,7 +209,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentType = '';
     const originalQuantity = {{ $incomingItem->jumlah }};
 
-    // Item selection handler
     function handleItemSelection() {
         const selectedOption = elements.itemSelect.options[elements.itemSelect.selectedIndex];
         
@@ -235,50 +220,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showItemDetails(option) {
-        // Show item details
         elements.itemDetails.classList.remove('hidden');
-        
-        // Get item type
         currentType = option.dataset.type;
-        
-        // Update basic details
         elements.itemCode.textContent = option.dataset.code || 'N/A';
         elements.supplierName.textContent = option.dataset.supplier || 'N/A';
         elements.categoryName.textContent = option.dataset.category || 'N/A';
         elements.itemDescription.textContent = option.dataset.description || 'Tidak ada deskripsi';
-        
-        // Update based on type
         if (currentType === 'stok') {
-            // For regular stock items
             const stockReguler = parseInt(option.dataset.stockReguler) || 0;
             elements.availableStock.textContent = stockReguler + ' unit';
             elements.stockLabel.textContent = 'Stok Tersedia:';
-            
-            // Show price section
             elements.priceSection.style.display = 'block';
             currentPrice = parseInt(option.dataset.price) || 0;
             elements.itemPrice.textContent = currentPrice > 0 ? 'Rp ' + currentPrice.toLocaleString('id-ID') : 'Tidak ada harga';
-            
-            // Update badge
             elements.itemTypeBadge.textContent = 'STOK';
             elements.itemTypeBadge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800';
             
         } else if (currentType === 'peminjaman') {
-            // For borrowing items
             const stockPeminjaman = parseInt(option.dataset.stockPeminjaman) || 0;
             elements.availableStock.textContent = stockPeminjaman + ' unit';
             elements.stockLabel.textContent = 'Stok Tersedia:';
-            
-            // Hide price section
             elements.priceSection.style.display = 'none';
             currentPrice = 0;
-            
-            // Update badge
             elements.itemTypeBadge.textContent = 'PEMINJAMAN';
             elements.itemTypeBadge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800';
         }
-        
-        // Calculate total and impact
         calculateTotal();
         calculateStockImpact();
     }
@@ -290,11 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
         currentPrice = 0;
         currentType = '';
     }
-
-    // Event listeners
     elements.itemSelect.addEventListener('change', handleItemSelection);
-
-    // Handle quantity input
     elements.jumlahInput.addEventListener('input', function() {
         calculateTotal();
         calculateStockImpact();
@@ -337,8 +299,6 @@ document.addEventListener('DOMContentLoaded', function() {
             elements.stockImpact.classList.add('hidden');
         }
     }
-
-    // Initialize if item already selected
     if (elements.itemSelect.value) {
         handleItemSelection();
     }

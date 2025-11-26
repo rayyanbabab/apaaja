@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
-use App\Enums\UsersRole; // ✅ Tambahkan ini jika UsersRole ada di App\Enums
+use App\Enums\UsersRole; 
 
 class RoleMiddleware
 {

@@ -1,8 +1,6 @@
 @extends('admin.layouts.dashboard')
-
 @section('content')
 <div class="space-y-6">
-    {{-- Header --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
@@ -21,7 +19,6 @@
         </div>
     </div>
 
-    {{-- Form --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <form id="incomingForm" action="{{ route('admin.incoming.store') }}" method="POST">
             @csrf
@@ -31,7 +28,6 @@
             </div>
 
             <div class="px-6 py-6 space-y-6">
-                {{-- Multi Item Selection --}}
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
                         <label class="block text-sm font-medium text-gray-700">
@@ -45,13 +41,8 @@
                             Tambah Item
                         </button>
                     </div>
-
-                    {{-- Items Container --}}
                     <div id="itemsContainer" class="space-y-4">
-                        {{-- Initial item row will be added by JavaScript --}}
                     </div>
-
-                    {{-- Summary --}}
                     <div id="summarySection" class="hidden bg-green-50 border border-green-200 rounded-lg p-4">
                         <h4 class="text-sm font-medium text-green-900 mb-3">Ringkasan</h4>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
@@ -70,8 +61,6 @@
                         </div>
                     </div>
                 </div>
-
-                {{-- Keterangan --}}
                 <div>
                     <label for="keterangan" class="block text-sm font-medium text-gray-700 mb-2">
                         Keterangan (Opsional)
@@ -84,8 +73,6 @@
                     @enderror
                 </div>
             </div>
-
-            {{-- Form Footer --}}
             <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
                 <div class="flex items-center justify-end space-x-3">
                     <a href="{{ route('admin.incoming.index') }}" 
@@ -123,8 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let itemCounter = 0;
     let selectedItems = {};
-
-    // Available items data
     const itemsData = {!! json_encode($items->map(function($item) {
         return [
             'id' => $item->id,
@@ -138,8 +123,6 @@ document.addEventListener('DOMContentLoaded', function() {
             'type' => $item->type->value
         ];
     })) !!};
-
-    // Add item button handler
     elements.addItemBtn.addEventListener('click', function() {
         addItemRow();
     });
@@ -220,7 +203,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         elements.itemsContainer.appendChild(itemRow);
         
-        // Add event listeners for the new row
         const itemSelect = itemRow.querySelector('.item-select');
         const quantityInput = itemRow.querySelector('.quantity-input');
         
@@ -258,7 +240,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             selectedItems[counter] = itemData;
             
-            // Update display based on type
             document.querySelector(`.item-type-${counter}`).textContent = itemData.type === 'stok' ? 'STOK' : 'PEMINJAMAN';
             document.querySelector(`.item-supplier-${counter}`).textContent = itemData.supplier;
             
@@ -321,7 +302,6 @@ document.addEventListener('DOMContentLoaded', function() {
         elements.summarySection.classList.toggle('hidden', totalItems === 0);
     }
 
-    // Global function to remove item row
     window.removeItemRow = function(rowId) {
         const row = document.getElementById(rowId);
         if (row) {
@@ -332,10 +312,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Initialize with one item row
     addItemRow();
 
-    // Handle form submission
     const form = document.getElementById('incomingForm');
     const submitButton = document.getElementById('submitButton');
     const submitText = document.getElementById('submitText');
@@ -343,13 +321,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitSpinner = document.getElementById('submitSpinner');
 
     form.addEventListener('submit', function(e) {
-        // Prevent double submission
         if (submitButton.disabled) {
             e.preventDefault();
             return false;
         }
 
-        // Show loading state
         submitButton.disabled = true;
         submitText.textContent = 'Menyimpan...';
         submitIcon.classList.add('hidden');
@@ -358,7 +334,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     });
 
-    // Re-enable form if validation fails
     @if($errors->any())
         submitButton.disabled = false;
         submitText.textContent = 'Simpan Barang Masuk';

@@ -1,8 +1,6 @@
 @extends('admin.layouts.dashboard')
-
 @section('content')
 <div class="space-y-6">
-    {{-- Header --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
@@ -21,7 +19,6 @@
         </div>
     </div>
 
-    {{-- Form --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Form Edit Peminjaman</h3>
@@ -31,7 +28,6 @@
                 @csrf
                 @method('PUT')
                 
-                {{-- Current Info (Read Only) --}}
                 <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
                     <h4 class="text-sm font-medium text-gray-900 mb-3">Informasi Peminjaman</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
@@ -69,7 +65,6 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {{-- Status --}}
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status <span class="text-red-500">*</span></label>
                         <select name="status" id="status" required class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('status') border-red-300 @enderror">
@@ -82,7 +77,6 @@
                         @enderror
                     </div>
 
-                    {{-- Actual Return Date --}}
                     <div>
                         <label for="tanggal_kembali_aktual" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Kembali Aktual</label>
                         <input type="date" name="tanggal_kembali_aktual" id="tanggal_kembali_aktual" 
@@ -94,7 +88,6 @@
                         <p class="mt-1 text-xs text-gray-500">Kosongkan jika belum dikembalikan</p>
                     </div>
 
-                    {{-- Return Condition --}}
                     <div>
                         <label for="kondisi_kembali" class="block text-sm font-medium text-gray-700 mb-2">Kondisi Saat Dikembalikan</label>
                         <textarea name="kondisi_kembali" id="kondisi_kembali" rows="3" 
@@ -105,7 +98,6 @@
                         @enderror
                     </div>
 
-                    {{-- Notes --}}
                     <div>
                         <label for="keterangan" class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
                         <textarea name="keterangan" id="keterangan" rows="3" 
@@ -117,7 +109,6 @@
                     </div>
                 </div>
 
-                {{-- Current Conditions Display --}}
                 @if($borrowing->kondisi_pinjam)
                     <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
                         <h4 class="text-sm font-medium text-blue-900 mb-2">Kondisi Saat Dipinjam</h4>
@@ -125,7 +116,6 @@
                     </div>
                 @endif
 
-                {{-- Submit Buttons --}}
                 <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
                     <a href="{{ route('admin.borrowings.show', $borrowing) }}" 
                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -163,7 +153,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Trigger change event on page load
     statusSelect.dispatchEvent(new Event('change'));
 });
 </script>

@@ -58,23 +58,15 @@ class UserProfileController extends Controller
         ]);
 
         $user = auth()->user();
-
-        // Delete old photo if exists
         if ($user->profil && file_exists(public_path($user->profil))) {
             unlink(public_path($user->profil));
         }
-
-        // Process and store new photo
         $file = $request->file('profil');
         $filename = time().'_'.uniqid().'.jpg';
-
-        // Create profil directory if it doesn't exist
         $profileDir = public_path('images/profiles');
         if (! file_exists($profileDir)) {
             mkdir($profileDir, 0755, true);
         }
-
-        // Resize image using GD library
         $this->resizeImage($file->getPathname(), $profileDir.'/'.$filename, 200, 200);
 
         $user->profil = 'images/profiles/'.$filename;
@@ -85,13 +77,10 @@ class UserProfileController extends Controller
 
     private function resizeImage($sourcePath, $destinationPath, $width, $height)
     {
-        // Get image info
         $imageInfo = getimagesize($sourcePath);
         $sourceWidth = $imageInfo[0];
         $sourceHeight = $imageInfo[1];
         $imageType = $imageInfo[2];
-
-        // Create source image based on type
         switch ($imageType) {
             case IMAGETYPE_JPEG:
                 $sourceImage = imagecreatefromjpeg($sourcePath);
@@ -106,10 +95,7 @@ class UserProfileController extends Controller
                 return false;
         }
 
-        // Create destination image
         $destinationImage = imagecreatetruecolor($width, $height);
-
-        // Preserve transparency for PNG
         if ($imageType == IMAGETYPE_PNG) {
             imagealphablending($destinationImage, false);
             imagesavealpha($destinationImage, true);
@@ -117,17 +103,14 @@ class UserProfileController extends Controller
             imagefilledrectangle($destinationImage, 0, 0, $width, $height, $transparent);
         }
 
-        // Resize image
         imagecopyresampled(
             $destinationImage, $sourceImage,
             0, 0, 0, 0,
             $width, $height, $sourceWidth, $sourceHeight
         );
 
-        // Save image as JPEG
         imagejpeg($destinationImage, $destinationPath, 80);
 
-        // Clean up memory
         imagedestroy($sourceImage);
         imagedestroy($destinationImage);
 

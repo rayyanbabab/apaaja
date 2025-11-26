@@ -14,24 +14,17 @@ class BorrowingController extends Controller
      */
     public function index(Request $request)
     {
-        // Hanya tampilkan barang yang sedang dipinjam (dipinjam & terlambat)
         $query = Borrowing::with(['item', 'item.supplier', 'item.category', 'user'])
             ->whereIn('status', ['dipinjam', 'terlambat']);
-
-        // Filter by user
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
         }
-
-        // Filter by date range
         if ($request->filled('date_from')) {
             $query->whereDate('tanggal_pinjam', '>=', $request->date_from);
         }
         if ($request->filled('date_to')) {
             $query->whereDate('tanggal_pinjam', '<=', $request->date_to);
         }
-
-        // Check for overdue items and update status
         Borrowing::where('status', 'dipinjam')
             ->where('tanggal_kembali_rencana', '<', now()->toDateString())
             ->update(['status' => 'terlambat']);
@@ -53,21 +46,15 @@ class BorrowingController extends Controller
     {
         $query = Borrowing::with(['item', 'item.supplier', 'item.category', 'user'])
             ->where('status', 'dikembalikan');
-
-        // Filter by user
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
         }
-
-        // Filter by date range
         if ($request->filled('date_from')) {
             $query->whereDate('tanggal_pinjam', '>=', $request->date_from);
         }
         if ($request->filled('date_to')) {
             $query->whereDate('tanggal_pinjam', '<=', $request->date_to);
         }
-
-        // Filter by return date range
         if ($request->filled('return_date_from')) {
             $query->whereDate('tanggal_kembali_aktual', '>=', $request->return_date_from);
         }
@@ -116,18 +103,12 @@ class BorrowingController extends Controller
             'keterangan' => 'nullable|string',
             'kondisi_pinjam' => 'nullable|string',
         ]);
-
-        // Check if item has enough borrowing stock
         $item = Item::findOrFail($request->item_id);
         $availableStock = $item->getAvailableStokForBorrowing();
         if ($availableStock < $request->jumlah) {
             return back()->withErrors(['jumlah' => 'Stok peminjaman tidak mencukupi. Stok tersedia: '.$availableStock]);
         }
-
-        // Create borrowing record
         Borrowing::create($request->all());
-
-        // Reduce borrowing stock
         $item->reduceStok($request->jumlah, 'peminjaman');
 
         return redirect()->route('admin.borrowings.index')
@@ -173,8 +154,6 @@ class BorrowingController extends Controller
         $oldStatus = $borrowing->status;
 
         $borrowing->update($request->all());
-
-        // If item is returned, add back to borrowing stock
         if ($oldStatus !== 'dikembalikan' && $request->status === 'dikembalikan') {
             $borrowing->item->addStok($borrowing->jumlah, 'peminjaman');
             $borrowing->update(['tanggal_kembali_aktual' => now()]);
@@ -189,7 +168,6 @@ class BorrowingController extends Controller
      */
     public function destroy(Borrowing $borrowing)
     {
-        // If item is still borrowed, return borrowing stock
         if ($borrowing->status === 'dipinjam' || $borrowing->status === 'terlambat') {
             $borrowing->item->addStok($borrowing->jumlah, 'peminjaman');
         }
@@ -213,8 +191,6 @@ class BorrowingController extends Controller
             'status' => 'dikembalikan',
             'tanggal_kembali_aktual' => now(),
         ]);
-
-        // Add back to borrowing stock
         $borrowing->item->addStok($borrowing->jumlah, 'peminjaman');
 
         return back()->with('success', 'Barang berhasil dikembalikan');

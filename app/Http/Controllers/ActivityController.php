@@ -12,7 +12,6 @@ class ActivityController extends Controller
     {
         $query = LoginLog::with('user')->orderBy('logged_in_at', 'desc');
 
-        // Filter by date range
         if ($request->filled('date_from')) {
             $query->whereDate('logged_in_at', '>=', $request->date_from);
         }
@@ -21,7 +20,6 @@ class ActivityController extends Controller
             $query->whereDate('logged_in_at', '<=', $request->date_to);
         }
 
-        // Filter by month and year
         if ($request->filled('month') && $request->filled('year')) {
             $query->whereMonth('logged_in_at', $request->month)
                   ->whereYear('logged_in_at', $request->year);
@@ -29,14 +27,12 @@ class ActivityController extends Controller
             $query->whereYear('logged_in_at', $request->year);
         }
 
-        // Filter by user role
         if ($request->filled('role')) {
             $query->whereHas('user', function($q) use ($request) {
                 $q->where('role', $request->role);
             });
         }
 
-        // Search by user name or email
         if ($request->filled('search')) {
             $query->whereHas('user', function($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
@@ -45,8 +41,6 @@ class ActivityController extends Controller
         }
 
         $activities = $query->paginate(20)->withQueryString();
-
-        // Get statistics
         $totalActivities = LoginLog::count();
         $todayActivities = LoginLog::whereDate('logged_in_at', today())->count();
         $thisWeekActivities = LoginLog::whereBetween('logged_in_at', [

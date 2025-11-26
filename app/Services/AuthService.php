@@ -12,18 +12,13 @@ class AuthService
     public function login(array $credentials): ?string
     {
         $user = User::where('email', $credentials['email'])->first();
-
-        // Jika user tidak ditemukan atau password salah
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             return null;
         }
-
-        // ❌ Jika user tidak aktif, tolak login
         if (! $user->is_active) {
             return 'inactive';
         }
 
-        // ✅ Login berhasil
         Auth::login($user);
 
         LoginLog::create([

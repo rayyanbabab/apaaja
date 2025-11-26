@@ -15,7 +15,6 @@
          x-transition:leave-end="opacity-0 transform translate-y-2 scale-95"
          class="{{ $type }}-toast relative">
         
-        <!-- Close button (optional) -->
         <button @click="show = false" 
                 class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 focus:outline-none">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

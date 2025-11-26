@@ -64,8 +64,6 @@ class CategoryController extends Controller
                 ->withErrors($validator)
                 ->withInput();
         }
-
-        // Only accept expected fields
         $data = $request->only(['name', 'description', 'status']);
 
         $category->update($data);

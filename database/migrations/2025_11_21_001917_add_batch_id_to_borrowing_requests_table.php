@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->softDeletes();
+        Schema::table('borrowing_requests', function (Blueprint $table) {
+            $table->string('batch_id')->nullable()->after('user_id');
+            $table->index('batch_id');
         });
     }
 
@@ -21,8 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->dropSoftDeletes();
+        Schema::table('borrowing_requests', function (Blueprint $table) {
+            $table->dropIndex(['batch_id']);
+            $table->dropColumn('batch_id');
         });
     }
 };

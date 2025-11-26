@@ -13,7 +13,6 @@ class UsersAccountController extends Controller
     {
         $query = User::query();
 
-        // Search functionality
         if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -22,12 +21,10 @@ class UsersAccountController extends Controller
             });
         }
 
-        // Filter by role
         if ($request->has('role') && ! empty($request->role)) {
             $query->where('role', $request->role);
         }
 
-        // Filter by status
         if ($request->has('status') && ! empty($request->status)) {
             if ($request->status === 'active') {
                 $query->where('is_active', true);
@@ -77,38 +74,24 @@ class UsersAccountController extends Controller
             'bio' => $validated['bio'] ?? null,
             'is_active' => (bool) $validated['is_active'],
         ];
-
-        // Handle profile photo upload
         if ($request->hasFile('profil')) {
             $profil = $request->file('profil');
             $fileName = time().'_'.uniqid().'.jpg';
-
-            // Create directory if it doesn't exist
             $profilePath = public_path('images/profiles');
             if (! file_exists($profilePath)) {
                 mkdir($profilePath, 0755, true);
             }
-
-            // Resize and compress image
             $image = imagecreatefromstring(file_get_contents($profil->getPathname()));
             $resized = imagecreatetruecolor(200, 200);
-
-            // Get original dimensions
             $originalWidth = imagesx($image);
             $originalHeight = imagesy($image);
-
-            // Calculate crop dimensions for square aspect ratio
             $cropSize = min($originalWidth, $originalHeight);
             $cropX = ($originalWidth - $cropSize) / 2;
             $cropY = ($originalHeight - $cropSize) / 2;
-
-            // Resize with crop to square
+            
             imagecopyresampled($resized, $image, 0, 0, $cropX, $cropY, 200, 200, $cropSize, $cropSize);
-
-            // Save with compression
             imagejpeg($resized, $profilePath.'/'.$fileName, 85);
 
-            // Clean up memory
             imagedestroy($image);
             imagedestroy($resized);
 

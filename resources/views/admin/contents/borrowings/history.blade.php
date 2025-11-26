@@ -1,8 +1,6 @@
 @extends('admin.layouts.dashboard')
-
 @section('content')
 <div class="space-y-6">
-    {{-- Header --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
@@ -29,7 +27,6 @@
         </div>
     </div>
 
-    {{-- Filters --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Filter</h3>
@@ -92,7 +89,6 @@
         </div>
     </div>
 
-    {{-- Data Table --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Riwayat Peminjaman</h3>
@@ -178,8 +174,7 @@
                     </tbody>
                 </table>
             </div>
-            
-            {{-- Pagination --}}
+
             <div class="px-6 py-4 border-t border-gray-200">
                 {{ $borrowings->links() }}
             </div>

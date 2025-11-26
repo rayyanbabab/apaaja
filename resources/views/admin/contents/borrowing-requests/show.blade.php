@@ -1,10 +1,7 @@
 @extends('admin.layouts.dashboard')
-
 @section('title', 'Detail Permintaan Peminjaman')
-
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Header -->
     <div class="mb-8">
         <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
             <div>
@@ -29,7 +26,6 @@
         </div>
     </div>
 
-    <!-- Alerts -->
     <div class="mb-6">
         @if(session('success'))
             <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
@@ -58,7 +54,6 @@
         @endif
     </div>
 
-    <!-- Status Badge -->
     <div class="mb-6">
         @switch($request->status)
             @case('pending')
@@ -95,9 +90,7 @@
                 @break
         @endswitch
 
-    <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <!-- Request Information Card -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-100">
                 <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
@@ -150,7 +143,6 @@
             </div>
         </div>
 
-        <!-- Item Information Card -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-100">
                 <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
@@ -191,7 +183,6 @@
         </div>
     </div>
 
-    <!-- Additional Information -->
     @if($request->keterangan || $request->kondisi_pinjam)
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         @if($request->keterangan)
@@ -246,7 +237,6 @@
     </div>
     @endif
 
-    <!-- Action Buttons -->
     @if($request->status === 'pending')
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-100">
@@ -279,11 +269,9 @@
         </div>
     </div>
 
-    <!-- Approve Modal -->
     <div id="approveModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 backdrop-blur-sm">
         <div class="relative top-20 mx-auto p-0 border-0 w-full max-w-lg shadow-2xl">
             <div class="bg-white rounded-2xl overflow-hidden">
-                <!-- Modal Header -->
                 <div class="bg-gradient-to-r from-green-500 to-green-600 px-6 py-5">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
@@ -305,7 +293,6 @@
                     </div>
                 </div>
                 
-                <!-- Modal Body -->
                 <div class="p-6">
                     <form id="approveForm" action="{{ route('admin.borrowing-requests.approve', $request->id) }}" method="POST">
                         @csrf
@@ -324,7 +311,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Stock Information -->
                             <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
                                 <h4 class="text-sm font-semibold text-blue-900 mb-3 flex items-center">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -380,11 +366,9 @@
         </div>
     </div>
 
-    <!-- Reject Modal -->
     <div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 backdrop-blur-sm">
         <div class="relative top-20 mx-auto p-0 border-0 w-full max-w-lg shadow-2xl">
             <div class="bg-white rounded-2xl overflow-hidden">
-                <!-- Modal Header -->
                 <div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-5">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
@@ -405,8 +389,7 @@
                         </button>
                     </div>
                 </div>
-                
-                <!-- Modal Body -->
+
                 <div class="p-6">
                     <form id="rejectForm" action="{{ route('admin.borrowing-requests.reject', $request->id) }}" method="POST">
                         @csrf

@@ -2,7 +2,6 @@
 
 @section('content')
     <div class="form min-h-screen space-y-6">
-        {{-- Header Section --}}
         <div class="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <x-heading-section title="Inventory" subtitle="View and control inventory item information in detail" />
 
@@ -40,10 +39,8 @@
             </x-tab-links>
         </x-tabs>
 
-
         <x-alert type="success" />
 
-        {{-- Tab Content --}}
         <div class="rounded-lg bg-white shadow-sm">
             {{ $slot }}
         </div>

@@ -1,7 +1,6 @@
 @extends('admin.layouts.dashboard')
 
 @section('content')
-    {{-- Page Header --}}
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <div>
@@ -19,9 +18,7 @@
         </div>
     </div>
 
-    {{-- Statistics Cards --}}
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <!-- Total Activities Card -->
         <div class="relative bg-white/80 backdrop-blur-sm overflow-hidden shadow-xl rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group">
             <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 opacity-50"></div>
             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-200 rounded-full -translate-y-16 translate-x-16 opacity-20 group-hover:scale-110 transition-transform duration-500"></div>
@@ -49,7 +46,6 @@
             </div>
         </div>
 
-        <!-- Today Activities Card -->
         <div class="relative bg-white/80 backdrop-blur-sm overflow-hidden shadow-xl rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group">
             <div class="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-100 opacity-50"></div>
             <div class="absolute top-0 right-0 w-32 h-32 bg-green-200 rounded-full -translate-y-16 translate-x-16 opacity-20 group-hover:scale-110 transition-transform duration-500"></div>
@@ -77,7 +73,6 @@
             </div>
         </div>
 
-        <!-- This Week Activities Card -->
         <div class="relative bg-white/80 backdrop-blur-sm overflow-hidden shadow-xl rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group">
             <div class="absolute inset-0 bg-gradient-to-br from-yellow-50 to-amber-100 opacity-50"></div>
             <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-200 rounded-full -translate-y-16 translate-x-16 opacity-20 group-hover:scale-110 transition-transform duration-500"></div>
@@ -105,7 +100,6 @@
             </div>
         </div>
 
-        <!-- This Month Activities Card -->
         <div class="relative bg-white/80 backdrop-blur-sm overflow-hidden shadow-xl rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group">
             <div class="absolute inset-0 bg-gradient-to-br from-purple-50 to-indigo-100 opacity-50"></div>
             <div class="absolute top-0 right-0 w-32 h-32 bg-purple-200 rounded-full -translate-y-16 translate-x-16 opacity-20 group-hover:scale-110 transition-transform duration-500"></div>
@@ -134,7 +128,6 @@
         </div>
     </div>
 
-    {{-- Filters Section --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">Filters</h3>
@@ -143,21 +136,18 @@
         <div class="p-6">
             <form method="GET" action="{{ route('admin.activities.index') }}" class="space-y-4">
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {{-- Date From --}}
                     <div>
                         <label for="date_from" class="block text-sm font-medium text-gray-700">From Date</label>
                         <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" 
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                     </div>
 
-                    {{-- Date To --}}
                     <div>
                         <label for="date_to" class="block text-sm font-medium text-gray-700">To Date</label>
                         <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" 
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                     </div>
 
-                    {{-- Month --}}
                     <div>
                         <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
                         <select name="month" id="month" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
@@ -170,7 +160,6 @@
                         </select>
                     </div>
 
-                    {{-- Year --}}
                     <div>
                         <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
                         <select name="year" id="year" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
@@ -185,7 +174,6 @@
                 </div>
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {{-- Role Filter --}}
                     <div>
                         <label for="role" class="block text-sm font-medium text-gray-700">User Role</label>
                         <select name="role" id="role" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
@@ -195,7 +183,6 @@
                         </select>
                     </div>
 
-                    {{-- Search --}}
                     <div>
                         <label for="search" class="block text-sm font-medium text-gray-700">Search User</label>
                         <input type="text" name="search" id="search" value="{{ request('search') }}" 
@@ -222,7 +209,6 @@
         </div>
     </div>
 
-    {{-- Activities List --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex items-center justify-between">
@@ -309,7 +295,6 @@
             @endforelse
         </div>
 
-        {{-- Pagination --}}
         @if($activities->hasPages())
         <div class="px-6 py-3 border-t border-gray-200 bg-gray-50">
             {{ $activities->links() }}

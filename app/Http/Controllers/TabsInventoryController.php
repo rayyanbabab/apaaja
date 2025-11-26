@@ -14,7 +14,6 @@ class TabsInventoryController extends Controller
     {
         $query = Item::with(['category', 'supplier']);
 
-        // Handle search
         $searchTerm = $request->get('search');
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm) {
@@ -28,26 +27,16 @@ class TabsInventoryController extends Controller
                     });
             });
         }
-
-        // Handle type filter
         if ($request->has('type') && !empty($request->get('type'))) {
             $query->where('type', $request->get('type'));
         }
-
-        // Handle category filter
         if ($request->has('category_id') && !empty($request->get('category_id'))) {
             $query->where('category_id', $request->get('category_id'));
         }
-
-        // Handle supplier filter
         if ($request->has('supplier_id') && !empty($request->get('supplier_id'))) {
             $query->where('supplier_id', $request->get('supplier_id'));
         }
-
-        // Get fresh data with relationships, ordered by updated_at
         $items = $query->orderBy('updated_at', 'desc')->get();
-
-        // Get categories and suppliers for filter dropdowns
         $categories = Category::orderBy('name')->get();
         $suppliers = Supplier::orderBy('company_name')->get();
 

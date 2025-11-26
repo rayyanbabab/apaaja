@@ -108,7 +108,7 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Barang Tersedia</p>
+                    <p class="text-sm font-medium text-gray-600">Jenis Barang Tersedia</p>
                     <p class="text-2xl font-bold text-gray-900">{{ $borrowingStats['available_items'] }}</p>
                 </div>
             </div>

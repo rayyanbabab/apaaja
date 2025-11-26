@@ -7,17 +7,12 @@ use Illuminate\Support\ServiceProvider;
 
 class ComponentsServiceProviders extends ServiceProvider
 {
-    /**
-     * Register services.
-     */
+
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap services.
-     */
     public function boot(): void
     {
         Blade::component('admin.components.partials.link', 'link');

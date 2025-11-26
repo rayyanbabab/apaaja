@@ -1,7 +1,5 @@
 @extends('admin.layouts.dashboard')
-
 @section('title', 'Permintaan Peminjaman Pending')
-
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header -->
@@ -23,7 +21,6 @@
         </div>
     </div>
 
-    <!-- Content -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="p-6">
             @if(session('success'))
@@ -116,7 +113,6 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
                 <div class="flex justify-center mt-6">
                     {{ $requests->links() }}
                 </div>
@@ -133,7 +129,6 @@
     </div>
 </div>
 
-<!-- Approve Modal -->
 <div id="approveModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
@@ -171,7 +166,6 @@
     </div>
 </div>
 
-<!-- Reject Modal -->
 <div id="rejectModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">

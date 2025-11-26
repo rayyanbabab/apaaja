@@ -14,26 +14,18 @@ class OutgoingItemsController extends Controller
     {
         $query = Inventory::with(['item.supplier', 'item.category', 'user'])
             ->where('tipe', 'keluar')
-            ->whereHas('item') // Only show inventories where item still exists
+            ->whereHas('item') 
             ->latest();
-
-        // Search functionality
         if ($request->filled('search')) {
             $search = $request->search;
             $query->whereHas('item', function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%");
             });
         }
-
-        // User filter
         if ($request->filled('user_filter')) {
             $query->where('user_id', $request->user_filter);
         }
-
-        // Always filter by 'to production' status
         $query->where('status', 'to_production');
-
-        // Filter by date range
         if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
@@ -42,16 +34,12 @@ class OutgoingItemsController extends Controller
         }
 
         $outgoingItems = $query->paginate(15)->withQueryString();
-
-        // Get users for filter dropdown
         $users = User::select('id', 'name')
             ->whereHas('inventories', function ($q) {
                 $q->where('tipe', 'keluar');
             })
             ->orderBy('name')
             ->get();
-
-        // Statistics
         $stats = Inventory::where('tipe', 'keluar')
             ->whereHas('item')
             ->selectRaw('
@@ -61,7 +49,6 @@ class OutgoingItemsController extends Controller
             ')
             ->first()
             ->toArray();
-
         return view('admin.contents.outgoing.index', compact('outgoingItems', 'stats', 'users'));
     }
 
@@ -90,11 +77,7 @@ class OutgoingItemsController extends Controller
             'user_select' => 'required|exists:users,id',
             'keterangan' => 'nullable|string|max:500',
         ]);
-
-        // Get selected user data
         $selectedUser = User::findOrFail($validated['user_select']);
-
-        // Validate stock for all items first
         $stockErrors = [];
         foreach ($validated['items'] as $index => $itemData) {
             $item = Item::findOrFail($itemData['item_id']);
@@ -102,7 +85,6 @@ class OutgoingItemsController extends Controller
                 $stockErrors["items.{$index}.quantity"] = "Stok {$item->nama} tidak mencukupi. Stok tersedia: {$item->stok_total}";
             }
         }
-
         if (!empty($stockErrors)) {
             return redirect()->back()->withErrors($stockErrors)->withInput();
         }
@@ -110,7 +92,6 @@ class OutgoingItemsController extends Controller
         DB::transaction(function () use ($validated, $selectedUser) {
             foreach ($validated['items'] as $itemData) {
                 $item = Item::findOrFail($itemData['item_id']);
-                
                 \Log::info('Creating outgoing item', [
                     'item_id' => $item->id,
                     'item_name' => $item->nama,
@@ -120,8 +101,6 @@ class OutgoingItemsController extends Controller
                         'stok_total' => $item->stok_total
                     ]
                 ]);
-                
-                // Create outgoing inventory record
                 Inventory::create([
                     'item_id' => $itemData['item_id'],
                     'tipe' => 'keluar',
@@ -132,8 +111,6 @@ class OutgoingItemsController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
-
-                // Update item stock - reduce both stok_reguler and stok_total
                 $updateResult = DB::table('items')
                     ->where('id', $item->id)
                     ->update([
@@ -141,10 +118,7 @@ class OutgoingItemsController extends Controller
                         'stok_total' => DB::raw('stok_total - ' . $itemData['quantity']),
                         'updated_at' => now()
                     ]);
-                
-                // Verify stock update
                 $updatedItem = DB::table('items')->where('id', $item->id)->first();
-                
                 \Log::info('Stock updated', [
                     'item_id' => $item->id,
                     'update_result' => $updateResult,
@@ -155,7 +129,6 @@ class OutgoingItemsController extends Controller
                 ]);
             }
         });
-
         $totalItems = count($validated['items']);
         return redirect()->route('admin.outgoing.index')->with('success', "Berhasil mencatat {$totalItems} item barang keluar");
     }
@@ -165,7 +138,6 @@ class OutgoingItemsController extends Controller
         $outgoingItem = Inventory::with(['item', 'item.supplier', 'item.category'])
             ->where('tipe', 'keluar')
             ->findOrFail($id);
-
         return view('admin.contents.outgoing.show', compact('outgoingItem'));
     }
 
@@ -200,7 +172,6 @@ class OutgoingItemsController extends Controller
         $newItem = Item::find($validated['item_id']);
 
         DB::transaction(function () use ($validated, $outgoingItem, $oldItem, $newItem) {
-            // Restore old item stock (both stok_reguler and stok_total)
             DB::table('items')
                 ->where('id', $oldItem->id)
                 ->update([
@@ -208,19 +179,11 @@ class OutgoingItemsController extends Controller
                     'stok_total' => DB::raw('stok_total + ' . $outgoingItem->jumlah),
                     'updated_at' => now()
                 ]);
-
-            // Refresh to get updated stock
             $newItem = $newItem->fresh();
-
-            // Check if new item has enough stock
             if ($newItem->stok_total < $validated['jumlah']) {
                 throw new \Exception('Stok tidak mencukupi untuk item yang dipilih');
             }
-
-            // Update outgoing record
             $outgoingItem->update($validated);
-
-            // Update new item stock (both stok_reguler and stok_total)
             DB::table('items')
                 ->where('id', $newItem->id)
                 ->update([
@@ -238,7 +201,6 @@ class OutgoingItemsController extends Controller
         $outgoingItem = Inventory::where('tipe', 'keluar')->findOrFail($id);
 
         DB::transaction(function () use ($outgoingItem) {
-            // Restore item stock (both stok_reguler and stok_total)
             DB::table('items')
                 ->where('id', $outgoingItem->item_id)
                 ->update([
@@ -246,11 +208,8 @@ class OutgoingItemsController extends Controller
                     'stok_total' => DB::raw('stok_total + ' . $outgoingItem->jumlah),
                     'updated_at' => now()
                 ]);
-
-            // Delete outgoing record
             $outgoingItem->delete();
         });
-
         return redirect()->route('admin.outgoing.index')->with('success', 'Data barang keluar berhasil dihapus');
     }
 
@@ -260,14 +219,11 @@ class OutgoingItemsController extends Controller
             'selected_items' => 'required|array',
             'selected_items.*' => 'exists:inventories,id',
         ]);
-
         DB::transaction(function () use ($validated) {
             $outgoingItems = Inventory::whereIn('id', $validated['selected_items'])
                 ->where('tipe', 'keluar')
                 ->get();
-
             foreach ($outgoingItems as $outgoingItem) {
-                // Restore item stock (both stok_reguler and stok_total)
                 DB::table('items')
                     ->where('id', $outgoingItem->item_id)
                     ->update([
@@ -275,30 +231,24 @@ class OutgoingItemsController extends Controller
                         'stok_total' => DB::raw('stok_total + ' . $outgoingItem->jumlah),
                         'updated_at' => now()
                     ]);
-
-                // Delete outgoing record
                 $outgoingItem->delete();
             }
         });
-
         return redirect()->route('admin.outgoing.index')->with('success', 'Data barang keluar terpilih berhasil dihapus');
     }
 
     public function searchUsers(Request $request)
     {
         $query = $request->get('query');
-
         if (empty($query)) {
             return response()->json([]);
         }
-
         $users = User::where('name', 'like', "%{$query}%")
             ->orWhere('id', 'like', "%{$query}%")
             ->orWhere('email', 'like', "%{$query}%")
             ->select('id', 'name', 'email')
             ->limit(10)
             ->get();
-
         return response()->json($users->map(function ($user) {
             return [
                 'id' => $user->id,

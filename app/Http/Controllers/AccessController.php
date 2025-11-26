@@ -96,7 +96,6 @@ class AccessController extends Controller
             ->take(5)
             ->get()
             ->map(function ($transaksi) {
-                // safe access to related item (in case item was deleted)
                 $item = $transaksi->item;
                 return (object) [
                     'created_at' => $transaksi->created_at,
@@ -107,7 +106,6 @@ class AccessController extends Controller
                 ];
             });
 
-        // Last 7 days summary
         $sevenDays = collect();
         $startDate = now()->subDays(6);
 
@@ -136,10 +134,10 @@ class AccessController extends Controller
         $chartDates = [];
 
         if ($range === 'weekly') {
-            $start = now()->startOfWeek(); // Monday
+            $start = now()->startOfWeek(); 
             for ($i = 0; $i < 7; $i++) {
                 $date = $start->copy()->addDays($i)->format('Y-m-d');
-                $chartDates[] = $start->copy()->addDays($i)->format('D'); // Mon, Tue...
+                $chartDates[] = $start->copy()->addDays($i)->format('D'); 
 
                 $chartMasuk[] = Inventory::where('tipe', 'masuk')->whereDate('created_at', $date)->sum('jumlah');
                 $chartKeluar[] = Inventory::where('tipe', 'keluar')->whereDate('created_at', $date)->sum('jumlah');
@@ -178,7 +176,6 @@ class AccessController extends Controller
             ->take(5)
             ->get();
 
-        // Get pending borrowing requests for notification
         $pendingBorrowingRequests = BorrowingRequest::with(['user', 'item'])
             ->where('status', 'pending')
             ->latest()
@@ -226,15 +223,12 @@ class AccessController extends Controller
 
     public function ShowDashboardUser()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
-        // Borrowing Statistics
-        // total_borrowed => all approved + completed (total that has been borrowed historically)
         $totalBorrowed = \App\Models\BorrowingRequest::where('user_id', $user->id)
             ->whereIn('status', ['approved', 'completed'])
             ->sum('jumlah');
 
-        // unreturned_items => approved but not yet completed (still with user)
         $unreturnedItems = \App\Models\BorrowingRequest::where('user_id', $user->id)
             ->where('status', 'approved')
             ->sum('jumlah');
@@ -262,7 +256,6 @@ class AccessController extends Controller
             'available_items' => $availableItems,
         ];
 
-        // Recent borrowing activities (last 5)
         $recent_activities = \App\Models\BorrowingRequest::where('user_id', $user->id)
             ->with('item')
             ->orderBy('created_at', 'desc')

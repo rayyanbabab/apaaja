@@ -29,13 +29,11 @@ class CreateAdminUser extends Command
         $email = $this->argument('email');
         $password = $this->option('password');
 
-        // Check if user already exists
         if (User::where('email', $email)->exists()) {
             $this->error('User with this email already exists!');
             return 1;
         }
 
-        // Create new admin user
         $user = User::create([
             'name' => 'Admin',
             'email' => $email,

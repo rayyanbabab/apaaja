@@ -21,6 +21,4 @@ class InventoryService
             'status' => $selisih < 0 ? $status : null,
         ]);
     }
-
-    // Bisa tambah method lain, misal update status inventory, nge-track, dll
 }

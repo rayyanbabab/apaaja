@@ -1,8 +1,6 @@
 @extends('admin.layouts.dashboard')
-
 @section('content')
 <div class="space-y-6">
-    <!-- ===== PAGE HEADER ===== -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div class="mb-4 sm:mb-0">
@@ -25,10 +23,7 @@
             </div>
         </div>
     </div>
-
-    <!-- ===== MAIN FORM CARD ===== -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-        <!-- Card Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900 flex items-center">
                 <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,7 +33,6 @@
             </h3>
         </div>
 
-        <!-- Alert Messages -->
         @if($errors->any())
             <div class="mx-6 mt-4 bg-red-50 border border-red-200 rounded-md p-4">
                 <div class="flex">
@@ -63,13 +57,11 @@
             </div>
         @endif
 
-        <!-- Form Content -->
         <div class="p-6">
             <form action="{{ route('admin.categories.update', $category) }}" method="POST" class="space-y-6">
                 @csrf
                 @method('PUT')
                 
-                <!-- Basic Information Section -->
                 <div class="bg-gray-50 rounded-lg p-4">
                     <h4 class="text-sm font-medium text-gray-700 mb-4 flex items-center">
                         <svg class="w-4 h-4 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,7 +71,6 @@
                     </h4>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Category Name -->
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
                                 Nama Kategori <span class="text-red-500">*</span>
@@ -99,7 +90,6 @@
                             </p>
                         </div>
 
-                        <!-- Status -->
                         <div>
                             <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
                                 Status <span class="text-red-500">*</span>
@@ -122,7 +112,6 @@
                     </div>
                 </div>
 
-                <!-- Description Section -->
                 <div class="bg-gray-50 rounded-lg p-4">
                     <h4 class="text-sm font-medium text-gray-700 mb-4 flex items-center">
                         <svg class="w-4 h-4 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,7 +138,6 @@
                     </div>
                 </div>
 
-                <!-- Current Category Info -->
                 <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
                     <h4 class="text-sm font-medium text-blue-700 mb-4 flex items-center">
                         <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,8 +181,6 @@
                         <p class="text-sm text-blue-900 font-medium">{{ $category->items->count() }} item</p>
                     </div>
                 </div>
-
-                <!-- Form Actions -->
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-6 border-t border-gray-200">
                     <div class="mb-4 sm:mb-0">
                         <button type="reset" 
@@ -228,8 +214,6 @@
         </div>
     </div>
 </div>
-
-<!-- ===== STYLES ===== -->
 <style>
     .update-category-button {
         display: inline-flex !important;
@@ -254,17 +238,13 @@
     }
 </style>
 
-<!-- ===== SCRIPTS ===== -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-resize textarea
     const textarea = document.getElementById('description');
     textarea.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
     });
-
-    // Smooth scroll to errors
     const errorElements = document.querySelectorAll('.border-red-300');
     if (errorElements.length > 0) {
         errorElements[0].scrollIntoView({ behavior: 'smooth', block: 'center' });

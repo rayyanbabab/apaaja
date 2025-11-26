@@ -1,4 +1,3 @@
-{{-- CSS to ensure hamburger is hidden on desktop --}}
 <style>
     @media (min-width: 768px) {
         .mobile-hamburger-container {
@@ -17,7 +16,6 @@
     }
 </style>
 
-{{-- Mobile Hamburger Button - Only visible on mobile --}}
 <div class="mobile-hamburger-container mobile-hamburger block md:hidden fixed top-4 left-4 z-50" 
      x-data="{ mobileMenuOpen: false }">
     <button @click="mobileMenuOpen = !mobileMenuOpen" 
@@ -30,7 +28,6 @@
         </svg>
     </button>
 
-    {{-- Mobile Sidebar Overlay --}}
     <div x-show="mobileMenuOpen" 
          x-transition:enter="transition-opacity ease-linear duration-300"
          x-transition:enter-start="opacity-0"
@@ -41,7 +38,6 @@
          class="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 md:hidden"
          @click="mobileMenuOpen = false"></div>
 
-    {{-- Mobile Sidebar --}}
     <div x-show="mobileMenuOpen"
          x-transition:enter="transition ease-in-out duration-300 transform"
          x-transition:enter-start="-translate-x-full"
@@ -52,7 +48,6 @@
          class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl border-r border-gray-200 md:hidden"
          x-data="sidebarData()" x-init="init()">
         
-        {{-- Mobile Header --}}
         <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-white">
             <div class="flex items-center space-x-3">
                 <img src="/inc.png" alt="CHEMI-CON Logo" class="h-10 w-auto">
@@ -65,10 +60,8 @@
             </button>
         </div>
 
-        {{-- Mobile Navigation --}}
         <div class="flex flex-col h-full">
             <nav class="px-4 py-6 space-y-1 flex-1 overflow-y-auto">
-            {{-- Dashboard --}}
             <a href="{{ route('admin.dashboard') }}" @click="mobileMenuOpen = false"
                class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ Route::is('admin.dashboard') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                 <svg class="w-5 h-5 mr-3 {{ Route::is('admin.dashboard') ? 'text-blue-600' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,7 +70,6 @@
                 Dashboard
             </a>
 
-            {{-- Master Data --}}
             <div class="pt-4">
                 <button @click="masterDataOpen = !masterDataOpen" 
                         class="flex items-center justify-between w-full px-4 py-2 text-sm font-semibold text-gray-500 transition-colors"
@@ -112,7 +104,6 @@
                 </div>
             </div>
 
-            {{-- Inventory --}}
             <div class="pt-4">
                 <button @click="inventoryOpen = !inventoryOpen" 
                         class="flex items-center justify-between w-full px-4 py-2 text-sm font-semibold text-gray-500 transition-colors"
@@ -154,7 +145,6 @@
                 </div>
             </div>
 
-            {{-- Borrowing --}}
             <div class="pt-4">
                 <button @click="borrowingOpen = !borrowingOpen" 
                         class="flex items-center justify-between w-full px-4 py-2 text-sm font-semibold text-gray-500 transition-colors"
@@ -189,7 +179,6 @@
                 </div>
             </div>
 
-            {{-- Users --}}
             <div class="pt-4">
                 <button @click="usersOpen = !usersOpen" 
                         class="flex items-center justify-between w-full px-4 py-2 text-sm font-semibold text-gray-500 transition-colors"
@@ -224,7 +213,6 @@
                 </div>
             </div>
 
-            {{-- Reports --}}
             <a href="{{ route('admin.reports.index') }}" @click="mobileMenuOpen = false"
                class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ Route::is('admin.reports.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }} mt-4">
                 <svg class="w-5 h-5 mr-3 {{ Route::is('admin.reports.*') ? 'text-blue-600' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -233,7 +221,6 @@
                 Reports
             </a>
 
-            {{-- Recent Activities --}}
             <a href="{{ route('admin.activities.index') }}" @click="mobileMenuOpen = false"
                class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ Route::is('admin.activities.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                 <svg class="w-5 h-5 mr-3 {{ Route::is('admin.activities.*') ? 'text-blue-600' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -242,7 +229,6 @@
                 Recent Activities
             </a>
 
-            {{-- Profile --}}
             <a href="{{ route('admin.profile.index') }}" @click="mobileMenuOpen = false"
                class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ Route::is('admin.profile.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                 <svg class="w-5 h-5 mr-3 {{ Route::is('admin.profile.*') ? 'text-blue-600' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -252,8 +238,6 @@
             </a>
 
             </nav>
-            
-            {{-- Mobile Footer with Sign Out --}}
             <div class="flex-shrink-0 p-4 border-t border-gray-200 bg-gray-50">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

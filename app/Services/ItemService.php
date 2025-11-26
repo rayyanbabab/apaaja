@@ -24,8 +24,6 @@ class ItemService
                 $item->keterangan = $data['keterangan'] ?? null;
                 $item->type = $data['type'];
             }
-
-            // Set stock based on type
             if ($data['type'] === 'peminjaman') {
                 $item->stok_peminjaman = $data['stok'];
                 $item->stok_reguler = 0;
@@ -34,19 +32,14 @@ class ItemService
                 $item->stok_peminjaman = 0;
             }
             $item->stok_total = $data['stok'];
-
-            // Handle image upload only if file is provided and valid
             if ($gambar && $gambar instanceof \Illuminate\Http\UploadedFile && $gambar->isValid()) {
                 if ($item->gambar && file_exists(public_path($item->gambar))) {
                     unlink(public_path($item->gambar));
                 }
-
-                // Create images directory if it doesn't exist
                 $imagesPath = public_path('images');
                 if (! file_exists($imagesPath)) {
                     mkdir($imagesPath, 0755, true);
                 }
-
                 $fileName = time().'_'.$gambar->getClientOriginalName();
                 $gambar->move($imagesPath, $fileName);
                 $item->gambar = 'images/'.$fileName;

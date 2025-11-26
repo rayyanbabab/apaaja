@@ -37,7 +37,6 @@ class SupplierController extends Controller
                 ->withInput();
         }
 
-        // Set company_name same as nama for consistency
         $data = $request->all();
         $data['company_name'] = $request->nama;
 
@@ -74,7 +73,6 @@ class SupplierController extends Controller
                 ->withInput();
         }
 
-        // Set company_name same as nama for consistency
         $data = $request->all();
         $data['company_name'] = $request->nama;
 

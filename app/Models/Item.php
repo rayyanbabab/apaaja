@@ -45,18 +45,6 @@ class Item extends Model
     {
         return $this->belongsTo(Supplier::class);
     }
-
-    // Multiple images functionality disabled - using single image (gambar column)
-    // public function images()
-    // {
-    //     return $this->hasMany(ItemImage::class)->orderBy('sort_order');
-    // }
-
-    // public function primaryImage()
-    // {
-    //     return $this->hasOne(ItemImage::class)->where('is_primary', true);
-    // }
-
     public function jumlahMasuk()
     {
         return $this->inventories()->where('tipe', 'masuk')->sum('jumlah');
@@ -66,8 +54,7 @@ class Item extends Model
     {
         return $this->inventories()->where('tipe', 'keluar')->sum('jumlah');
     }
-
-    // Helper methods for stock management
+    
     public function updateStokTotal()
     {
         $this->stok_total = $this->stok_reguler + $this->stok_peminjaman;
