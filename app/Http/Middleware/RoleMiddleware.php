@@ -10,7 +10,7 @@ use App\Enums\UsersRole;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         $user = $request->user()?->fresh();
 
@@ -18,12 +18,14 @@ class RoleMiddleware
             abort(403, 'No user found');
         }
 
-        if (! $user->hasRole($role)) {
+        $userRole = $user->role instanceof UsersRole
+            ? $user->role->value
+            : $user->role;
+
+        if (! in_array($userRole, $roles)) {
             Log::warning('Unauthorized role', [
-                'expected' => $role,
-                'actual' => $user->role instanceof UsersRole 
-                    ? $user->role->value 
-                    : $user->role,
+                'expected' => implode(',', $roles),
+                'actual'   => $userRole,
             ]);
 
             abort(403, 'Unauthorized role');

@@ -19,6 +19,7 @@ class User extends Authenticatable
         'password',
         'role',
         'is_active',
+        'whatsapp_number',
     ];
 
     public function hasRole(UsersRole|string $role): bool
@@ -46,13 +47,27 @@ class User extends Authenticatable
         'is_active' => true,
     ];
 
+    /**
+     * Get the inventories for the user.
+     */
     public function inventories()
     {
         return $this->hasMany(Inventory::class);
     }
 
+    /**
+     * Get the borrowing requests for the user.
+     */
     public function borrowingRequests()
     {
         return $this->hasMany(BorrowingRequest::class);
+    }
+
+    /**
+     * Route notifications for the WhatsApp channel.
+     */
+    public function routeNotificationForWhatsApp(): ?string
+    {
+        return $this->whatsapp_number ?: null;
     }
 }

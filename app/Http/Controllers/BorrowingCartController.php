@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use App\Models\BorrowingCart;
 use App\Models\BorrowingRequest;
 use App\Models\Item;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,9 @@ class BorrowingCartController extends Controller
             ->where('user_id', Auth::id())
             ->get();
 
-        return view('user.contents.borrowing.cart', compact('cartItems'));
+        $maxBorrowDays = (int) Setting::get('max_borrow_days', 7);
+
+        return view('user.contents.borrowing.cart', compact('cartItems', 'maxBorrowDays'));
     }
 
     public function add(Request $request)
@@ -100,6 +103,18 @@ class BorrowingCartController extends Controller
 
         if ($cartItems->isEmpty()) {
             return back()->withErrors(['error' => 'Keranjang Anda kosong.']);
+        }
+
+        // Cek batas maksimal item aktif per user
+        $maxItems = Setting::get('max_items_per_user', 3);
+        $activeCount = BorrowingRequest::where('user_id', Auth::id())
+            ->whereIn('status', ['pending', 'approved'])
+            ->count();
+        $cartCount = $cartItems->count();
+
+        if (($activeCount + $cartCount) > $maxItems) {
+            $remaining = max(0, $maxItems - $activeCount);
+            return back()->withErrors(['error' => 'Batas peminjaman aktif adalah ' . $maxItems . ' item. Anda saat ini memiliki ' . $activeCount . ' item aktif. Anda hanya bisa menambahkan ' . $remaining . ' item lagi.']);
         }
 
         DB::beginTransaction();

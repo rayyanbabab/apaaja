@@ -33,9 +33,10 @@ class AuthService
             : $user->role;
 
         return match ($role) {
-            'admin' => route('admin.dashboard'),
-            'user'  => route('user.dashboard'),
-            default => '/',
+            'admin'    => '/admin/dashboard',
+            'operator' => '/staff/dashboard',
+            'user'     => '/user/dashboard',
+            default    => '/',
         };
     }
 }

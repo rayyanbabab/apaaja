@@ -9,7 +9,7 @@
                 <p class="text-sm text-gray-600">Update user information and profile</p>
             </div>
             <div class="flex items-center space-x-3">
-                <a href="{{ route('admin.content.listusers') }}"
+                <a href="{{ route($routePrefix . '.content.listusers') }}"
                     class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
                     <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -39,7 +39,7 @@
 
         {{-- Main Form --}}
         <div class="rounded-lg border border-gray-200 bg-white shadow-sm">
-            <form action="{{ route('admin.content.updateusers', $user->id) }}" method="POST" enctype="multipart/form-data">
+            <form id="update-form-{{ $user->id }}" action="{{ route($routePrefix . '.content.updateusers', $user->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('POST')
 
@@ -53,12 +53,21 @@
                             <h3 class="text-lg font-semibold text-gray-900">Edit User: {{ $user->name }}</h3>
                             <p class="text-sm text-gray-600">{{ $user->email }}</p>
                             <div class="mt-1">
-                                @if(($user->role->value ?? 'user') === 'admin')
+                                @php $uRole = $user->role->value ?? 'user'; @endphp
+                                @if($uRole === 'admin')
                                     <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
                                         <svg class="mr-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd" />
                                         </svg>
                                         Administrator
+                                    </span>
+                                @elseif($uRole === 'operator')
+                                    <span class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">
+                                        <svg class="mr-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                                            <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z"/>
+                                        </svg>
+                                        Operator
                                     </span>
                                 @else
                                     <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
@@ -189,6 +198,29 @@
                             @enderror
                         </div>
 
+                        {{-- WhatsApp Number Field --}}
+                        <div class="space-y-2">
+                            <label for="whatsapp_number" class="block text-sm font-medium text-gray-700">
+                                Nomor WhatsApp
+                                <span class="text-xs text-gray-400 font-normal ml-1">(Opsional — untuk notifikasi WA)</span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                                        <path d="M11.999 0C5.373 0 0 5.373 0 12c0 2.117.554 4.107 1.523 5.832L.051 23.999l6.333-1.462A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.626 0 11.999 0zm.001 21.818a9.818 9.818 0 01-5.001-1.368l-.359-.214-3.721.975.993-3.62-.234-.371A9.818 9.818 0 012.182 12c0-5.418 4.4-9.818 9.818-9.818 5.418 0 9.818 4.4 9.818 9.818 0 5.419-4.4 9.818-9.818 9.818z"/>
+                                    </svg>
+                                </span>
+                                <input type="text" id="whatsapp_number" name="whatsapp_number" 
+                                    value="{{ old('whatsapp_number', $user->whatsapp_number) }}"
+                                    class="input-form pl-9" 
+                                    placeholder="Contoh: 08123456789 atau 628123456789">
+                            </div>
+                            @error('whatsapp_number')
+                                <p class="text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         {{-- Status Field --}}
                         <div class="space-y-2">
                             <label class="block text-sm font-medium text-gray-700">
@@ -196,16 +228,19 @@
                             </label>
                             <div class="flex items-center space-x-4">
                                 <label class="flex items-center">
-                                    <input type="radio" name="is_active" value="1" {{ old('is_active', $user->is_active ?? true) == '1' ? 'checked' : '' }}
+                                    <input type="radio" name="is_active" value="1" {{ old('is_active', $user->is_active ?? true) == '1' ? 'checked' : '' }} {{ ($user->role->value ?? (string) $user->role) === 'admin' ? 'disabled' : '' }}
                                         class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
                                     <span class="ml-2 text-sm text-gray-700">Active</span>
                                 </label>
                                 <label class="flex items-center">
-                                    <input type="radio" name="is_active" value="0" {{ old('is_active', $user->is_active ?? true) == '0' ? 'checked' : '' }}
+                                    <input type="radio" name="is_active" value="0" {{ old('is_active', $user->is_active ?? true) == '0' ? 'checked' : '' }} {{ ($user->role->value ?? (string) $user->role) === 'admin' ? 'disabled' : '' }}
                                         class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
                                     <span class="ml-2 text-sm text-gray-700">Inactive</span>
                                 </label>
                             </div>
+                            @if(($user->role->value ?? (string) $user->role) === 'admin')
+                                <p class="text-xs text-gray-500">Status akun admin tidak bisa diubah.</p>
+                            @endif
                             @error('is_active')
                                 <p class="text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -264,10 +299,19 @@
                         {{-- Role Field --}}
                         <div class="space-y-2">
                             <label for="role" class="block text-sm font-medium text-gray-700">User Role</label>
-                            <select id="role" name="role" class="input-form" required>
-                                <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>Admin</option>
-                                <option value="user" {{ old('role', $user->role) === 'user' ? 'selected' : '' }}>User</option>
+                            @php
+                                $selectedRole = old('role', $user->role->value ?? (string) $user->role);
+                            @endphp
+                            <select id="role" name="role" class="input-form" required {{ ($user->role->value ?? (string) $user->role) === 'admin' ? 'disabled' : '' }}>
+                                <option value="admin" {{ $selectedRole === 'admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="operator" {{ $selectedRole === 'operator' ? 'selected' : '' }}>Operator</option>
+                                <option value="user" {{ $selectedRole === 'user' ? 'selected' : '' }}>User</option>
                             </select>
+                            @if(($user->role->value ?? (string) $user->role) === 'admin')
+                                <p class="text-xs text-gray-500">Role admin tidak bisa diubah.</p>
+                                <input type="hidden" name="role" value="admin">
+                                <input type="hidden" name="is_active" value="{{ $user->is_active ? 1 : 0 }}">
+                            @endif
                             @error('role')
                                 <p class="flex items-center text-sm text-red-600">
                                     <svg class="mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,7 +328,7 @@
                 {{-- Form Footer --}}
                 <div class="rounded-b-lg border-t border-gray-200 bg-gray-50 px-4 py-4">
                     <div class="flex items-center justify-between">
-                        <a href="{{ route('admin.content.listusers') }}"
+                        <a href="{{ route($routePrefix . '.content.listusers') }}"
                             class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
                             <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -293,13 +337,13 @@
                     Cancel
                 </a>
 
-                        <button type="submit" class="update-button">
+                        <button type="button" onclick="openModal('update-modal-{{ $user->id }}')" class="update-button">
                             <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7" />
                             </svg>
                             Update User
-                </button>
+                        </button>
                     </div>
             </div>
         </form>
@@ -367,4 +411,16 @@
             }
         }
     </script>
+        }
+    </script>
 @endsection
+
+@push('scripts')
+    <x-popup id="update-modal-{{ $user->id }}" title="Konfirmasi Update"
+        message="Apakah Anda yakin ingin menyimpan perubahan data user ini?"
+        formId="update-form-{{ $user->id }}"
+        confirmText="Simpan"
+        confirmClass="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 rounded-xl transition-colors shadow-sm"
+        cancelText="Batal"
+        icon="info" />
+@endpush

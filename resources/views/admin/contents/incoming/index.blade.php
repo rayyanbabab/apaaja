@@ -1,23 +1,27 @@
 @extends('admin.layouts.dashboard')
+
 @section('content')
 <div class="space-y-6">
+    {{-- Header --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">Barang Masuk</h1>
                     <p class="text-sm text-gray-600 mt-1">Kelola data barang yang masuk ke inventory</p>
                 </div>
-                <a href="{{ route('admin.incoming.create') }}" 
-                   class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                <a href="{{ route($routePrefix . '.incoming.create') }}" 
+                   class="inline-flex items-center justify-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150 whitespace-nowrap">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
-                    Tambah Barang Masuk
+                    <span class="hidden sm:inline">Tambah Barang Masuk</span>
+                    <span class="sm:hidden">Tambah</span>
                 </a>
             </div>
         </div>
 
+        {{-- Statistics --}}
         <div class="px-6 py-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -87,6 +91,7 @@
         </div>
     </div>
 
+    {{-- Flash Messages --}}
     @if (session('success'))
         <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-4">
             <div class="flex">
@@ -128,9 +133,10 @@
         </div>
     @endif
 
+    {{-- Filters --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4">
-            <form method="GET" action="{{ route('admin.incoming.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <form method="GET" action="{{ route($routePrefix . '.incoming.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                     <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Pencarian</label>
                     <div class="relative">
@@ -178,7 +184,7 @@
                         </svg>
                         Filter
                     </button>
-                    <a href="{{ route('admin.incoming.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <a href="{{ route($routePrefix . '.incoming.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                         <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
                         </svg>
@@ -189,6 +195,7 @@
         </div>
     </div>
 
+    {{-- Table --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         @if($incomingItems->count() > 0)
             <div class="px-6 py-4 border-b border-gray-200">
@@ -197,8 +204,9 @@
                     <div class="flex items-center space-x-2">
                         <button type="button" id="selectAllBtn" class="px-3 py-1 text-sm text-green-600 hover:text-green-800 border border-green-200 rounded hover:bg-green-50">Pilih Semua</button>
                         <button type="button" id="deselectAllBtn" class="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-200 rounded hover:bg-gray-50" style="display: none;">Batal Pilih</button>
-                        <button type="button" id="bulkDeleteBtn" class="px-3 py-1 text-sm text-red-600 hover:text-red-800 border border-red-200 rounded hover:bg-red-50" style="display: none;">
-                            <i class="fas fa-trash mr-1"></i> Hapus Terpilih
+                        <button type="button" id="bulkDeleteBtn" class="inline-flex items-center px-3 py-1 text-sm text-red-600 hover:text-red-800 border border-red-200 rounded hover:bg-red-50" style="display: none;">
+                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            Hapus Terpilih
                         </button>
                     </div>
                 </div>
@@ -254,13 +262,9 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex items-center space-x-2">
-                                        <a href="{{ route('admin.incoming.show', $item->id) }}" class="text-green-600 hover:text-green-900">View</a>
-                                        <a href="{{ route('admin.incoming.edit', $item->id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                                        <form action="{{ route('admin.incoming.destroy', $item->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
-                                        </form>
+                                        <a href="{{ route($routePrefix . '.incoming.show', $item->id) }}" class="text-green-600 hover:text-green-900">View</a>
+                                        <a href="{{ route($routePrefix . '.incoming.edit', $item->id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                        <button type="button" onclick="openModal('del-inc-{{ $item->id }}')" class="text-red-600 hover:text-red-900">Delete</button>
                                     </div>
                                 </td>
                             </tr>
@@ -281,7 +285,7 @@
                 <h3 class="mt-2 text-sm font-medium text-gray-900">Belum ada barang masuk</h3>
                 <p class="mt-1 text-sm text-gray-500">Mulai dengan menambahkan barang masuk baru.</p>
                 <div class="mt-6">
-                    <a href="{{ route('admin.incoming.create') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    <a href="{{ route($routePrefix . '.incoming.create') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
@@ -294,7 +298,7 @@
 </div>
 
 {{-- Bulk Delete Form --}}
-<form id="bulkDeleteForm" action="{{ route('admin.incoming.bulk-delete') }}" method="POST" style="display: none;">
+<form id="bulkDeleteForm" action="{{ route($routePrefix . '.incoming.bulk-delete') }}" method="POST" style="display: none;">
     @csrf
     @method('DELETE')
     <div id="selectedItemsContainer"></div>
@@ -302,32 +306,6 @@
 
 @push('styles')
 <style>
-    .pagination {
-        display: flex;
-        justify-content: center;
-        margin-top: 1.5rem;
-    }
-    .pagination > * {
-        margin: 0 0.25rem;
-        padding: 0.5rem 0.75rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.375rem;
-        color: #4a5568;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-    .pagination > *:hover:not(.disabled) {
-        background-color: #f7fafc;
-    }
-    .pagination .active {
-        background-color: #48bb78;
-        color: white;
-        border-color: #48bb78;
-    }
-    .pagination .disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
 </style>
 @endpush
 
@@ -440,46 +418,45 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        if (confirm(`Anda yakin ingin menghapus ${checkedBoxes.length} item terpilih?`)) {
-            const form = document.getElementById('bulkDeleteForm');
-            const container = document.getElementById('selectedItemsContainer');
-            
-            // Show loading state
-            const originalContent = this.innerHTML;
-            this.disabled = true;
-            this.innerHTML = `
-                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Menghapus...
-            `;
-            
-            // Clear previous inputs
-            container.innerHTML = '';
-            
-            // Add selected item IDs
-            checkedBoxes.forEach(checkbox => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'selected_items[]';
-                input.value = checkbox.value;
-                container.appendChild(input);
-            });
-            
-            // Submit form
-            form.submit();
-        }
+        const container = document.getElementById('selectedItemsContainer');
+        container.innerHTML = '';
+        checkedBoxes.forEach(checkbox => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'selected_items[]';
+            input.value = checkbox.value;
+            container.appendChild(input);
+        });
+        
+        openModal('bulk-del-modal');
     });
 
     // Initialize
     updateSelectAllState();
 });
 </script>
-@if($incomingItems->hasPages())
-    <div class="px-6 py-4 border-t border-gray-200">
-        {{ $incomingItems->appends(request()->query())->links() }}
-    </div>
-@endif
+
 
 @endsection
+
+@push('scripts')
+    <x-popup id="bulk-del-modal" title="Hapus Item Terpilih"
+        message="Apakah Anda yakin ingin menghapus item yang dipilih?"
+        formId="bulkDeleteForm"
+        confirmText="Hapus"
+        confirmClass="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors shadow-sm"
+        cancelText="Batal" />
+
+    @foreach($incomingItems as $item)
+        <x-popup id="del-inc-{{ $item->id }}" title="Hapus Barang Masuk"
+            message="Apakah Anda yakin ingin menghapus catatan barang masuk ini? Stok barang akan disesuaikan kembali."
+            formId="del-inc-form-{{ $item->id }}"
+            confirmText="Hapus"
+            confirmClass="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors shadow-sm"
+            cancelText="Batal" />
+        <form id="del-inc-form-{{ $item->id }}" action="{{ route($routePrefix . '.incoming.destroy', $item->id) }}" method="POST" style="display: none;">
+            @csrf
+            @method('DELETE')
+        </form>
+    @endforeach
+@endpush

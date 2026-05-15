@@ -1,5 +1,6 @@
 @import './next-theme.css';
 @import './config.css';
+@import './dark-mode.css';
 
 @tailwind base;
 @tailwind components;

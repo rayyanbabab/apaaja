@@ -1,17 +1,18 @@
-@extends('admin.layouts.dashboard')
+﻿@extends('admin.layouts.dashboard')
 
 @section('content')
+@php $lowStockThreshold = $lowStockThreshold ?? 5; @endphp
 <div class="space-y-6">
     {{-- Header --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">Laporan Persediaan Barang</h1>
                     <p class="text-sm text-gray-600 mt-1">Filter dan export laporan persediaan barang</p>
                 </div>
-                <a href="{{ route('admin.reports.index') }}" 
-                   class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                <a href="{{ route($routePrefix . '.reports.index') }}" 
+                   class="inline-flex items-center justify-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150 whitespace-nowrap">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
@@ -27,7 +28,7 @@
             <h3 class="text-lg font-medium text-gray-900">Filter Laporan</h3>
         </div>
         <div class="px-6 py-4">
-            <form method="GET" action="{{ route('admin.reports.inventory') }}" class="space-y-6">
+            <form method="GET" action="{{ route($routePrefix . '.reports.inventory') }}" class="space-y-6">
                 {{-- Filter Row --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
@@ -36,7 +37,7 @@
                             <option value="">Semua Supplier</option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{ $supplier->id }}" {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>
-                                    {{ $supplier->nama }}
+                                    {{ $supplier->company_name ?? $supplier->nama ?? 'Supplier #'.$supplier->id }}
                                 </option>
                             @endforeach
                         </select>
@@ -73,7 +74,7 @@
                                     </svg>
                                     Filter
                                 </button>
-                                <a href="{{ route('admin.reports.inventory') }}" class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg font-medium text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
+                                <a href="{{ route($routePrefix . '.reports.inventory') }}" class="flex-1 inline-flex justify-center items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg font-medium text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                     </svg>
@@ -164,7 +165,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">Low Stock</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $items->where('stok_total', '<', 10)->count() }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $items->filter(fn($i) => ($i->stok_total ?? 0) <= $lowStockThreshold && ($i->stok_total ?? 0) > 0)->count() }}</p>
                 </div>
             </div>
         </div>
@@ -290,24 +291,20 @@
                                     {{ $item->category->name ?? 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $item->stok_total }}
+                                    @php $stok = $item->stok_total ?? 0; @endphp
+                                    @if($stok == 0)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">0 — Habis</span>
+                                    @elseif($stok <= $lowStockThreshold)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">{{ $stok }} — Rendah</span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{{ $stok }}</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php
-                                        $rawType = null;
-                                        try {
-                                            $rawType = DB::table('items')->where('id', $item->id)->value('type');
-                                        } catch (\Exception $e) {
-                                            // Column might not exist yet
-                                        }
-                                        
-                                        $typeLabel = 'Stok';
-                                        $badgeClass = 'bg-orange-100 text-orange-800';
-                                        
-                                        if ($rawType === 'peminjaman') {
-                                            $typeLabel = 'Peminjaman';
-                                            $badgeClass = 'bg-blue-100 text-blue-800';
-                                        }
+                                        $typeVal = $item->type?->value ?? $item->getRawOriginal('type') ?? 'stok';
+                                        $typeLabel = $typeVal === 'peminjaman' ? 'Peminjaman' : 'Stok';
+                                        $badgeClass = $typeVal === 'peminjaman' ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800';
                                     @endphp
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $badgeClass }}">
                                         {{ $typeLabel }}

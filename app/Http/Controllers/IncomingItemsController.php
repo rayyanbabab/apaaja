@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Inventory;
 use App\Models\Item;
+use App\Services\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -40,8 +41,8 @@ class IncomingItemsController extends Controller
 
     public function create()
     {
-        $items = Item::with(['supplier:id,nama', 'category:id,name'])
-        ->select('id', 'nama', 'stok_total', 'stok_reguler', 'stok_peminjaman', 'supplier_id', 'category_id', 'type', 'harga')
+        $items = Item::with(['supplier:id,nama', 'category:id,name', 'location:id,name,kode,parent_id', 'location.parent:id,name'])
+        ->select('id', 'nama', 'stok_total', 'stok_reguler', 'stok_peminjaman', 'supplier_id', 'category_id', 'location_id', 'type', 'harga')
         ->orderBy('nama')    
         ->get()
         ->map(function($item) {
@@ -56,6 +57,18 @@ class IncomingItemsController extends Controller
                 $item->supplier->nama ?? 'Tanpa Supplier',
                 $item->category->name ?? 'Tanpa Kategori'
             );
+
+            // Build location label
+            if ($item->location) {
+                $item->location_label = $item->location->parent
+                    ? $item->location->parent->name . ' › ' . $item->location->name
+                    : $item->location->name;
+                $item->location_kode  = $item->location->kode ?? '';
+            } else {
+                $item->location_label = '';
+                $item->location_kode  = '';
+            }
+
             return $item;
         });
         $selectedItemId = request()->query('item_id');
@@ -68,8 +81,6 @@ class IncomingItemsController extends Controller
 
     public function store(Request $request)
     {
-        \Log::info('Starting multi-item stock addition process', ['request' => $request->all()]);
-        
         $validated = $request->validate([
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:items,id',
@@ -84,84 +95,45 @@ class IncomingItemsController extends Controller
 
         try {
             DB::beginTransaction();
-            \Log::info('Transaction started');
 
             foreach ($validated['items'] as $itemData) {
                 $item = Item::lockForUpdate()->findOrFail($itemData['item_id']);
-                \Log::info('Item retrieved', ['item' => $item->toArray()]);
                 $itemType = $item->type->value;
                 $jumlah = (int)$itemData['quantity'];
-                
+
                 if ($itemType === 'stok') {
-                    $oldStokReguler = (int)$item->stok_reguler;
-                    $oldStokTotal = (int)$item->stok_total;
-                    $newStokReguler = $oldStokReguler + $jumlah;
-                    $newStokTotal = $oldStokTotal + $jumlah;
-                    
-                    \Log::info('Stock calculation (Reguler)', [
-                        'item_id' => $item->id,
-                        'item_name' => $item->nama,
-                        'item_type' => 'stok',
-                        'old_stok_reguler' => $oldStokReguler,
-                        'old_stok_total' => $oldStokTotal,
-                        'jumlah' => $jumlah,
-                        'new_stok_reguler' => $newStokReguler,
-                        'new_stok_total' => $newStokTotal
-                    ]);
                     $updateResult = DB::table('items')
                         ->where('id', $item->id)
                         ->update([
-                            'stok_reguler' => $newStokReguler,
-                            'stok_total' => $newStokTotal,
-                            'updated_at' => now()
+                            'stok_reguler' => DB::raw('stok_reguler + ' . $jumlah),
+                            'stok_total'   => DB::raw('stok_total + ' . $jumlah),
+                            'updated_at'   => now(),
                         ]);
-                        
+
                 } elseif ($itemType === 'peminjaman') {
-                    $oldStokPeminjaman = (int)$item->stok_peminjaman;
-                    $oldStokTotal = (int)$item->stok_total;
-                    $newStokPeminjaman = $oldStokPeminjaman + $jumlah;
-                    $newStokTotal = $oldStokTotal + $jumlah;
-                    
-                    \Log::info('Stock calculation (Peminjaman)', [
-                        'item_id' => $item->id,
-                        'item_name' => $item->nama,
-                        'item_type' => 'peminjaman',
-                        'old_stok_peminjaman' => $oldStokPeminjaman,
-                        'old_stok_total' => $oldStokTotal,
-                        'jumlah' => $jumlah,
-                        'new_stok_peminjaman' => $newStokPeminjaman,
-                        'new_stok_total' => $newStokTotal
-                    ]);
                     $updateResult = DB::table('items')
                         ->where('id', $item->id)
                         ->update([
-                            'stok_peminjaman' => $newStokPeminjaman,
-                            'stok_total' => $newStokTotal,
-                            'updated_at' => now()
+                            'stok_peminjaman' => DB::raw('stok_peminjaman + ' . $jumlah),
+                            'stok_total'      => DB::raw('stok_total + ' . $jumlah),
+                            'updated_at'      => now(),
                         ]);
                 } else {
-                    \Log::error('Invalid item type', ['item_type' => $itemType]);
                     return back()->with('error', 'Tipe item tidak valid.');
                 }
+
                 $inventoryData = [
-                    'item_id' => $item->id,
-                    'user_id' => auth()->id(),
-                    'tipe' => 'masuk',
-                    'jumlah' => $jumlah,
-                    'status' => 'received',
-                    'keterangan' => $validated['keterangan'] ?? null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'item_id'     => $item->id,
+                    'user_id'     => auth()->id(),
+                    'tipe'        => 'masuk',
+                    'jumlah'      => $jumlah,
+                    'status'      => 'received',
+                    'keterangan'  => $validated['keterangan'] ?? null,
+                    'created_at'  => now(),
+                    'updated_at'  => now(),
                 ];
-                
-                $inventory = Inventory::create($inventoryData);
-                \Log::info('Inventory record created', ['inventory' => $inventory->toArray()]);
-                $item = $item->fresh();
-                
-                \Log::info('Item stock update result', [
-                    'update_result' => $updateResult,
-                    'updated_item' => $item->toArray()
-                ]);
+
+                Inventory::create($inventoryData);
 
                 if ($updateResult === false) {
                     throw new \Exception('Gagal memperbarui stok barang: ' . $item->nama);
@@ -169,10 +141,15 @@ class IncomingItemsController extends Controller
             }
 
             DB::commit();
-            \Log::info('Transaction committed successfully');
 
             $totalItems = count($validated['items']);
-            return redirect()->route('admin.incoming.index')
+            AuditLogger::log(
+                'incoming.created',
+                'Barang Masuk',
+                "Stok masuk ditambahkan untuk {$totalItems} item barang"
+            );
+
+            return panel_redirect('incoming.index')
                 ->with('success', "Berhasil menambahkan stok untuk {$totalItems} item barang");
 
         } catch (\Exception $e) {
@@ -181,7 +158,7 @@ class IncomingItemsController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return back()
                 ->withInput()
                 ->with('error', 'Terjadi kesalahan saat menambahkan stok. ' . $e->getMessage());
@@ -223,12 +200,15 @@ class IncomingItemsController extends Controller
 
             $oldItem = Item::lockForUpdate()->findOrFail($incomingItem->item_id);
             $newItem = Item::lockForUpdate()->findOrFail($validated['item_id']);
-            if ($newItem->type->value !== 'stok') {
-                return back()->with('error', 'Hanya barang bertipe stok yang dapat diperbarui melalui menu ini.');
-            }
+
+            $oldStockType = $oldItem->type->value === 'stok' ? 'reguler' : 'peminjaman';
+            $newStockType = $newItem->type->value === 'stok' ? 'reguler' : 'peminjaman';
+
             if ($oldItem->id != $newItem->id) {
-                $oldItem->reduceStok($incomingItem->jumlah, 'reguler');
+                // Reverse old item's stock
+                $oldItem->reduceStok($incomingItem->jumlah, $oldStockType);
             }
+
             $quantityDiff = $validated['jumlah'] - $incomingItem->jumlah;
             $incomingItem->update([
                 'item_id' => $validated['item_id'],
@@ -236,19 +216,20 @@ class IncomingItemsController extends Controller
                 'keterangan' => $validated['keterangan'] ?? $incomingItem->keterangan,
                 'updated_at' => now(),
             ]);
+
             if ($oldItem->id == $newItem->id) {
                 if ($quantityDiff > 0) {
-                    $newItem->addStok($quantityDiff, 'reguler');
+                    $newItem->addStok($quantityDiff, $newStockType);
                 } elseif ($quantityDiff < 0) {
-                    $newItem->reduceStok(abs($quantityDiff), 'reguler');
+                    $newItem->reduceStok(abs($quantityDiff), $newStockType);
                 }
             } else {
-                $newItem->addStok($validated['jumlah'], 'reguler');
+                $newItem->addStok($validated['jumlah'], $newStockType);
             }
 
             DB::commit();
 
-            return redirect()->route('admin.incoming.index')
+            return panel_redirect('incoming.index')
                 ->with('success', 'Data stok masuk berhasil diperbarui');
 
         } catch (\Exception $e) {
@@ -278,7 +259,14 @@ class IncomingItemsController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.incoming.index')
+            AuditLogger::log(
+                'incoming.deleted',
+                'Barang Masuk',
+                "Catatan stok masuk untuk \"{$item->nama}\" (-{$incomingItem->jumlah}) dihapus",
+                $item
+            );
+
+            return panel_redirect('incoming.index')
                 ->with('success', "Data stok masuk berhasil dihapus untuk {$item->nama} (-{$incomingItem->jumlah})");
 
         } catch (\Exception $e) {
@@ -340,7 +328,7 @@ class IncomingItemsController extends Controller
                     ->with('warning', trim($message));
             }
 
-            return redirect()->route('admin.incoming.index')
+            return panel_redirect('incoming.index')
                 ->with('success', $message ?: 'Tidak ada data yang dihapus');
 
         } catch (\Exception $e) {

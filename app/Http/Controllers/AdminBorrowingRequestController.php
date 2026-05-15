@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\BorrowingRequest;
 use App\Models\Item;
+use App\Notifications\BorrowingApprovedNotification;
+use App\Notifications\BorrowingRejectedNotification;
+use App\Notifications\BorrowingCompletedNotification;
+use App\Services\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,43 +16,21 @@ class AdminBorrowingRequestController extends Controller
 {
     public function index()
     {
-        $allRequests = BorrowingRequest::with(['user', 'item', 'item.supplier', 'approvedBy'])
+        // Get only pending requests for approval
+        $requests = BorrowingRequest::with(['user', 'item', 'item.supplier', 'approvedBy'])
+            ->where('status', 'pending')
             ->latest()
-            ->get();
-        $groupedRequests = collect();
-        $processedBatchIds = [];
-        foreach ($allRequests as $request) {
-            if ($request->batch_id && !in_array($request->batch_id, $processedBatchIds)) {
-                $batchItems = $allRequests->where('batch_id', $request->batch_id);
-                $groupedRequests->push([
-                    'is_batch' => true,
-                    'batch_id' => $request->batch_id,
-                    'main_request' => $request,
-                    'items' => $batchItems,
-                    'created_at' => $request->created_at,
-                ]);
-                $processedBatchIds[] = $request->batch_id;
-            } elseif (!$request->batch_id) {
-                $groupedRequests->push([
-                    'is_batch' => false,
-                    'main_request' => $request,
-                    'created_at' => $request->created_at,
-                ]);
-            }
-        }
-        $perPage = 15;
-        $currentPage = request()->get('page', 1);
-        $requests = new \Illuminate\Pagination\LengthAwarePaginator(
-            $groupedRequests->forPage($currentPage, $perPage),
-            $groupedRequests->count(),
-            $perPage,
-            $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-        $pendingCount = BorrowingRequest::where('status', 'pending')->count();
-        $approvedCount = BorrowingRequest::where('status', 'approved')->count();
-        $rejectedCount = BorrowingRequest::where('status', 'rejected')->count();
-        $completedCount = BorrowingRequest::where('status', 'completed')->count();
+            ->paginate(15);
+
+        // Single query for all status counts
+        $counts = BorrowingRequest::selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $pendingCount = $counts->get('pending', 0);
+        $approvedCount = $counts->get('approved', 0);
+        $rejectedCount = $counts->get('rejected', 0);
+        $completedCount = $counts->get('completed', 0);
 
         return view('admin.contents.borrowing-requests.index', compact(
             'requests',
@@ -59,9 +41,61 @@ class AdminBorrowingRequestController extends Controller
         ));
     }
 
+    public function history(Request $request)
+    {
+        // Show all borrowing requests with final statuses (approved, rejected, completed, cancelled)
+        $query = BorrowingRequest::with(['user', 'item', 'item.supplier', 'approvedBy'])
+            ->whereIn('status', ['approved', 'rejected', 'completed', 'cancelled']);
+
+        // Apply filters if provided
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($subQuery) use ($search) {
+                    $subQuery->where('name', 'LIKE', "%{$search}%");
+                })->orWhereHas('item', function ($subQuery) use ($search) {
+                    $subQuery->where('nama', 'LIKE', "%{$search}%");
+                });
+            });
+        }
+
+        // Apply date filters
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $requests = $query->latest()->paginate(15)->appends($request->except('page'));
+
+        // Single query for all status counts
+        $counts = BorrowingRequest::selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $approvedCount = $counts->get('approved', 0);
+        $rejectedCount = $counts->get('rejected', 0);
+        $completedCount = $counts->get('completed', 0);
+        $cancelledCount = $counts->get('cancelled', 0);
+
+        return view('admin.contents.borrowing-requests.history', compact(
+            'requests',
+            'approvedCount',
+            'rejectedCount',
+            'completedCount',
+            'cancelledCount'
+        ));
+    }
+
     public function show($id)
     {
-        $request = BorrowingRequest::with(['user', 'item', 'item.supplier', 'item.category', 'approvedBy'])
+        $request = BorrowingRequest::with(['user', 'item', 'item.supplier', 'item.category', 'item.location', 'item.location.parent', 'approvedBy'])
             ->findOrFail($id);
 
         return view('admin.contents.borrowing-requests.show', compact('request'));
@@ -72,60 +106,43 @@ class AdminBorrowingRequestController extends Controller
         $borrowingRequest = BorrowingRequest::findOrFail($id);
 
         $validated = $request->validate([
-            'admin_notes' => 'nullable|string|max:1000',
-            'approve_batch' => 'nullable|boolean',
+            'admin_notes' => 'required|string|max:1000',  // Require notes for approval
         ]);
 
         DB::beginTransaction();
         try {
-            if ($borrowingRequest->batch_id && ($validated['approve_batch'] ?? false)) {
-                $batchRequests = BorrowingRequest::where('batch_id', $borrowingRequest->batch_id)
-                    ->where('status', 'pending')
-                    ->get();
-
-                foreach ($batchRequests as $batchReq) {
-                    $item = $batchReq->item;
-                    if ($item->stok_peminjaman < $batchReq->jumlah) {
-                        DB::rollBack();
-                        return back()->withErrors(['error' => 'Stok '.$item->nama.' tidak mencukupi. Stok tersedia: '.$item->stok_peminjaman]);
-                    }
-                    $batchReq->update([
-                        'status' => 'approved',
-                        'approved_by' => Auth::id(),
-                        'approved_at' => now(),
-                        'admin_notes' => $validated['admin_notes'] ?? null,
-                    ]);
-                    $item->decrement('stok_peminjaman', $batchReq->jumlah);
-                    $item->updateStokTotal();
-                }
-
-                DB::commit();
-                return redirect()->route('admin.borrowing-requests.index')
-                    ->with('success', 'Semua permintaan dalam paket berhasil disetujui.');
-            } else {
-                $item = $borrowingRequest->item;
-                if ($item->stok_peminjaman < $borrowingRequest->jumlah) {
-                    DB::rollBack();
-                    return back()->withErrors(['error' => 'Stok peminjaman tidak mencukupi. Stok tersedia: '.$item->stok_peminjaman]);
-                }
-
-                $borrowingRequest->update([
-                    'status' => 'approved',
-                    'approved_by' => Auth::id(),
-                    'approved_at' => now(),
-                    'admin_notes' => $validated['admin_notes'] ?? null,
-                ]);
-
-                $item->decrement('stok_peminjaman', $borrowingRequest->jumlah);
-                $item->updateStokTotal();
-
-                DB::commit();
-                return redirect()->route('admin.borrowing-requests.index')
-                    ->with('success', 'Permintaan peminjaman berhasil disetujui.');
+            // Single item approval only
+            $item = $borrowingRequest->item;
+            if ($item->stok_peminjaman < $borrowingRequest->jumlah) {
+                DB::rollBack();
+                return back()->withErrors(['error' => 'Stok peminjaman tidak mencukupi. Stok tersedia: ' . $item->stok_peminjaman]);
             }
+
+            $borrowingRequest->update([
+                'status' => 'approved',
+                'approved_by' => Auth::id(),
+                'approved_at' => now(),
+                'admin_notes' => $validated['admin_notes'] ?? null,
+            ]);
+
+            $item->reduceStok($borrowingRequest->jumlah, 'peminjaman');
+
+            // Send notification to user
+            $borrowingRequest->user->notify(new BorrowingApprovedNotification($borrowingRequest));
+
+            AuditLogger::log(
+                'borrowing.approved',
+                'Peminjaman',
+                "Peminjaman #{$borrowingRequest->id} oleh {$borrowingRequest->user->name} ({$borrowingRequest->item->nama} x{$borrowingRequest->jumlah}) disetujui",
+                $borrowingRequest
+            );
+
+            DB::commit();
+            return panel_redirect('borrowing-requests.index')
+                ->with('success', 'Permintaan peminjaman berhasil disetujui.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Terjadi kesalahan saat memproses permintaan.']);
+            return back()->withErrors(['error' => 'Terjadi kesalahan saat memproses permintaan: ' . $e->getMessage()]);
         }
     }
 
@@ -135,38 +152,34 @@ class AdminBorrowingRequestController extends Controller
 
         $validated = $request->validate([
             'admin_notes' => 'required|string|max:1000',
-            'reject_batch' => 'nullable|boolean',
         ]);
 
         DB::beginTransaction();
         try {
-            if ($borrowingRequest->batch_id && ($validated['reject_batch'] ?? false)) {
-                BorrowingRequest::where('batch_id', $borrowingRequest->batch_id)
-                    ->where('status', 'pending')
-                    ->update([
-                        'status' => 'rejected',
-                        'approved_by' => Auth::id(),
-                        'approved_at' => now(),
-                        'admin_notes' => $validated['admin_notes'],
-                    ]);
-                DB::commit();
-                return redirect()->route('admin.borrowing-requests.index')
-                    ->with('success', 'Semua permintaan dalam paket berhasil ditolak.');
-            } else {
-                $borrowingRequest->update([
-                    'status' => 'rejected',
-                    'approved_by' => Auth::id(),
-                    'approved_at' => now(),
-                    'admin_notes' => $validated['admin_notes'],
-                ]);
+            // Single item rejection only
+            $borrowingRequest->update([
+                'status' => 'rejected',
+                'approved_by' => Auth::id(),
+                'approved_at' => now(),
+                'admin_notes' => $validated['admin_notes'],
+            ]);
 
-                DB::commit();
-                return redirect()->route('admin.borrowing-requests.index')
-                    ->with('success', 'Permintaan peminjaman berhasil ditolak.');
-            }
+            // Send notification to user
+            $borrowingRequest->user->notify(new BorrowingRejectedNotification($borrowingRequest));
+
+            AuditLogger::log(
+                'borrowing.rejected',
+                'Peminjaman',
+                "Peminjaman #{$borrowingRequest->id} oleh {$borrowingRequest->user->name} ({$borrowingRequest->item->nama}) ditolak",
+                $borrowingRequest
+            );
+
+            DB::commit();
+            return panel_redirect('borrowing-requests.index')
+                ->with('success', 'Permintaan peminjaman berhasil ditolak.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Terjadi kesalahan saat memproses permintaan.']);
+            return back()->withErrors(['error' => 'Terjadi kesalahan saat memproses permintaan: ' . $e->getMessage()]);
         }
     }
 
@@ -178,15 +191,32 @@ class AdminBorrowingRequestController extends Controller
             return back()->withErrors(['error' => 'Hanya permintaan yang disetujui yang dapat diselesaikan.']);
         }
 
-        $borrowingRequest->update([
-            'status' => 'completed',
-            'completed_at' => now(),
-        ]);
-        $borrowingRequest->item->increment('stok_peminjaman', $borrowingRequest->jumlah);
-        $borrowingRequest->item->updateStokTotal();
+        DB::beginTransaction();
+        try {
+            $borrowingRequest->update([
+                'status' => 'completed',
+                'completed_at' => now(),
+            ]);
+            $borrowingRequest->item->increment('stok_peminjaman', $borrowingRequest->jumlah);
+            $borrowingRequest->item->updateStokTotal();
 
-        return redirect()->route('admin.borrowing-requests.index')
-            ->with('success', 'Peminjaman berhasil diselesaikan dan stok dikembalikan.');
+            // Send notification to user
+            $borrowingRequest->user->notify(new BorrowingCompletedNotification($borrowingRequest));
+
+            AuditLogger::log(
+                'borrowing.completed',
+                'Peminjaman',
+                "Peminjaman #{$borrowingRequest->id} oleh {$borrowingRequest->user->name} ({$borrowingRequest->item->nama} x{$borrowingRequest->jumlah}) diselesaikan & stok dikembalikan",
+                $borrowingRequest
+            );
+
+            DB::commit();
+            return panel_redirect('borrowing-requests.index')
+                ->with('success', 'Peminjaman berhasil diselesaikan dan stok dikembalikan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Terjadi kesalahan saat menyelesaikan peminjaman: ' . $e->getMessage()]);
+        }
     }
 
     public function pending()

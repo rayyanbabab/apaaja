@@ -1,4 +1,4 @@
-<div class="mb-4 flex items-center justify-between">
+﻿<div class="mb-4 flex items-center justify-between">
     <x-heading-section title="History Table" title-color="text-base text-gray-700" subtitle="Here your items history and condition" subtitle-color="text-xs text-gray-400" />
     <div class="relative z-10" x-data="{ open: false }">
         <div class="vertical">
@@ -29,12 +29,12 @@
             x-transition:leave-start="transform opacity-100 scale-100"
             x-transition:leave-end="transform opacity-0 scale-95">
             @foreach (['sold', 'damaged', 'expired', 'lost'] as $status)
-                <a href="{{ route('admin.inventory.tab.history.status', $status) }}"
+                <a href="{{ route($routePrefix . '.inventory.tab.history.status', $status) }}"
                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                     {{ ucfirst($status) }}
                 </a>
             @endforeach
-            <a href="{{ route('admin.inventory.tab.history') }}"
+            <a href="{{ route($routePrefix . '.inventory.tab.history') }}"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                 Show All
             </a>

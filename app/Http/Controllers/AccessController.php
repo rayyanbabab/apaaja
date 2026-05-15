@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
@@ -25,21 +24,21 @@ class AccessController extends Controller
     }
 
     public function login(LoginRequest $request, AuthService $authService)
-{
-    $redirect = $authService->login($request->validated());
+    {
+        $redirect = $authService->login($request->validated());
 
-    if ($redirect === 'inactive') {
-        return back()->withErrors([
-            'email' => 'Akun Anda tidak aktif. Silakan hubungi administrator.',
-        ])->withInput();
+        if ($redirect === 'inactive') {
+            return back()->withErrors([
+                'email' => 'Akun Anda tidak aktif. Silakan hubungi administrator.',
+            ])->withInput();
+        }
+
+        if ($redirect) {
+            return Inertia::location($redirect);
+        }
+
+        return back()->withErrors(['email' => 'Email atau password salah.'])->withInput();
     }
-
-    if ($redirect) {
-        return Inertia::location($redirect);
-    }
-
-    return back()->withErrors(['email' => 'Email atau password salah.'])->withInput();
-}
 
 
     public function logout(Request $request)
@@ -53,10 +52,37 @@ class AccessController extends Controller
 
     public function showDashboard(Request $request)
     {
+        $userRole = Auth::user()->role->value ?? 'user';
+
+        // ── Operator: Maintenance-focused dashboard ──────────────────────
+        if ($userRole === 'operator') {
+            $inRepairCount     = \App\Models\Maintenance::where('status', 'in_repair')->count();
+            $totalUnitInRepair = \App\Models\Maintenance::where('status', 'in_repair')->sum('jumlah');
+            $completedToday    = \App\Models\Maintenance::where('status', 'completed')
+                                    ->whereDate('completed_at', today())->count();
+            $completedTotal    = \App\Models\Maintenance::where('status', 'completed')->count();
+            $scrappedTotal     = \App\Models\Maintenance::where('status', 'scrapped')->count();
+
+            $recentMaintenances = \App\Models\Maintenance::with(['item.category', 'user'])
+                ->latest('started_at')
+                ->take(10)
+                ->get();
+
+            return view('admin.contents.operator-dashboard', [
+                'inRepairCount'      => $inRepairCount,
+                'totalUnitInRepair'  => $totalUnitInRepair,
+                'completedToday'     => $completedToday,
+                'completedTotal'     => $completedTotal,
+                'scrappedTotal'      => $scrappedTotal,
+                'recentMaintenances' => $recentMaintenances,
+            ]);
+        }
+
+        // ── Admin full dashboard ─────────────────────────────────────────
         $query = $request->input('query');
         $items = Item::latest()->get();
 
-        $totalMasuk = Inventory::where('tipe', 'masuk')->sum('jumlah');
+        $totalMasuk  = Inventory::where('tipe', 'masuk')->sum('jumlah');
         $totalKeluar = Inventory::where('tipe', 'keluar')->sum('jumlah');
 
         $updatedItem = session('updatedItem');
@@ -65,160 +91,107 @@ class AccessController extends Controller
             return ($item->stok_total ?? 0) * ($item->harga ?? 0);
         });
 
-        $jumlahJenisBarang = Item::count();
-
-        $userCount = User::count();
-        $supplierCount = Supplier::count();
-        $categoryCount = Category::count();
+        $jumlahJenisBarang    = Item::count();
+        $userCount            = User::count();
+        $supplierCount        = Supplier::count();
+        $categoryCount        = Category::count();
         $borrowableItemsCount = Item::where('type', 'peminjaman')->count();
 
-        $now = Carbon::now();
+        $now      = Carbon::now();
         $lastWeek = $now->copy()->subWeek();
 
-        $keluarThisWeek = Inventory::where('tipe', 'keluar')
-            ->whereBetween('created_at', [$lastWeek, $now])
-            ->sum('jumlah');
+        $keluarThisWeek = Inventory::where('tipe', 'keluar')->whereBetween('created_at', [$lastWeek, $now])->sum('jumlah');
+        $keluarLastWeek = Inventory::where('tipe', 'keluar')->whereBetween('created_at', [$lastWeek->copy()->subWeek(), $lastWeek])->sum('jumlah');
 
-        $keluarLastWeek = Inventory::where('tipe', 'keluar')
-            ->whereBetween('created_at', [$lastWeek->copy()->subWeek(), $lastWeek])
-            ->sum('jumlah');
+        $percentageChange = $keluarLastWeek > 0
+            ? (($keluarThisWeek - $keluarLastWeek) / $keluarLastWeek) * 100
+            : 0;
 
-        $percentageChange = 0;
-        if ($keluarLastWeek > 0) {
-            $percentageChange = (($keluarThisWeek - $keluarLastWeek) / $keluarLastWeek) * 100;
-        }
-
-        $barangMasukTabel = Inventory::where('tipe', 'masuk')->latest()->take(5)->get();
+        $barangMasukTabel  = Inventory::where('tipe', 'masuk')->latest()->take(5)->get();
         $barangKeluarTabel = Inventory::where('tipe', 'keluar')->latest()->take(5)->get();
 
-        $transaksiTerakhir = Inventory::with('item')
-            ->latest()
-            ->take(5)
-            ->get()
-            ->map(function ($transaksi) {
-                $item = $transaksi->item;
-                return (object) [
-                    'created_at' => $transaksi->created_at,
-                    'tipe' => $transaksi->tipe,
-                    'nama' => $item ? $item->nama : '-',
-                    'jumlah' => $transaksi->jumlah,
-                    'stok_sekarang' => $item ? ($item->stok_total ?? 0) : 0,
-                ];
-            });
-
-        $sevenDays = collect();
-        $startDate = now()->subDays(6);
-
-        for ($i = 0; $i < 7; $i++) {
-            $date = $startDate->copy()->addDays($i)->format('Y-m-d');
-
-            $masuk = Inventory::where('tipe', 'masuk')
-                ->whereDate('created_at', $date)
-                ->sum('jumlah');
-
-            $keluar = Inventory::where('tipe', 'keluar')
-                ->whereDate('created_at', $date)
-                ->sum('jumlah');
-
-            $sevenDays->push([
-                'date' => $date,
-                'masuk' => $masuk,
-                'keluar' => $keluar,
-            ]);
-        }
+        $transaksiTerakhir = Inventory::with('item')->latest()->take(5)->get()->map(function ($transaksi) {
+            $item = $transaksi->item;
+            return (object) [
+                'created_at'    => $transaksi->created_at,
+                'tipe'          => $transaksi->tipe,
+                'nama'          => $item ? $item->nama : '-',
+                'jumlah'        => $transaksi->jumlah,
+                'stok_sekarang' => $item ? ($item->stok_total ?? 0) : 0,
+            ];
+        });
 
         $range = $request->input('range', 'weekly');
-
-        $chartMasuk = [];
-        $chartKeluar = [];
-        $chartDates = [];
+        $chartMasuk = $chartKeluar = $chartDates = [];
 
         if ($range === 'weekly') {
-            $start = now()->startOfWeek(); 
+            $start = now()->startOfWeek();
             for ($i = 0; $i < 7; $i++) {
-                $date = $start->copy()->addDays($i)->format('Y-m-d');
-                $chartDates[] = $start->copy()->addDays($i)->format('D'); 
-
-                $chartMasuk[] = Inventory::where('tipe', 'masuk')->whereDate('created_at', $date)->sum('jumlah');
+                $date          = $start->copy()->addDays($i)->format('Y-m-d');
+                $chartDates[]  = $start->copy()->addDays($i)->format('D');
+                $chartMasuk[]  = Inventory::where('tipe', 'masuk')->whereDate('created_at', $date)->sum('jumlah');
                 $chartKeluar[] = Inventory::where('tipe', 'keluar')->whereDate('created_at', $date)->sum('jumlah');
             }
         } elseif ($range === 'monthly') {
-            $start = now()->startOfMonth();
-            $end = now()->endOfMonth();
-            $daysInMonth = $end->day;
-
+            $start       = now()->startOfMonth();
+            $daysInMonth = now()->endOfMonth()->day;
             for ($i = 1; $i <= $daysInMonth; $i++) {
-                $date = $start->copy()->day($i)->format('Y-m-d');
-                $chartDates[] = $i;
-
-                $chartMasuk[] = Inventory::where('tipe', 'masuk')->whereDate('created_at', $date)->sum('jumlah');
+                $date          = $start->copy()->day($i)->format('Y-m-d');
+                $chartDates[]  = $i;
+                $chartMasuk[]  = Inventory::where('tipe', 'masuk')->whereDate('created_at', $date)->sum('jumlah');
                 $chartKeluar[] = Inventory::where('tipe', 'keluar')->whereDate('created_at', $date)->sum('jumlah');
             }
         } elseif ($range === 'yearly') {
             for ($month = 1; $month <= 12; $month++) {
-                $monthLabel = Carbon::create()->month($month)->format('M');
-                $chartDates[] = $monthLabel;
-
-                $chartMasuk[] = Inventory::where('tipe', 'masuk')
-                    ->whereMonth('created_at', $month)
-                    ->whereYear('created_at', now()->year)
-                    ->sum('jumlah');
-
-                $chartKeluar[] = Inventory::where('tipe', 'keluar')
-                    ->whereMonth('created_at', $month)
-                    ->whereYear('created_at', now()->year)
-                    ->sum('jumlah');
+                $chartDates[]  = Carbon::create()->month($month)->format('M');
+                $chartMasuk[]  = Inventory::where('tipe', 'masuk')->whereMonth('created_at', $month)->whereYear('created_at', now()->year)->sum('jumlah');
+                $chartKeluar[] = Inventory::where('tipe', 'keluar')->whereMonth('created_at', $month)->whereYear('created_at', now()->year)->sum('jumlah');
             }
         }
 
-        $loginLogs = LoginLog::with('user')
-            ->latest('logged_in_at')
-            ->take(5)
-            ->get();
+        $loginLogs = LoginLog::with('user')->latest('logged_in_at')->take(5)->get();
 
         $pendingBorrowingRequests = BorrowingRequest::with(['user', 'item'])
-            ->where('status', 'pending')
-            ->latest()
-            ->get();
+            ->where('status', 'pending')->latest()->get();
 
         return view('admin.contents.dashboard', [
-            'query' => $query,
-            'items' => $items,
-            'totalMasuk' => $totalMasuk,
-            'totalKeluar' => $totalKeluar,
-            'totalValue' => $totalValue,
-            'jumlahJenisBarang' => $jumlahJenisBarang,
-            'userCount' => $userCount,
-            'supplierCount' => $supplierCount,
-            'categoryCount' => $categoryCount,
-            'borrowableItemsCount' => $borrowableItemsCount,
-            'updatedItem' => $updatedItem,
-            'loginLogs' => $loginLogs,
-            'percentageChange' => $percentageChange,
-            'barangMasukTabel' => $barangMasukTabel,
-            'barangKeluarTabel' => $barangKeluarTabel,
-            'chartMasuk' => $chartMasuk,
-            'chartKeluar' => $chartKeluar,
-            'range' => $range,
-            'chartDates' => $chartDates,
-            'transaksiTerakhir' => $transaksiTerakhir,
+            'query'                    => $query,
+            'items'                    => $items,
+            'totalMasuk'               => $totalMasuk,
+            'totalKeluar'              => $totalKeluar,
+            'totalValue'               => $totalValue,
+            'jumlahJenisBarang'        => $jumlahJenisBarang,
+            'userCount'                => $userCount,
+            'supplierCount'            => $supplierCount,
+            'categoryCount'            => $categoryCount,
+            'borrowableItemsCount'     => $borrowableItemsCount,
+            'updatedItem'              => $updatedItem,
+            'loginLogs'                => $loginLogs,
+            'percentageChange'         => $percentageChange,
+            'barangMasukTabel'         => $barangMasukTabel,
+            'barangKeluarTabel'        => $barangKeluarTabel,
+            'chartMasuk'               => $chartMasuk,
+            'chartKeluar'              => $chartKeluar,
+            'range'                    => $range,
+            'chartDates'               => $chartDates,
+            'transaksiTerakhir'        => $transaksiTerakhir,
             'pendingBorrowingRequests' => $pendingBorrowingRequests,
         ]);
     }
 
     public function ShowDashboardManage()
     {
-        return view('admin.layouts.dashboard-manage');
+        return panel_redirect('dashboard');
     }
 
     public function ShowDashboardOperation()
     {
-        return view('admin.layouts.dashboard-operation');
+        return panel_redirect('dashboard');
     }
 
     public function ShowDashboardStatistic()
     {
-        return view('admin.layouts.dashboard-statistic');
+        return panel_redirect('dashboard');
     }
 
     public function ShowDashboardUser()
@@ -281,7 +254,10 @@ class AccessController extends Controller
                 ];
             });
 
-        return view('user.contents.dashboard', compact('user', 'borrowingStats', 'recent_activities'));
+        // Get recent notifications
+        $notifications = $user->notifications()->orderBy('created_at', 'desc')->limit(5)->get();
+
+        return view('user.contents.dashboard', compact('user', 'borrowingStats', 'recent_activities', 'notifications'));
     }
 
     private function getStatusClass($status)

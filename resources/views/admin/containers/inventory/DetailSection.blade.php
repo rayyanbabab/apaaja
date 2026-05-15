@@ -1,11 +1,11 @@
-@extends('admin.layouts.dashboard')
+﻿@extends('admin.layouts.dashboard')
 
 @section('content')
     <x-inventory-form>
         <x-heading-section title="Details items" title-color="text-base text-gray-700" subtitle="Manage items, see the detail information" subtitle-color="text-xs text-gray-400" />
 
         <div class="mb-6 bg-white rounded-lg border border-gray-200 shadow-sm p-4">
-            <form method="GET" action="{{ route('admin.inventory.tab.detail') }}" class="space-y-4">
+            <form method="GET" action="{{ route($routePrefix . '.inventory.tab.detail') }}" class="space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-sm font-medium text-gray-900">Filter Items</h3>
                     <button type="button" onclick="resetFilters()" class="text-xs text-gray-500 hover:text-gray-700">
@@ -100,8 +100,8 @@
                             <tbody class="divide-y divide-slate-100">
                                 @forelse($items as $index => $item)
                                     @php
-                                        $currentItemType = DB::table('items')->where('id', $item->id)->value('type');
-                                        $isCurrentItemBorrowing = $currentItemType === 'peminjaman' || $item->type === 'peminjaman';
+                                        $currentItemTypeVal = $item->type?->value ?? $item->getRawOriginal('type') ?? 'stok';
+                                        $isCurrentItemBorrowing = $currentItemTypeVal === 'peminjaman';
                                     @endphp
                                     <tr class="hover:bg-slate-50">
                                         <td class="td-next">{{ $index + 1 }}</td>
@@ -217,7 +217,7 @@
                                             <div class="flex w-full items-center justify-center gap-2">
                                                
 
-                                                <a href="{{ route('admin.inventory.show', $item->id) }}"
+                                                <a href="{{ route($routePrefix . '.inventory.show', $item->id) }}"
                                                     class="rounded-md border border-green-500 px-2 py-1 text-sm text-green-600 hover:bg-green-50">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -225,7 +225,7 @@
                                                     </svg>
                                                 </a>
 
-                                                <a href="{{ route('admin.inventory.edit', $item->id) }}"
+                                                <a href="{{ route($routePrefix . '.inventory.edit', $item->id) }}"
                                                     class="rounded-md border border-blue-500 px-2 py-1 text-sm text-blue-600 hover:bg-blue-50">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -241,7 +241,7 @@
                                             </div>
 
                                             <form id="delete-form-{{ $item->id }}" method="POST"
-                                                action="{{ route('admin.inventory.destroy', $item->id) }}">
+                                                action="{{ route($routePrefix . '.inventory.destroy', $item->id) }}">
                                                 @csrf
                                                 @method('DELETE')
                                             </form>

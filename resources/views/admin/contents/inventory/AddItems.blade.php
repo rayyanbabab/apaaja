@@ -1,348 +1,606 @@
 @extends('admin.layouts.dashboard')
 
 @section('content')
-    <div class="form mx-auto space-y-8">
-        {{-- Header Section --}}
-        <div class="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+<div class="form mx-auto space-y-4 p-4 max-w-4xl">
 
-            <x-heading-section title="Add Item" subtitle="Create a new inventory item with all necessary details" />
-            <div class="flex items-center space-x-3">
-                <a href="{{ route('admin.inventory.index') }}" 
-                   class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
-                    Back to Inventory
-                </a>
-            </div>
+    {{-- Header Section --}}
+    <div class="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Add New Item</h1>
+            <p class="text-sm text-gray-600">Create a new inventory item</p>
         </div>
-
-        {{-- Main Form --}}
-        <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
-            <form method="POST" action="{{ route('admin.inventory.store') }}"
-                  enctype="multipart/form-data"
-                  x-data="{ 
-                      selectedType: 'stok',
-                      resetPriceOnTypeChange() {
-                          if (this.selectedType === 'peminjaman') {
-                              document.getElementById('harga').value = '';
-                          }
-                      }
-                  }">
-                @csrf
-                
-                @if($errors->any())
-                    <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-red-800">Ada kesalahan:</h3>
-                                <div class="mt-2 text-sm text-red-700">
-                                    <ul class="list-disc pl-5 space-y-1">
-                                        @foreach($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">Item Information</h3>
-                </div>
-
-                <div class="p-6 space-y-6">
-                    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                        <div class="space-y-2">
-                            <label for="nama" class="block text-sm font-medium text-gray-700">
-                                Item Name
-                            </label>
-                            <input type="text" 
-                                   name="nama" 
-                                   id="nama" 
-                                   value="{{ old('nama') }}"
-                                   class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('nama') border-red-300 @enderror"
-                                   placeholder="Enter item name">
-                            @error('nama')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="space-y-2">
-                            <label for="category_id" class="block text-sm font-medium text-gray-700">
-                                Category
-                                <span x-show="selectedType === 'stok'" class="text-red-500">*</span>
-                                <span x-show="selectedType === 'peminjaman'" class="text-gray-400">(Optional)</span>
-                            </label>
-                            <select id="category_id" name="category_id" class="input-form">
-                                <option value="">Select Category</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('category_id')
-                                <p class="text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="space-y-2">
-                            <label for="supplier_id" class="block text-sm font-medium text-gray-700">
-                                Supplier
-                                <span x-show="selectedType === 'stok'" class="text-red-500">*</span>
-                                <span x-show="selectedType === 'peminjaman'" class="text-gray-400">(Optional)</span>
-                            </label>
-                            <select id="supplier_id" name="supplier_id" class="input-form">
-                                <option value="">Select Supplier</option>
-                                @foreach($suppliers as $supplier)
-                                    <option value="{{ $supplier->id }}" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
-                                        {{ $supplier->company_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('supplier_id')
-                                <p class="text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="space-y-2">
-                            <label for="type" class="block text-sm font-medium text-gray-700">
-                                Item Type <span class="text-red-500">*</span>
-                            </label>
-                            <select id="type" 
-                                    name="type" 
-                                    x-model="selectedType"
-                                    @change="resetPriceOnTypeChange()"
-                                    required
-                                    class="input-form">
-                                <option value="stok">Stok (For Sale)</option>
-                                <option value="peminjaman">Peminjaman (For Lending)</option>
-                            </select>
-                            @error('type')
-                                <p class="text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>    
-                        <p class="text-xs text-gray-500">
-                            Pilih "Stok" untuk barang yang dijual atau "Peminjaman" untuk barang yang dipinjamkan
-                        </p>
-                    </div>
-
-                    {{-- Price Section (Only for Stok Type) --}}
-                    <div class="space-y-2" x-show="selectedType === 'stok'" x-transition>
-                        <label for="harga" class="block text-sm font-medium text-gray-700">
-                            Price <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3">
-                                <span class="text-gray-500 sm:text-sm">Rp</span>
-                            </div>
-                            <input type="number" 
-                                   id="harga"
-                                   name="harga" 
-                                   min="0"
-                                   max="999999999"
-                                   step="0.01"
-                                   value="{{ old('harga') }}"
-                                   class="input-form pl-12"
-                                   placeholder="0.00">
-                        </div>
-                        @error('harga')
-                            <p class="text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    {{-- Info Alert --}}
-                    <div class="rounded-md bg-blue-50 p-4 border border-blue-200">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-blue-800">Informasi Stok</h3>
-                                <div class="mt-2 text-sm text-blue-700">
-                                    <p>Item baru akan dibuat dengan stok awal 0. Untuk menambahkan stok, gunakan menu <strong>"Barang Masuk"</strong> setelah item berhasil ditambahkan.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Multiple Image Upload Section --}}
-                    <div class="space-y-4">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Product Image
-                            <span class="text-sm text-gray-500 font-normal">(Single image)</span>
-                        </label>
-                        
-                        {{-- Image Preview --}}
-                        <div id="imagePreview" class="hidden mb-4">
-                            <img id="previewImg" src="" alt="Preview" class="w-32 h-32 object-cover rounded-lg border border-gray-200">
-                            <p class="text-sm text-gray-500 mt-1">Selected image</p>
-                        </div>
-
-                        {{-- Upload Area --}}
-                        <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors">
-                            <div class="space-y-2 text-center">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <div class="text-sm text-gray-600">
-                                    <label for="gambarInput" class="relative cursor-pointer rounded-md font-medium text-gray-900 hover:text-gray-700 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-gray-500">
-                                        <span>Upload files</span>
-                                        <input id="gambarInput" 
-                                               name="gambar" 
-                                               type="file" 
-                                               accept="image/*"
-                                               onchange="previewImage(this)"
-                                               class="sr-only">
-                                    </label>
-                                    <span class="pl-1">or drag and drop</span>
-                                </div>
-                                <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB each</p>
-                                <p class="text-xs text-blue-600">Select single image for this item</p>
-                            </div>
-                        </div>
-                        @error('gambar')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-
-                        {{-- Multiple image preview disabled --}}
-                    </div>
-
-                    {{-- Description --}}
-                    <div class="space-y-2">
-                        <label for="keterangan" class="block text-sm font-medium text-gray-700">
-                            Description
-                        </label>
-                        <textarea id="keterangan"
-                                  name="keterangan" 
-                                  rows="4" 
-                                  class="input-form resize-none"
-                                  placeholder="Enter item description...">{{ old('keterangan') }}</textarea>
-                        @error('keterangan')
-                            <p class="text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                        <p class="text-xs text-gray-500">Provide a detailed description of the item (optional)</p>
-                    </div>
-                </div>
-
-                {{-- Form Footer --}}
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            <button type="button" 
-                                    onclick="window.history.back()"
-                                    class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                                Cancel
-                            </button>
-                            
-                            {{-- Reset button for Edit Items --}}
-                            @if(isset($updatedItem))
-                                <button type="button" 
-                                        onclick="document.getElementById('resetForm').submit()"
-                                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                    </svg>
-                                    Reset
-                                </button>
-                            @endif
-                        </div>
-
-                        <div class="flex items-center space-x-3">
-                            <button type="submit" 
-                                    class="inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                </svg>
-                                Add Item
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-
-            {{-- No reset form needed for Add Items --}}
+        <div class="flex items-center space-x-3">
+            <a href="{{ route($routePrefix . '.inventory.index') }}"
+                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Inventory
+            </a>
         </div>
     </div>
 
-    <script>
-        function previewImage(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('previewImg').src = e.target.result;
-                    document.getElementById('imagePreview').classList.remove('hidden');
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+    {{-- Error Messages --}}
+    @if ($errors->any())
+        <div class="rounded-md bg-red-50 p-4 border border-red-200">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">There were errors with your submission:</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 
-        // Validate price input
-        document.addEventListener('DOMContentLoaded', function() {
-            const hargaInput = document.getElementById('harga');
-            if (hargaInput) {
-                hargaInput.addEventListener('input', function() {
-                    const value = parseFloat(this.value);
-                    if (value > 999999999) {
-                        this.setCustomValidity('Harga tidak boleh lebih dari Rp 999.999.999');
-                    } else {
-                        this.setCustomValidity('');
+    {{-- Main Form --}}
+    <div class="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <form method="POST" action="{{ route($routePrefix . '.inventory.store') }}"
+              enctype="multipart/form-data"
+              x-data="addItemForm()"
+              @click.outside.window="catOpen = false; supOpen = false">
+            @csrf
+
+            {{-- ── Section: Item Information ── --}}
+            <div class="border-b border-gray-200 px-4 py-3">
+                <h3 class="text-lg font-semibold text-gray-900">Item Information</h3>
+            </div>
+
+            <div class="space-y-4 p-4">
+
+                {{-- Name & Type --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label for="nama" class="block text-sm font-medium text-gray-700">
+                            Item Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="nama" id="nama" value="{{ old('nama') }}"
+                            class="input-form @error('nama') border-red-300 bg-red-50 @enderror"
+                            placeholder="e.g. Office Chair">
+                        @error('nama')
+                            <p class="text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="type" class="block text-sm font-medium text-gray-700">
+                            Item Type <span class="text-red-500">*</span>
+                        </label>
+                        <select id="type" name="type" x-model="selectedType" @change="resetPriceOnTypeChange()" required
+                            class="input-form">
+                            <option value="stok">Stock (For Sale)</option>
+                            <option value="peminjaman">Borrowing (For Lending)</option>
+                        </select>
+                        @error('type')
+                            <p class="text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                {{-- Category & Supplier --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    {{-- ── CATEGORY DROPDOWN ── --}}
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-sm font-medium text-gray-700">
+                                Category
+                                <span x-show="selectedType === 'stok'" class="text-red-500">*</span>
+                                <span x-show="selectedType === 'peminjaman'" class="text-xs font-normal text-gray-400">(optional)</span>
+                            </label>
+                            <span x-show="catId" class="text-xs text-blue-600 font-medium cursor-pointer hover:text-blue-800"
+                                  @click="catId = ''; catLabel = ''; catSearch = ''">Clear</span>
+                        </div>
+                        <input type="hidden" name="category_id" :value="catId">
+                        <div class="relative">
+
+                            {{-- Trigger --}}
+                            <button type="button"
+                                    @click="catOpen = !catOpen; supOpen = false"
+                                    class="relative w-full flex items-center gap-2 px-3 py-2.5 text-sm bg-white border rounded-lg text-left transition-all duration-150
+                                           {{ $errors->has('category_id') ? 'border-red-400 ring-1 ring-red-300' : 'border-gray-300' }}"
+                                    :class="catOpen
+                                        ? 'border-blue-500 ring-2 ring-blue-100 shadow-sm'
+                                        : 'hover:border-gray-400 hover:shadow-sm'">
+                                {{-- Icon --}}
+                                <span class="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center"
+                                      :class="catId ? 'bg-blue-50' : 'bg-gray-50'">
+                                    <svg class="w-3.5 h-3.5" :class="catId ? 'text-blue-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                    </svg>
+                                </span>
+                                {{-- Label --}}
+                                <span class="flex-1 truncate" :class="catId ? 'text-gray-900 font-medium' : 'text-gray-400'" x-text="catLabel || 'Pilih kategori...'"></span>
+                                {{-- Chevron --}}
+                                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-200" :class="catOpen ? 'rotate-180 text-blue-500' : ''"
+                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+
+                            {{-- Dropdown Panel --}}
+                            <div x-show="catOpen"
+                                 @click.outside="catOpen = false"
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100 scale-100"
+                                 x-transition:leave-end="opacity-0 scale-95"
+                                 class="absolute z-50 w-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden"
+                                 style="transform-origin: top;">
+
+                                {{-- Search --}}
+                                <div class="p-2 bg-gray-50 border-b border-gray-100">
+                                    <div class="relative">
+                                        
+                                        <input type="text"
+                                               x-model="catSearch"
+                                               x-init="$watch('catOpen', v => v && $nextTick(() => $refs.catInput.focus()))"
+                                               x-ref="catInput"
+                                               placeholder="Cari kategori..."
+                                               class="w-full pl-9 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400">
+                                        <button type="button" x-show="catSearch" @click="catSearch = ''"
+                                                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    {{-- Result count --}}
+                                    <p class="mt-1.5 text-xs text-gray-400 px-1">
+                                        <span x-text="filteredCats.length"></span> kategori ditemukan
+                                    </p>
+                                </div>
+
+                                {{-- List --}}
+                                <ul class="overflow-y-auto dropdown-scroll" style="max-height: 200px;">
+                                    {{-- Clear option --}}
+                                    <li @click="catId = ''; catLabel = ''; catOpen = false; catSearch = ''"
+                                        class="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer border-b border-gray-50"
+                                        :class="!catId ? 'bg-gray-50 text-gray-500' : 'text-gray-400 hover:bg-gray-50'">
+                                        <span class="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center bg-gray-100">
+                                            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </span>
+                                        <span class="italic">Tidak ada</span>
+                                    </li>
+
+                                    {{-- Kategori items --}}
+                                    <template x-for="cat in filteredCats" :key="cat.id">
+                                        <li @click="catId = cat.id; catLabel = cat.name; catOpen = false; catSearch = ''"
+                                            class="flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors duration-100"
+                                            :class="catId == cat.id
+                                                ? 'bg-blue-50 text-blue-700'
+                                                : 'text-gray-700 hover:bg-gray-50'">
+                                            <span class="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center"
+                                                  :class="catId == cat.id ? 'bg-blue-100' : 'bg-gray-100'">
+                                                <svg x-show="catId == cat.id" class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                                </svg>
+                                                <svg x-show="catId != cat.id" class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                                </svg>
+                                            </span>
+                                            <span class="flex-1 truncate" x-text="cat.name"></span>
+                                            <span x-show="catId == cat.id"
+                                                  class="text-xs font-semibold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded-full">Dipilih</span>
+                                        </li>
+                                    </template>
+
+                                    {{-- Empty state --}}
+                                    <li x-show="filteredCats.length === 0" class="py-6 text-center">
+                                        <svg class="w-8 h-8 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <p class="text-sm text-gray-400">Tidak ditemukan</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        @error('category_id')
+                            <p class="flex items-center gap-1 text-xs text-red-600 mt-1">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    {{-- ── SUPPLIER DROPDOWN ── --}}
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-sm font-medium text-gray-700">
+                                Supplier
+                                <span x-show="selectedType === 'stok'" class="text-red-500">*</span>
+                                <span x-show="selectedType === 'peminjaman'" class="text-xs font-normal text-gray-400">(optional)</span>
+                            </label>
+                            <span x-show="supId" class="text-xs text-blue-600 font-medium cursor-pointer hover:text-blue-800"
+                                  @click="supId = ''; supLabel = ''; supSearch = ''">Clear</span>
+                        </div>
+                        <input type="hidden" name="supplier_id" :value="supId">
+                        <div class="relative">
+
+                            {{-- Trigger --}}
+                            <button type="button"
+                                    @click="supOpen = !supOpen; catOpen = false"
+                                    class="relative w-full flex items-center gap-2 px-3 py-2.5 text-sm bg-white border rounded-lg text-left transition-all duration-150
+                                           {{ $errors->has('supplier_id') ? 'border-red-400 ring-1 ring-red-300' : 'border-gray-300' }}"
+                                    :class="supOpen
+                                        ? 'border-blue-500 ring-2 ring-blue-100 shadow-sm'
+                                        : 'hover:border-gray-400 hover:shadow-sm'">
+                                <span class="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center"
+                                      :class="supId ? 'bg-blue-50' : 'bg-gray-50'">
+                                    <svg class="w-3.5 h-3.5" :class="supId ? 'text-blue-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    </svg>
+                                </span>
+                                <span class="flex-1 truncate" :class="supId ? 'text-gray-900 font-medium' : 'text-gray-400'" x-text="supLabel || 'Pilih supplier...'"></span>
+                                <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-200" :class="supOpen ? 'rotate-180 text-blue-500' : ''"
+                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+
+                            {{-- Dropdown Panel --}}
+                            <div x-show="supOpen"
+                                 @click.outside="supOpen = false"
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100 scale-100"
+                                 x-transition:leave-end="opacity-0 scale-95"
+                                 class="absolute z-50 w-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden"
+                                 style="transform-origin: top;">
+
+                                {{-- Search --}}
+                                <div class="p-2 bg-gray-50 border-b border-gray-100">
+                                    <div class="relative">
+                                       
+                                        <input type="text"
+                                               x-model="supSearch"
+                                               x-init="$watch('supOpen', v => v && $nextTick(() => $refs.supInput.focus()))"
+                                               x-ref="supInput"
+                                               placeholder="Cari supplier..."
+                                               class="w-full pl-9 pr-8 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400">
+                                        <button type="button" x-show="supSearch" @click="supSearch = ''"
+                                                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <p class="mt-1.5 text-xs text-gray-400 px-1">
+                                        <span x-text="filteredSups.length"></span> supplier ditemukan
+                                    </p>
+                                </div>
+
+                                {{-- List --}}
+                                <ul class="overflow-y-auto dropdown-scroll" style="max-height: 200px;">
+                                    <li @click="supId = ''; supLabel = ''; supOpen = false; supSearch = ''"
+                                        class="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer border-b border-gray-50"
+                                        :class="!supId ? 'bg-gray-50 text-gray-500' : 'text-gray-400 hover:bg-gray-50'">
+                                        <span class="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center bg-gray-100">
+                                            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </span>
+                                        <span class="italic">Tidak ada</span>
+                                    </li>
+
+                                    <template x-for="sup in filteredSups" :key="sup.id">
+                                        <li @click="supId = sup.id; supLabel = sup.name; supOpen = false; supSearch = ''"
+                                            class="flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors duration-100"
+                                            :class="supId == sup.id
+                                                ? 'bg-blue-50 text-blue-700'
+                                                : 'text-gray-700 hover:bg-gray-50'">
+                                            <span class="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center"
+                                                  :class="supId == sup.id ? 'bg-blue-100' : 'bg-gray-100'">
+                                                <svg x-show="supId == sup.id" class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                                </svg>
+                                                <svg x-show="supId != sup.id" class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                </svg>
+                                            </span>
+                                            <span class="flex-1 truncate" x-text="sup.name"></span>
+                                            <span x-show="supId == sup.id"
+                                                  class="text-xs font-semibold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded-full">Dipilih</span>
+                                        </li>
+                                    </template>
+
+                                    <li x-show="filteredSups.length === 0" class="py-6 text-center">
+                                        <svg class="w-8 h-8 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <p class="text-sm text-gray-400">Tidak ditemukan</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        @error('supplier_id')
+                            <p class="flex items-center gap-1 text-xs text-red-600 mt-1">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                </div>
+
+                {{-- Location (optional) --}}
+                <div class="space-y-1.5" x-data="{
+                    locOpen: false,
+                    locId: {{ Js::from(old('location_id', '')) }},
+                    locLabel: {{ Js::from(old('location_id') ? ($locations->firstWhere('id', old('location_id'))?->full_label ?? '') : '') }},
+                    locSearch: '',
+                    locations: {{ Js::from($locations->map(fn($l) => ['id' => $l->id, 'name' => $l->full_label])->values()) }},
+                    get filteredLocs() {
+                        if (!this.locSearch) return this.locations;
+                        return this.locations.filter(l => l.name.toLowerCase().includes(this.locSearch.toLowerCase()));
                     }
-                });
-            }
-        });
-    </script>
+                }" @click.outside="locOpen = false">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Lokasi Barang
+                            <span class="text-xs font-normal text-gray-400">(opsional)</span>
+                        </label>
+                        <span x-show="locId" class="text-xs text-blue-600 font-medium cursor-pointer hover:text-blue-800"
+                              @click="locId = ''; locLabel = ''; locSearch = ''">Clear</span>
+                    </div>
+                    <input type="hidden" name="location_id" :value="locId">
+                    <div class="relative">
+                        <button type="button" @click="locOpen = !locOpen"
+                                class="relative w-full flex items-center gap-2 px-3 py-2.5 text-sm bg-white border rounded-lg text-left transition-all duration-150
+                                       {{ $errors->has('location_id') ? 'border-red-400 ring-1 ring-red-300' : 'border-gray-300' }}"
+                                :class="locOpen ? 'border-indigo-500 ring-2 ring-indigo-100 shadow-sm' : 'hover:border-gray-400 hover:shadow-sm'">
+                            <span class="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center" :class="locId ? 'bg-indigo-50' : 'bg-gray-50'">
+                                <svg class="w-3.5 h-3.5" :class="locId ? 'text-indigo-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </span>
+                            <span class="flex-1 truncate" :class="locId ? 'text-gray-900 font-medium' : 'text-gray-400'" x-text="locLabel || 'Pilih lokasi...'"></span>
+                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-200" :class="locOpen ? 'rotate-180 text-indigo-500' : ''"
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div x-show="locOpen" @click.outside="locOpen = false"
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="absolute z-50 w-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden"
+                             style="transform-origin: top;">
+                            <div class="p-2 bg-gray-50 border-b border-gray-100">
+                                <input type="text" x-model="locSearch"
+                                       x-init="$watch('locOpen', v => v && $nextTick(() => $el.focus()))"
+                                       placeholder="Cari lokasi..."
+                                       class="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400">
+                                <p class="mt-1.5 text-xs text-gray-400 px-1"><span x-text="filteredLocs.length"></span> lokasi ditemukan</p>
+                            </div>
+                            <ul class="overflow-y-auto dropdown-scroll" style="max-height: 200px;">
+                                <li @click="locId = ''; locLabel = ''; locOpen = false; locSearch = ''"
+                                    class="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer border-b border-gray-50"
+                                    :class="!locId ? 'bg-gray-50 text-gray-500' : 'text-gray-400 hover:bg-gray-50'">
+                                    <span class="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center bg-gray-100">
+                                        <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </span>
+                                    <span class="italic">Tidak ada</span>
+                                </li>
+                                <template x-for="loc in filteredLocs" :key="loc.id">
+                                    <li @click="locId = loc.id; locLabel = loc.name; locOpen = false; locSearch = ''"
+                                        class="flex items-center gap-2 px-3 py-2.5 text-sm cursor-pointer transition-colors duration-100"
+                                        :class="locId == loc.id ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50'">
+                                        <span class="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center" :class="locId == loc.id ? 'bg-indigo-100' : 'bg-gray-100'">
+                                            <svg x-show="locId == loc.id" class="w-3 h-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                            <svg x-show="locId != loc.id" class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                        </span>
+                                        <span class="flex-1 truncate" x-text="loc.name"></span>
+                                        <span x-show="locId == loc.id" class="text-xs font-semibold text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded-full">Dipilih</span>
+                                    </li>
+                                </template>
+                                <li x-show="filteredLocs.length === 0" class="py-6 text-center">
+                                    <p class="text-sm text-gray-400">Lokasi tidak ditemukan</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    @error('location_id')
+                        <p class="flex items-center gap-1 text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
 
-    <style>
-        /* Custom file input styling */
-        input[type="file"]::-webkit-file-upload-button {
-            visibility: hidden;
-        }
+                {{-- Price (only for stok) --}}
+                <div x-show="selectedType === 'stok'" x-transition class="space-y-2">
+                    <label for="harga" class="block text-sm font-medium text-gray-700">
+                        Price <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <span class="text-sm text-gray-500 font-medium">Rp</span>
+                        </div>
+                        <input type="number" id="harga" name="harga" min="0" max="999999999" step="1"
+                            value="{{ old('harga') }}"
+                            class="input-form pl-10 @error('harga') border-red-300 @enderror"
+                            placeholder="0"
+                            style="-moz-appearance:textfield;">
+                    </div>
+                    @error('harga')
+                        <p class="text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
-        input[type="file"]::before {
-            content: 'Choose file';
-            display: inline-block;
-            background: linear-gradient(top, #f9f9f9, #e3e3e3);
-            border: 1px solid #999;
-            border-radius: 3px;
-            padding: 5px 8px;
-            outline: none;
-            white-space: nowrap;
-            cursor: pointer;
-            text-shadow: 1px 1px #fff;
-            font-weight: 700;
-            font-size: 10pt;
-        }
+                {{-- Description --}}
+                <div class="space-y-2">
+                    <label for="keterangan" class="block text-sm font-medium text-gray-700">
+                        Description <span class="text-gray-400 font-normal text-xs">(optional)</span>
+                    </label>
+                    <textarea id="keterangan" name="keterangan" rows="3"
+                        class="input-form resize-none"
+                        placeholder="Describe the item...">{{ old('keterangan') }}</textarea>
+                </div>
 
-        input[type="file"]:hover::before {
-            border-color: black;
-        }
+            </div>
 
-        input[type="file"]:active::before {
-            background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
-        }
+            {{-- ── Section: Product Image ── --}}
+            <div class="border-t border-b border-gray-200 px-4 py-3">
+                <h3 class="text-lg font-semibold text-gray-900">Product Image</h3>
+                <p class="text-sm text-gray-500 mt-0.5">Optional — upload a single image for this item</p>
+            </div>
 
-        /* Remove number input arrows */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+            <div class="p-4 space-y-3">
+                <div id="imagePreview" class="hidden">
+                    <div class="flex items-center gap-3">
+                        <div class="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
+                            <img id="previewImg" src="" alt="Preview" class="w-full h-full object-cover">
+                            <button type="button" onclick="clearImage()"
+                                class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600">✕</button>
+                        </div>
+                        <p class="text-sm text-gray-500">Image selected — click ✕ to remove</p>
+                    </div>
+                </div>
+                <label for="gambarInput"
+                       class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition-colors group">
+                    <svg class="w-8 h-8 text-gray-300 group-hover:text-blue-400 transition-colors mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <p class="text-sm text-gray-500 group-hover:text-blue-600 transition-colors font-medium">Click to upload image</p>
+                    <p class="text-xs text-gray-400 mt-0.5">PNG, JPG up to 10MB</p>
+                    <input id="gambarInput" name="gambar" type="file" accept="image/*" onchange="previewImage(this)" class="sr-only">
+                </label>
+                @error('gambar')
+                    <p class="text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
 
-        input[type="number"] {
-            -moz-appearance: textfield;
+            {{-- ── Info Note ── --}}
+            <div class="mx-4 mb-4 flex items-start gap-3 px-4 py-3 bg-blue-50 border border-blue-100 rounded-lg">
+                <svg class="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+                <p class="text-sm text-blue-700">
+                    New items start with <strong>0 stock</strong>. To add stock, use the <strong>Incoming Items</strong> menu after the item is created.
+                </p>
+            </div>
+
+            {{-- Form Footer --}}
+            <div class="rounded-b-lg border-t border-gray-200 bg-gray-50 px-4 py-3">
+                <div class="flex items-center justify-between">
+                    <a href="{{ route($routePrefix . '.inventory.index') }}"
+                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Add Item
+                    </button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('imagePreview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(input.files[0]);
         }
-    </style>
+    }
+    function clearImage() {
+        document.getElementById('gambarInput').value = '';
+        document.getElementById('imagePreview').classList.add('hidden');
+        document.getElementById('previewImg').src = '';
+    }
+    document.querySelectorAll('input[type=number]').forEach(el => {
+        el.style.webkitAppearance = 'none';
+    });
+
+    function addItemForm() {
+        return {
+            selectedType: {{ Js::from(old('type', 'stok')) }},
+            resetPriceOnTypeChange() {
+                if (this.selectedType === 'peminjaman') {
+                    const el = document.getElementById('harga');
+                    if (el) el.value = '';
+                }
+            },
+
+            catSearch: '',
+            catOpen: false,
+            catId: {{ Js::from(old('category_id', '')) }},
+            catLabel: {{ Js::from(old('category_id') ? ($categories->firstWhere('id', old('category_id'))?->name ?? '') : '') }},
+            categories: {{ Js::from($categories->map(fn($c) => ['id' => $c->id, 'name' => $c->name])->values()) }},
+            get filteredCats() {
+                if (!this.catSearch) return this.categories;
+                return this.categories.filter(c => c.name.toLowerCase().includes(this.catSearch.toLowerCase()));
+            },
+
+            supSearch: '',
+            supOpen: false,
+            supId: {{ Js::from(old('supplier_id', '')) }},
+            supLabel: {{ Js::from(old('supplier_id') ? ($suppliers->firstWhere('id', old('supplier_id'))?->company_name ?? '') : '') }},
+            suppliers: {{ Js::from($suppliers->map(fn($s) => ['id' => $s->id, 'name' => $s->company_name])->values()) }},
+            get filteredSups() {
+                if (!this.supSearch) return this.suppliers;
+                return this.suppliers.filter(s => s.name.toLowerCase().includes(this.supSearch.toLowerCase()));
+            },
+        };
+    }
+</script>
+
+<style>
+    .dropdown-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+    .dropdown-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+    .dropdown-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .dropdown-scroll::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 999px;
+    }
+    .dropdown-scroll::-webkit-scrollbar-thumb:hover {
+        background-color: #94a3b8;
+    }
+</style>
 @endsection

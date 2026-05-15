@@ -8,202 +8,113 @@
             size: A4 landscape;
             margin: 15mm;
         }
-        
+
         body {
             font-family: 'DejaVu Sans', sans-serif;
             font-size: 10px;
             line-height: 1.3;
             color: #2c3e50;
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
         }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #ea580c;
-            padding-bottom: 15px;
+
+        /* ── HEADER ── */
+        .header { margin-bottom: 18px; border-bottom: 2.5px solid #ea580c; padding-bottom: 12px; }
+        .header-table { display: table; width: 100%; }
+        .header-logo-cell { display: table-cell; width: 60px; vertical-align: middle; }
+        .header-logo-cell img { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; }
+        .logo-fallback {
+            width: 52px; height: 52px; border-radius: 10px; background: #ea580c;
+            text-align: center; padding-top: 14px; color: #fff; font-weight: 800; font-size: 11px;
         }
-        
-        .company-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .company-logo {
-            font-size: 20px;
-            font-weight: bold;
-            color: #ea580c;
-        }
-        
-        .company-details {
-            text-align: right;
-            font-size: 9px;
-            color: #7f8c8d;
-        }
-        
+        .header-brand-cell { display: table-cell; vertical-align: middle; padding-left: 10px; }
+        .brand-name { font-size: 13px; font-weight: 800; color: #2c3e50; }
+        .brand-sub  { font-size: 9px; color: #7f8c8d; margin-top: 2px; }
         .report-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #ea580c;
-            margin: 10px 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 15px; font-weight: bold; color: #ea580c;
+            margin: 10px 0 4px; text-transform: uppercase; letter-spacing: 1px;
         }
-        
-        .report-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 9px;
-            color: #7f8c8d;
-            margin-bottom: 15px;
-        }
-        
+        .report-meta { font-size: 9px; color: #7f8c8d; margin-bottom: 14px; }
+
+        /* ── SUMMARY ── */
         .summary-section {
-            background-color: #fff7ed;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid #fed7aa;
+            background-color: #fff7ed; padding: 12px; border-radius: 6px;
+            margin-bottom: 20px; border: 1px solid #fed7aa;
         }
-        
-        .summary-grid {
-            display: table;
-            width: 100%;
-        }
-        
+        .summary-grid { display: table; width: 100%; }
         .summary-item {
-            display: table-cell;
-            text-align: center;
-            padding: 8px;
-            border-right: 1px solid #fdba74;
-            vertical-align: middle;
+            display: table-cell; text-align: center; padding: 8px;
+            border-right: 1px solid #fdba74; vertical-align: middle;
         }
-        
-        .summary-item:last-child {
-            border-right: none;
-        }
-        
-        .summary-label {
-            font-size: 8px;
-            color: #9a3412;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
-        
-        .summary-value {
-            font-size: 14px;
-            font-weight: bold;
-            color: #7c2d12;
-        }
-        
-        .table-container {
-            margin-top: 15px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-        }
-        
+        .summary-item:last-child { border-right: none; }
+        .summary-label { font-size: 8px; color: #9a3412; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .summary-value { font-size: 14px; font-weight: bold; color: #7c2d12; }
+
+        /* ── TABLE ── */
+        .table-container { margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
         th {
-            background-color: #ea580c;
-            color: #ffffff;
-            font-weight: bold;
-            padding: 8px 6px;
-            text-align: center;
-            border: 1px solid #c2410c;
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            background-color: #ea580c; color: #ffffff; font-weight: bold;
+            padding: 8px 6px; text-align: center; border: 1px solid #c2410c;
+            font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px;
         }
-        
-        td {
-            padding: 6px;
-            border: 1px solid #fed7aa;
-            font-size: 9px;
-            vertical-align: middle;
+        td { padding: 6px; border: 1px solid #fed7aa; font-size: 9px; vertical-align: middle; }
+        tr:nth-child(even) { background-color: #fff7ed; }
+
+        .status-badge { padding: 3px 6px; border-radius: 10px; font-size: 8px; font-weight: bold; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-active   { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .status-inactive { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        .text-center { text-align: center; }
+        .text-left   { text-align: left; }
+        .font-bold   { font-weight: bold; }
+        .contact-info { font-size: 8px; color: #6b7280; margin-top: 2px; line-height: 1.2; }
+        .address-info { font-size: 8px; color: #374151; line-height: 1.2; }
+
+        /* ── SIGNATURE ── */
+        .signature-section { margin-top: 26px; page-break-inside: avoid; }
+        .sig-label {
+            font-size: 8px; color: #6c757d; text-transform: uppercase; font-weight: bold;
+            letter-spacing: 0.5px; border-left: 3px solid #ea580c; padding-left: 6px; margin-bottom: 8px;
         }
-        
-        tr:nth-child(even) {
-            background-color: #fff7ed;
-        }
-        
-        .status-badge {
-            padding: 3px 6px;
-            border-radius: 10px;
-            font-size: 8px;
-            font-weight: bold;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .status-active {
-            background-color: #d1fae5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
-        }
-        
-        .status-inactive {
-            background-color: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-        
+        .sig-date-row { text-align: right; font-size: 9px; color: #6c757d; margin-bottom: 6px; }
+        .sig-grid { display: table; width: 100%; }
+        .sig-col  { display: table-cell; text-align: center; width: 33.33%; padding: 0 6px; }
+        .sig-box  { border: 1px solid #fed7aa; border-radius: 6px; padding: 8px 6px 7px; background: #fff7ed; }
+        .sig-role { font-weight: 700; font-size: 9px; color: #2c3e50; margin-bottom: 1px; }
+        .sig-unit { font-size: 8px; color: #6c757d; margin-bottom: 46px; }
+        .sig-line { border-top: 1px solid #9ca3af; padding-top: 4px; }
+        .sig-name { font-size: 9px; font-weight: 800; color: #2c3e50; }
+        .sig-nip  { font-size: 8px; color: #6c757d; margin-top: 2px; }
+
+        /* ── FOOTER ── */
         .footer {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px solid #fed7aa;
-            text-align: center;
-            font-size: 8px;
-            color: #6c757d;
+            margin-top: 14px; padding-top: 7px; border-top: 1px solid #fed7aa;
+            font-size: 8px; color: #6c757d; display: table; width: 100%;
         }
-        
-        .text-center {
-            text-align: center;
-        }
-        
-        .text-left {
-            text-align: left;
-        }
-        
-        .font-bold {
-            font-weight: bold;
-        }
-        
-        .contact-info {
-            font-size: 8px;
-            color: #6b7280;
-            margin-top: 2px;
-            line-height: 1.2;
-        }
-        
-        .address-info {
-            font-size: 8px;
-            color: #374151;
-            line-height: 1.2;
-        }
+        .footer-left  { display: table-cell; text-align: left; }
+        .footer-right { display: table-cell; text-align: right; }
     </style>
 </head>
 <body>
+
+    {{-- HEADER --}}
     <div class="header">
-        <div class="company-info">
-            <div class="company-logo">PT. ARTILIA</div>
-            <div class="company-details">
-                Inventory Management System<br>
-                Supplier Report
+        <div class="header-table">
+            <div class="header-logo-cell">
+                @if(!empty($logoBase64))
+                    <img src="{{ $logoBase64 }}" alt="Logo">
+                @else
+                    <div class="logo-fallback">ART</div>
+                @endif
+            </div>
+            <div class="header-brand-cell">
+                <div class="brand-name">{{ $company['name'] }}</div>
+                <div class="brand-sub">{{ $company['tagline'] }}@if($company['address']) &nbsp;|&nbsp; {{ $company['address'] }}@endif</div>
             </div>
         </div>
         <div class="report-title">{{ $title }}</div>
         <div class="report-meta">
-            <div>Generated on: {{ $date }}</div>
-            <div>Report Period: {{ $date }}</div>
+            Tanggal Cetak: {{ $print_time }}&nbsp;&nbsp;|&nbsp;&nbsp;Dicetak oleh: {{ $printed_by }}
         </div>
     </div>
 
@@ -231,7 +142,7 @@
             </div>
             <div class="summary-item">
                 <div class="summary-label">Latest Joined</div>
-                <div class="summary-value">{{ $suppliers->max('created_at') ? $suppliers->max('created_at')->format('d/m/Y') : 'N/A' }}</div>
+                <div class="summary-value">{{ $suppliers->max('created_at') ? \Carbon\Carbon::parse($suppliers->max('created_at'))->format('d/m/Y') : 'N/A' }}</div>
             </div>
         </div>
     </div>
@@ -256,22 +167,12 @@
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td class="font-bold">{{ $supplier->nama }}</td>
                     <td class="text-left">
-                        @if($supplier->phone)
-                            <div>{{ $supplier->phone }}</div>
-                        @endif
-                        @if($supplier->email)
-                            <div class="contact-info">{{ $supplier->email }}</div>
-                        @endif
-                        @if(!$supplier->phone && !$supplier->email)
-                            <div class="contact-info">N/A</div>
-                        @endif
+                        @if($supplier->phone) <div>{{ $supplier->phone }}</div> @endif
+                        @if($supplier->email) <div class="contact-info">{{ $supplier->email }}</div> @endif
+                        @if(!$supplier->phone && !$supplier->email) <div class="contact-info">N/A</div> @endif
                     </td>
                     <td class="text-left">
-                        @if($supplier->address)
-                            <div class="address-info">{{ $supplier->address }}</div>
-                        @else
-                            <div class="address-info">N/A</div>
-                        @endif
+                        <div class="address-info">{{ $supplier->address ?? 'N/A' }}</div>
                     </td>
                     <td class="text-center">{{ $supplier->items->count() }}</td>
                     <td class="text-center">
@@ -282,11 +183,7 @@
                         @endif
                     </td>
                     <td class="text-center">
-                        @if($supplier->contact_person)
-                            <div class="contact-info">{{ $supplier->contact_person }}</div>
-                        @else
-                            <div class="contact-info">N/A</div>
-                        @endif
+                        <div class="contact-info">{{ $supplier->contact_person ?? 'N/A' }}</div>
                     </td>
                     <td class="text-center">{{ $supplier->created_at ? $supplier->created_at->format('d/m/Y') : date('d/m/Y') }}</td>
                 </tr>
@@ -295,10 +192,48 @@
         </table>
     </div>
 
-    <div class="footer">
-        <p><strong>PT. ARTILIA - Inventory Management System</strong></p>
-        <p>This report was generated automatically on {{ $date }} | Total Suppliers: {{ $total_suppliers }}</p>
-        <p>For questions regarding this report, please contact the IT Department</p>
+    {{-- SIGNATURE --}}
+    <div class="signature-section">
+        <div class="sig-label">Lembar Pengesahan</div>
+        <div class="sig-date-row">{{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</div>
+        <div class="sig-grid">
+            <div class="sig-col">
+                <div class="sig-box">
+                    <div class="sig-role">Disiapkan Oleh</div>
+                    <div class="sig-unit">Staf Pengadaan / Procurement</div>
+                    <div class="sig-line">
+                        <div class="sig-name">(................................)</div>
+                        <div class="sig-nip">NIP. .............................</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sig-col">
+                <div class="sig-box">
+                    <div class="sig-role">Diperiksa Oleh</div>
+                    <div class="sig-unit">Kepala Bagian / Supervisor</div>
+                    <div class="sig-line">
+                        <div class="sig-name">(................................)</div>
+                        <div class="sig-nip">NIP. .............................</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sig-col">
+                <div class="sig-box">
+                    <div class="sig-role">Mengetahui</div>
+                    <div class="sig-unit">Direktur / Pimpinan</div>
+                    <div class="sig-line">
+                        <div class="sig-name">(................................)</div>
+                        <div class="sig-nip">NIP. .............................</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div class="footer">
+        <div class="footer-left"><strong>{{ $company['name'] }}</strong> &mdash; {{ $company['tagline'] }}</div>
+        <div class="footer-right">Dicetak: {{ $print_time }} &nbsp;|&nbsp; Total: {{ $total_suppliers }} supplier</div>
+    </div>
+
 </body>
 </html>

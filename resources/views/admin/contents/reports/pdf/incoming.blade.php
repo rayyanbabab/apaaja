@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -8,7 +8,7 @@
             size: A4 landscape;
             margin: 15mm;
         }
-        
+
         body {
             font-family: 'DejaVu Sans', sans-serif;
             font-size: 10px;
@@ -17,199 +17,142 @@
             margin: 0;
             padding: 0;
         }
-        
+
+        /* ── HEADER ── */
         .header {
-            text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #059669;
-            padding-bottom: 15px;
+            margin-bottom: 18px;
+            border-bottom: 2.5px solid #059669;
+            padding-bottom: 12px;
         }
-        
-        .company-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .company-logo {
-            font-size: 20px;
-            font-weight: bold;
-            color: #059669;
-        }
-        
-        .company-details {
-            text-align: right;
-            font-size: 9px;
-            color: #7f8c8d;
-        }
-        
-        .report-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #059669;
-            margin: 10px 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .report-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 9px;
-            color: #7f8c8d;
-            margin-bottom: 15px;
-        }
-        
-        .filter-info {
-            background-color: #f0fdf4;
-            padding: 8px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            font-size: 9px;
-            border-left: 4px solid #059669;
-        }
-        
-        .filter-info strong {
-            color: #047857;
-        }
-        
-        .summary-section {
-            background-color: #f0fdf4;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid #bbf7d0;
-        }
-        
-        .summary-grid {
-            display: table;
-            width: 100%;
-        }
-        
-        .summary-item {
+        .header-table { display: table; width: 100%; }
+        .header-logo-cell {
             display: table-cell;
-            text-align: center;
-            padding: 8px;
-            border-right: 1px solid #a7f3d0;
+            width: 60px;
             vertical-align: middle;
         }
-        
-        .summary-item:last-child {
-            border-right: none;
+        .header-logo-cell img {
+            width: 52px; height: 52px;
+            border-radius: 10px; object-fit: cover;
         }
-        
-        .summary-label {
-            font-size: 8px;
-            color: #047857;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
+        .logo-fallback {
+            width: 52px; height: 52px;
+            border-radius: 10px;
+            background: #059669;
+            text-align: center;
+            padding-top: 14px;
+            color: #fff; font-weight: 800; font-size: 11px;
         }
-        
-        .summary-value {
-            font-size: 14px;
-            font-weight: bold;
-            color: #065f46;
+        .header-brand-cell {
+            display: table-cell;
+            vertical-align: middle;
+            padding-left: 10px;
         }
-        
-        .table-container {
-            margin-top: 15px;
+        .brand-name  { font-size: 13px; font-weight: 800; color: #2c3e50; }
+        .brand-sub   { font-size: 9px;  color: #7f8c8d;  margin-top: 2px; }
+        .report-title {
+            font-size: 15px; font-weight: bold; color: #059669;
+            margin: 10px 0 4px; text-transform: uppercase; letter-spacing: 1px;
         }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
+        .report-meta { font-size: 9px; color: #7f8c8d; margin-bottom: 14px; }
+
+        /* ── FILTER ── */
+        .filter-info {
+            background-color: #f0fdf4; padding: 8px; border-radius: 4px;
+            margin-bottom: 15px; font-size: 9px; border-left: 4px solid #059669;
         }
-        
+        .filter-info strong { color: #047857; }
+
+        /* ── SUMMARY ── */
+        .summary-section {
+            background-color: #f0fdf4; padding: 12px; border-radius: 6px;
+            margin-bottom: 20px; border: 1px solid #bbf7d0;
+        }
+        .summary-grid   { display: table; width: 100%; }
+        .summary-item   {
+            display: table-cell; text-align: center; padding: 8px;
+            border-right: 1px solid #a7f3d0; vertical-align: middle;
+        }
+        .summary-item:last-child { border-right: none; }
+        .summary-label  {
+            font-size: 8px; color: #047857; text-transform: uppercase;
+            font-weight: bold; margin-bottom: 4px; letter-spacing: 0.5px;
+        }
+        .summary-value  { font-size: 14px; font-weight: bold; color: #065f46; }
+
+        /* ── TABLE ── */
+        .table-container { margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
         th {
-            background-color: #059669;
-            color: #ffffff;
-            font-weight: bold;
-            padding: 8px 6px;
-            text-align: center;
-            border: 1px solid #047857;
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            background-color: #059669; color: #ffffff; font-weight: bold;
+            padding: 8px 6px; text-align: center; border: 1px solid #047857;
+            font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px;
         }
-        
-        td {
-            padding: 6px;
-            border: 1px solid #d1fae5;
-            font-size: 9px;
-            vertical-align: middle;
+        td { padding: 6px; border: 1px solid #d1fae5; font-size: 9px; vertical-align: middle; }
+        tr:nth-child(even) { background-color: #f0fdf4; }
+        .total-row { background-color: #d1fae5; font-weight: bold; color: #065f46; }
+        .total-row td { border-top: 2px solid #059669; border-bottom: 2px solid #059669; }
+        .text-right  { text-align: right; }
+        .text-center { text-align: center; }
+        .font-bold   { font-weight: bold; }
+        .currency    { font-family: 'Courier New', monospace; }
+
+        /* ── SIGNATURE ── */
+        .signature-section { margin-top: 26px; page-break-inside: avoid; }
+        .sig-label {
+            font-size: 8px; color: #6c757d; text-transform: uppercase; font-weight: bold;
+            letter-spacing: 0.5px; border-left: 3px solid #059669;
+            padding-left: 6px; margin-bottom: 8px;
         }
-        
-        tr:nth-child(even) {
-            background-color: #f0fdf4;
+        .sig-date-row { text-align: right; font-size: 9px; color: #6c757d; margin-bottom: 6px; }
+        .sig-grid { display: table; width: 100%; }
+        .sig-col  { display: table-cell; text-align: center; width: 33.33%; padding: 0 6px; }
+        .sig-box  {
+            border: 1px solid #bbf7d0; border-radius: 6px;
+            padding: 8px 6px 7px; background: #f0fdf4;
         }
-        
+        .sig-role { font-weight: 700; font-size: 9px; color: #2c3e50; margin-bottom: 1px; }
+        .sig-unit { font-size: 8px; color: #6c757d; margin-bottom: 46px; }
+        .sig-line { border-top: 1px solid #9ca3af; padding-top: 4px; }
+        .sig-name { font-size: 9px; font-weight: 800; color: #2c3e50; }
+        .sig-nip  { font-size: 8px; color: #6c757d; margin-top: 2px; }
+
+        /* ── FOOTER ── */
         .footer {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px solid #d1fae5;
-            text-align: center;
-            font-size: 8px;
-            color: #6c757d;
+            margin-top: 14px; padding-top: 7px; border-top: 1px solid #d1fae5;
+            font-size: 8px; color: #6c757d; display: table; width: 100%;
         }
-        
-        .text-right {
-            text-align: right;
-        }
-        
-        .text-center {
-            text-align: center;
-        }
-        
-        .font-bold {
-            font-weight: bold;
-        }
-        
-        .currency {
-            font-family: 'Courier New', monospace;
-        }
-        
-        .total-row {
-            background-color: #d1fae5;
-            font-weight: bold;
-            color: #065f46;
-        }
-        
-        .total-row td {
-            border-top: 2px solid #059669;
-            border-bottom: 2px solid #059669;
-        }
+        .footer-left  { display: table-cell; text-align: left; }
+        .footer-right { display: table-cell; text-align: right; }
     </style>
 </head>
 <body>
+
+    {{-- HEADER --}}
     <div class="header">
-        <div class="company-info">
-            <div class="company-logo">PT. ARTILIA</div>
-            <div class="company-details">
-                Inventory Management System<br>
-                Incoming Items Report
+        <div class="header-table">
+            <div class="header-logo-cell">
+                @if(!empty($logoBase64))
+                    <img src="{{ $logoBase64 }}" alt="Logo">
+                @else
+                    <div class="logo-fallback">ART</div>
+                @endif
+            </div>
+            <div class="header-brand-cell">
+                <div class="brand-name">{{ $company['name'] }}</div>
+                <div class="brand-sub">{{ $company['tagline'] }}@if($company['address']) &nbsp;|&nbsp; {{ $company['address'] }}@endif</div>
             </div>
         </div>
         <div class="report-title">{{ $title }}</div>
         <div class="report-meta">
-            <div>Generated on: {{ $date }}</div>
-            <div>Report Period: {{ $date }}</div>
+            Tanggal Cetak: {{ $print_time }}&nbsp;&nbsp;|&nbsp;&nbsp;Dicetak oleh: {{ $printed_by }}
         </div>
     </div>
 
     @if($date_from || $date_to)
     <div class="filter-info">
         <strong>Filter Applied:</strong>
-        @if($date_from)
-            From: {{ \Carbon\Carbon::parse($date_from)->format('d M Y') }}
-        @endif
-        @if($date_to)
-            @if($date_from) | @endif
-            To: {{ \Carbon\Carbon::parse($date_to)->format('d M Y') }}
-        @endif
+        @if($date_from) From: {{ \Carbon\Carbon::parse($date_from)->format('d M Y') }} @endif
+        @if($date_to) @if($date_from) | @endif To: {{ \Carbon\Carbon::parse($date_to)->format('d M Y') }} @endif
     </div>
     @endif
 
@@ -229,7 +172,7 @@
             </div>
             <div class="summary-item">
                 <div class="summary-label">Total Value</div>
-                <div class="summary-value currency">Rp {{ number_format($items->sum(function($item) { return $item->jumlah * $item->item->harga; }), 0, ',', '.') }}</div>
+                <div class="summary-value currency">Rp {{ number_format($items->sum(function($item) { return ($item->jumlah ?? 0) * ($item->item->harga ?? 0); }), 0, ',', '.') }}</div>
             </div>
             <div class="summary-item">
                 <div class="summary-label">Avg Qty/Item</div>
@@ -237,7 +180,7 @@
             </div>
             <div class="summary-item">
                 <div class="summary-label">Latest Entry</div>
-                <div class="summary-value">{{ $items->max('created_at') ? $items->max('created_at')->format('d/m/Y') : 'N/A' }}</div>
+                <div class="summary-value">{{ $items->max('created_at') ? \Carbon\Carbon::parse($items->max('created_at'))->format('d/m/Y') : 'N/A' }}</div>
             </div>
         </div>
     </div>
@@ -268,28 +211,65 @@
                     <td>{{ $item->item->supplier->nama ?? 'N/A' }}</td>
                     <td>{{ $item->item->category->name ?? 'N/A' }}</td>
                     <td class="text-center">{{ number_format($item->jumlah) }}</td>
-                    <td class="text-right currency">Rp {{ number_format($item->item->harga, 0, ',', '.') }}</td>
-                    <td class="text-right currency">Rp {{ number_format($item->jumlah * $item->item->harga, 0, ',', '.') }}</td>
+                    <td class="text-right currency">Rp {{ number_format($item->item->harga ?? 0, 0, ',', '.') }}</td>
+                    <td class="text-right currency">Rp {{ number_format(($item->jumlah ?? 0) * ($item->item->harga ?? 0), 0, ',', '.') }}</td>
                     <td class="text-center">{{ $item->user->name ?? 'System' }}</td>
                 </tr>
                 @endforeach
-                
-                {{-- Total Row --}}
+
                 <tr class="total-row">
                     <td colspan="5" class="text-right font-bold">TOTAL:</td>
                     <td class="text-center font-bold">{{ number_format($total_quantity) }}</td>
                     <td></td>
-                    <td class="text-right font-bold currency">Rp {{ number_format($items->sum(function($item) { return $item->jumlah * $item->item->harga; }), 0, ',', '.') }}</td>
+                    <td class="text-right font-bold currency">Rp {{ number_format($items->sum(function($item) { return ($item->jumlah ?? 0) * ($item->item->harga ?? 0); }), 0, ',', '.') }}</td>
                     <td></td>
                 </tr>
             </tbody>
         </table>
     </div>
 
-    <div class="footer">
-        <p><strong>PT. ARTILIA - Inventory Management System</strong></p>
-        <p>This report was generated automatically on {{ $date }} | Total Records: {{ $total_items }} incoming items</p>
-        <p>For questions regarding this report, please contact the IT Department</p>
+    {{-- SIGNATURE --}}
+    <div class="signature-section">
+        <div class="sig-label">Lembar Pengesahan</div>
+        <div class="sig-date-row">{{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</div>
+        <div class="sig-grid">
+            <div class="sig-col">
+                <div class="sig-box">
+                    <div class="sig-role">Disiapkan Oleh</div>
+                    <div class="sig-unit">Staf Gudang / Logistik</div>
+                    <div class="sig-line">
+                        <div class="sig-name">(................................)</div>
+                        <div class="sig-nip">NIP. .............................</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sig-col">
+                <div class="sig-box">
+                    <div class="sig-role">Diperiksa Oleh</div>
+                    <div class="sig-unit">Kepala Bagian / Supervisor</div>
+                    <div class="sig-line">
+                        <div class="sig-name">(................................)</div>
+                        <div class="sig-nip">NIP. .............................</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sig-col">
+                <div class="sig-box">
+                    <div class="sig-role">Mengetahui</div>
+                    <div class="sig-unit">Direktur / Pimpinan</div>
+                    <div class="sig-line">
+                        <div class="sig-name">(................................)</div>
+                        <div class="sig-nip">NIP. .............................</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div class="footer">
+        <div class="footer-left"><strong>{{ $company['name'] }}</strong> &mdash; {{ $company['tagline'] }}</div>
+        <div class="footer-right">Dicetak: {{ $print_time }} &nbsp;|&nbsp; Total: {{ $total_items }} item</div>
+    </div>
+
 </body>
 </html>

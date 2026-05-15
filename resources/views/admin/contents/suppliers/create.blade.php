@@ -1,4 +1,4 @@
-@extends('admin.layouts.dashboard')
+﻿@extends('admin.layouts.dashboard')
 
 @section('content')
 <div class="space-y-6">
@@ -15,7 +15,7 @@
                 <p class="text-gray-600 mt-2">Buat data supplier dan vendor perusahaan yang baru</p>
             </div>
             <div>
-                <a href="{{ route('admin.suppliers.index') }}" 
+                <a href="{{ route($routePrefix . '.suppliers.index') }}" 
                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -65,7 +65,7 @@
 
         <!-- Form Content -->
         <div class="p-6">
-            <form action="{{ route('admin.suppliers.store') }}" method="POST" class="space-y-6">
+            <form action="{{ route($routePrefix . '.suppliers.store') }}" method="POST" class="space-y-6">
                         @csrf
                         
                 <!-- Company Information Section -->
@@ -216,7 +216,7 @@
                     </div>
                     
                     <div class="flex space-x-3">
-                        <a href="{{ route('admin.suppliers.index') }}" 
+                        <a href="{{ route($routePrefix . '.suppliers.index') }}" 
                            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>

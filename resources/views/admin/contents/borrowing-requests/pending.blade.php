@@ -1,4 +1,4 @@
-@extends('admin.layouts.dashboard')
+﻿@extends('admin.layouts.dashboard')
 @section('title', 'Permintaan Peminjaman Pending')
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -10,7 +10,7 @@
                 <p class="text-gray-600 mt-2">Permintaan peminjaman yang menunggu persetujuan</p>
             </div>
             <div class="flex space-x-3">
-                <a href="{{ route('admin.borrowing-requests.index') }}" 
+                <a href="{{ route($routePrefix . '.borrowing-requests.index') }}" 
                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
@@ -84,7 +84,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <a href="{{ route('admin.borrowing-requests.show', $request->id) }}" 
+                                            <a href="{{ route($routePrefix . '.borrowing-requests.show', $request->id) }}" 
                                                class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -207,7 +207,8 @@
 @push('scripts')
 <script>
 function openApproveModal(id, userName, itemName) {
-    document.getElementById('approveForm').action = `/admin/borrowing-requests/${id}/approve`;
+    const form = document.getElementById('approveForm');
+    form.action = `/admin/borrowing-requests/${id}/approve`;
     document.getElementById('approveText').textContent = `Setujui permintaan peminjaman dari ${userName} untuk barang ${itemName}?`;
     document.getElementById('approveModal').classList.remove('hidden');
 }
@@ -218,7 +219,8 @@ function closeApproveModal() {
 }
 
 function openRejectModal(id, userName, itemName) {
-    document.getElementById('rejectForm').action = `/admin/borrowing-requests/${id}/reject`;
+    const form = document.getElementById('rejectForm');
+    form.action = `/admin/borrowing-requests/${id}/reject`;
     document.getElementById('rejectText').textContent = `Tolak permintaan peminjaman dari ${userName} untuk barang ${itemName}?`;
     document.getElementById('rejectModal').classList.remove('hidden');
 }

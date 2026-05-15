@@ -13,7 +13,7 @@
                 <p class="text-gray-600 mt-2">Perbarui data kategori untuk mengorganisir produk dan inventori</p>
             </div>
             <div>
-                <a href="{{ route('admin.categories.index') }}" 
+                <a href="{{ route($routePrefix . '.categories.index') }}" 
                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -58,7 +58,7 @@
         @endif
 
         <div class="p-6">
-            <form action="{{ route('admin.categories.update', $category) }}" method="POST" class="space-y-6">
+            <form id="update-form-{{ $category->id }}" action="{{ route($routePrefix . '.categories.update', $category) }}" method="POST" class="space-y-6">
                 @csrf
                 @method('PUT')
                 
@@ -111,7 +111,7 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <div class="bg-gray-50 rounded-lg p-4">
                     <h4 class="text-sm font-medium text-gray-700 mb-4 flex items-center">
                         <svg class="w-4 h-4 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,7 +193,7 @@
                     </div>
                     
                     <div class="flex space-x-3">
-                        <a href="{{ route('admin.categories.index') }}" 
+                        <a href="{{ route($routePrefix . '.categories.index') }}" 
                            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -201,7 +201,7 @@
                             Batal
                         </a>
                         
-                        <button type="submit" 
+                        <button type="button" onclick="openModal('update-modal-{{ $category->id }}')"
                                 class="update-category-button">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -253,4 +253,13 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 @endsection
 
+@push('scripts')
+    <x-popup id="update-modal-{{ $category->id }}" title="Konfirmasi Update"
+        message="Apakah Anda yakin ingin menyimpan perubahan data kategori ini?"
+        formId="update-form-{{ $category->id }}"
+        confirmText="Simpan"
+        confirmClass="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 rounded-xl transition-colors shadow-sm"
+        cancelText="Batal"
+        icon="info" />
+@endpush
 

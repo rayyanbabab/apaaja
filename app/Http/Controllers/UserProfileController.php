@@ -36,7 +36,7 @@ class UserProfileController extends Controller
     {
         $request->validate([
             'current_password' => 'required',
-            'password' => 'required|min:8|confirmed',
+            'password'         => 'required|min:8|confirmed',
         ]);
 
         $user = auth()->user();
@@ -49,6 +49,19 @@ class UserProfileController extends Controller
         $user->save();
 
         return back()->with('success', 'Password berhasil diperbarui.');
+    }
+
+    public function updateWhatsapp(Request $request)
+    {
+        $request->validate([
+            'whatsapp_number' => 'nullable|string|max:20|regex:/^[0-9+\-\s\(\)]+$/',
+        ]);
+
+        $user = auth()->user();
+        $user->whatsapp_number = $request->whatsapp_number ?: null;
+        $user->save();
+
+        return back()->with('success', 'Nomor WhatsApp berhasil diperbarui.');
     }
 
     public function updatePhoto(Request $request)

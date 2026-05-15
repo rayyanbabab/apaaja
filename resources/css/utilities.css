@@ -49,43 +49,43 @@
 
 @layer components {
   .form {
-    @apply bg-white border border-gray-200 shadow-sm rounded-sm p-4;
+    @apply bg-white border border-gray-100 shadow-sm rounded-2xl p-5;
   }
   .title-form {
-    @apply text-2xl tracking-tighter font-bold text-gray-800;
+    @apply text-xl tracking-tight font-extrabold text-gray-900;
   }
   .paragraph-form {
-    @apply text-sm font-medium text-gray-500;
+    @apply text-sm font-medium text-gray-400;
   }
   .space-form {
-    @apply space-y-2;
+    @apply space-y-4;
   }
   .label-form {
-    @apply block text-sm font-medium text-gray-700;
+    @apply block text-sm font-semibold text-gray-700;
   }
   .input-form {
-    @apply block w-full rounded-md border-gray-300 shadow-sm sm:text-sm transition-all;
-    @apply focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-violet-300;
+    @apply block w-full rounded-xl border-gray-200 shadow-sm sm:text-sm transition-all;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400;
   }
   .option-form {
     @apply px-4 py-2 text-gray-700 text-sm cursor-pointer;
-    @apply hover:bg-violet-50 hover:text-violet-500;
+    @apply hover:bg-blue-50 hover:text-blue-600;
   }
 }
 
 @layer components {
   .card {
-    @apply rounded-sm shadow-sm border border-gray-300 p-4 bg-white hover:shadow-md transition;
+    @apply rounded-2xl shadow-sm border border-gray-100 p-5 bg-white hover:shadow-md transition;
   }
   .card-add {
-    @apply rounded-sm shadow-sm border-2 border-dashed border-gray-300 hover:border-blue-400 flex flex-col items-center justify-center p-6 text-center text-gray-400 hover:text-blue-500 transition;
+    @apply rounded-2xl shadow-sm border-2 border-dashed border-gray-200 hover:border-blue-400 flex flex-col items-center justify-center p-6 text-center text-gray-400 hover:text-blue-500 transition;
   }
 
   .tabs-default {
-    @apply border border-transparent text-gray-500 hover:text-gray-950;
+    @apply border border-transparent text-gray-500 hover:text-gray-900 rounded-lg px-3 py-1.5;
   }
   .tabs-active {
-    @apply text-green-700 bg-green-50 rounded-md border border-green-200;
+    @apply text-blue-700 bg-blue-50 rounded-lg border border-blue-200 px-3 py-1.5 font-semibold;
   }
 }
 
@@ -176,18 +176,18 @@
 
 @layer components {
   .table-next {
-    @apply min-w-full divide-y divide-gray-200;
+    @apply min-w-full divide-y divide-gray-100;
   }
   .th-next {
-    @apply px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500;
+    @apply px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-400 bg-gray-50/80;
   }
   .tbody-next {
-    @apply divide-y divide-gray-200 bg-white;
+    @apply divide-y divide-gray-50 bg-white;
   }
   .tr-next {
-    @apply transition-colors hover:bg-gray-50;
+    @apply transition-colors hover:bg-gray-50/60;
   }
   .td-next {
-    @apply whitespace-nowrap px-6 py-4;
+    @apply whitespace-nowrap px-5 py-3.5 text-sm;
   }
 }

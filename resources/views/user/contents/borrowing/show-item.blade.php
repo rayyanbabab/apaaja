@@ -1,6 +1,6 @@
 @extends('user.layouts.dashboard-user')
 
-@section('title', 'Detail Barang')
+@section('title', 'Item Details')
 
 @section('user')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -14,14 +14,14 @@
                 </svg>
             </a>
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Detail Barang</h1>
-                <p class="text-gray-600 mt-2">Informasi lengkap tentang barang yang tersedia untuk dipinjam</p>
+                <h1 class="text-3xl font-bold text-gray-900">Item Details</h1>
+                <p class="text-gray-600 mt-2">Complete information about items available for borrowing</p>
             </div>
         </div>
     </div>
 
     <!-- Content -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
             {{-- Image Section --}}
             <div class="space-y-4">
@@ -50,12 +50,12 @@
                 {{-- Title and Stock --}}
                 <div>
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ $item->nama }}</h2>
-                    <div class="flex items-center space-x-4">
+                    <div class="flex flex-wrap items-center gap-2">
                         <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
-                            {{ $item->stok_peminjaman }} unit tersedia
+                            {{ $item->stok_peminjaman }} units available
                         </span>
                         <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
-                            Barang Peminjaman
+                            Borrowing Item
                         </span>
                     </div>
                 </div>
@@ -63,15 +63,15 @@
                 {{-- Item Information --}}
                 <div class="space-y-4">
                     <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Informasi Barang</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Item Information</h3>
                         <div class="space-y-3">
                             <div class="flex justify-between">
-                                <span class="text-gray-600">Stok Tersedia:</span>
+                                <span class="text-gray-600">Available Stock:</span>
                                 <span class="font-medium text-green-600">{{ $item->stok_peminjaman }} unit</span>
                             </div>
                             
                             <div class="flex justify-between">
-                                <span class="text-gray-600">Ditambahkan:</span>
+                                <span class="text-gray-600">Added:</span>
                                 <span class="font-medium text-gray-900">{{ $item->created_at->setTimezone('Asia/Jakarta')->format('d M Y') }}</span>
                             </div>
                         </div>
@@ -80,7 +80,7 @@
                     {{-- Description --}}
                     @if($item->keterangan)
                         <div class="bg-gray-50 rounded-lg p-4">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-3">Deskripsi</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-3">Description</h3>
                             <p class="text-gray-700 leading-relaxed">{{ $item->keterangan }}</p>
                         </div>
                     @endif
@@ -94,14 +94,14 @@
                             <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                             </svg>
-                            Ajukan Peminjaman Barang Ini
+                            Submit Borrowing Request for This Item
                         </a>
                     @else
                         <div class="w-full bg-gray-100 text-gray-500 py-3 px-6 rounded-lg text-center font-medium">
                             <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"/>
                             </svg>
-                            Stok Tidak Tersedia
+                            Stock Not Available
                         </div>
                     @endif
                     
@@ -110,7 +110,7 @@
                         <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                         </svg>
-                        Kembali ke Daftar Barang
+                        Back to Item List
                     </a>
                 </div>
             </div>
@@ -118,8 +118,8 @@
     </div>
 
     {{-- Related Items or Additional Info --}}
-    <div class="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Informasi Peminjaman</h3>
+    <div class="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Borrowing Information</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="text-center p-4 bg-blue-50 rounded-lg">
                 <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -127,8 +127,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                     </svg>
                 </div>
-                <h4 class="font-medium text-gray-900 mb-1">Ajukan Permintaan</h4>
-                <p class="text-sm text-gray-600">Isi form peminjaman dengan lengkap</p>
+                <h4 class="font-medium text-gray-900 mb-1">Submit Request</h4>
+                <p class="text-sm text-gray-600">Fill out the borrowing form completely</p>
             </div>
             
             <div class="text-center p-4 bg-yellow-50 rounded-lg">
@@ -137,8 +137,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <h4 class="font-medium text-gray-900 mb-1">Menunggu Persetujuan</h4>
-                <p class="text-sm text-gray-600">Admin akan meninjau permintaan Anda</p>
+                <h4 class="font-medium text-gray-900 mb-1">Pending Approval</h4>
+                <p class="text-sm text-gray-600">Admin will review your request</p>
             </div>
             
             <div class="text-center p-4 bg-green-50 rounded-lg">
@@ -147,8 +147,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
                 </div>
-                <h4 class="font-medium text-gray-900 mb-1">Ambil Barang</h4>
-                <p class="text-sm text-gray-600">Setelah disetujui, ambil barang sesuai jadwal</p>
+                <h4 class="font-medium text-gray-900 mb-1">Pick Up Item</h4>
+                <p class="text-sm text-gray-600">After approval, pick up the item according to schedule</p>
             </div>
         </div>
     </div>

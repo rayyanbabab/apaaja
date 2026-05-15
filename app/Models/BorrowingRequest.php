@@ -23,6 +23,7 @@ class BorrowingRequest extends Model
         'approved_by',
         'approved_at',
         'completed_at',
+        'overdue_notified_at',
     ];
 
     protected $casts = [
@@ -30,6 +31,7 @@ class BorrowingRequest extends Model
         'tanggal_kembali_rencana' => 'date',
         'approved_at' => 'datetime',
         'completed_at' => 'datetime',
+        'overdue_notified_at' => 'datetime',
     ];
 
     public function user()
@@ -60,6 +62,11 @@ class BorrowingRequest extends Model
     public function scopeRejected($query)
     {
         return $query->where('status', 'rejected');
+    }
+
+    public function scopeCancelled($query)
+    {
+        return $query->where('status', 'cancelled');
     }
 
     public function scopeBatch($query, $batchId)

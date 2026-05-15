@@ -30,6 +30,7 @@ class UpdateItemRequest extends FormRequest
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
             'delete_images' => 'nullable|array',
             'delete_images.*' => 'integer|exists:item_images,id',
+            'location_id' => 'nullable|exists:locations,id',
         ];
         if ($this->input('type') === 'stok') {
             $rules['category_id'] = 'required|exists:categories,id';

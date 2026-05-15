@@ -20,6 +20,7 @@ class StoreItemRequest extends FormRequest
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             'images' => 'nullable|array|max:10',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
+            'location_id' => 'nullable|exists:locations,id',
         ];
         if ($this->input('type') === 'stok') {
             $rules['category_id'] = 'required|exists:categories,id';

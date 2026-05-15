@@ -1,4 +1,4 @@
-<form method="GET" action="{{ route('admin.inventory.index') }}" class="flex gap-x-2">
+﻿<form method="GET" action="{{ route($routePrefix . '.inventory.index') }}" class="flex gap-x-2">
     <input
         type="text"
         name="query"

@@ -3,14 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Services\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::orderBy('name')->paginate(10);
+        $search = trim((string) $request->query('search', ''));
+
+        $categories = Category::query()
+            ->when($search !== '', function ($q) use ($search) {
+                $q->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhere('id', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('name')
+            ->paginate(10);
 
         return view('admin.contents.categories.index', compact('categories'));
     }
@@ -30,8 +42,10 @@ class CategoryController extends Controller
 
         try {
             Category::create($validated);
-            
-            return redirect()->route('admin.categories.index')
+
+            AuditLogger::log('category.created', 'Kategori', "Kategori \"{$validated['name']}\" ditambahkan");
+
+            return panel_redirect('categories.index')
                 ->with('success', 'Kategori berhasil ditambahkan.');
                 
         } catch (\Exception $e) {
@@ -68,20 +82,25 @@ class CategoryController extends Controller
 
         $category->update($data);
 
-        return redirect()->route('admin.categories.index')
+        AuditLogger::log('category.updated', 'Kategori', "Kategori \"{$category->name}\" diperbarui", $category);
+
+        return panel_redirect('categories.index')
             ->with('success', 'Kategori berhasil diperbarui.');
     }
 
     public function destroy(Category $category)
     {
         if ($category->items()->count() > 0) {
-            return redirect()->route('admin.categories.index')
+            return panel_redirect('categories.index')
                 ->with('error', 'Cannot delete category. It has associated items.');
         }
 
+        $categoryName = $category->name;
         $category->delete();
 
-        return redirect()->route('admin.categories.index')
+        AuditLogger::log('category.deleted', 'Kategori', "Kategori \"{$categoryName}\" dihapus");
+
+        return panel_redirect('categories.index')
             ->with('success', 'Category deleted successfully.');
     }
 }

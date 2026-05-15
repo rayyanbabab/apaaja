@@ -23,14 +23,16 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'bio' => 'nullable|string',
-            'password' => 'nullable|min:6|confirmed',
+            'name'             => 'required|string|max:255',
+            'bio'              => 'nullable|string',
+            'password'         => 'nullable|min:6|confirmed',
+            'whatsapp_number'  => 'nullable|string|max:20|regex:/^[0-9+\-\s\(\)]+$/',
         ]);
 
         $user = auth()->user();
         $user->name = $data['name'];
-        $user->bio = $data['bio'] ?? $user->bio;
+        $user->bio  = $data['bio'] ?? $user->bio;
+        $user->whatsapp_number = $data['whatsapp_number'] ?? null;
 
         if (!empty($data['password'])) {
             $user->password = Hash::make($data['password']);
@@ -58,6 +60,19 @@ class ProfileController extends Controller
         $user->save();
 
         return back()->with('success', 'Email berhasil diperbarui.');
+    }
+
+    public function updateWhatsapp(Request $request)
+    {
+        $request->validate([
+            'whatsapp_number' => 'nullable|string|max:20|regex:/^[0-9+\-\s\(\)]+$/',
+        ]);
+
+        $user = auth()->user();
+        $user->whatsapp_number = $request->whatsapp_number ?: null;
+        $user->save();
+
+        return back()->with('success', 'Nomor WhatsApp berhasil diperbarui.');
     }
 
     public function updatePhoto(Request $request)

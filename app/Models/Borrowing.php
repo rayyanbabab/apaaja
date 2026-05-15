@@ -51,6 +51,6 @@ class Borrowing extends Model
             return 0;
         }
 
-        return now()->diffInDays($this->tanggal_kembali_rencana);
+        return (int) ceil($this->tanggal_kembali_rencana->diffInDays(now(), true));
     }
 }

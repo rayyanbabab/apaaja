@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Inventory;
 use App\Models\Item;
 use App\Models\User;
+use App\Services\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class OutgoingItemsController extends Controller
 {
@@ -14,7 +16,7 @@ class OutgoingItemsController extends Controller
     {
         $query = Inventory::with(['item.supplier', 'item.category', 'user'])
             ->where('tipe', 'keluar')
-            ->whereHas('item') 
+            ->whereHas('item')
             ->latest();
         if ($request->filled('search')) {
             $search = $request->search;
@@ -38,6 +40,7 @@ class OutgoingItemsController extends Controller
             ->whereHas('inventories', function ($q) {
                 $q->where('tipe', 'keluar');
             })
+            ->where('role', 'user')
             ->orderBy('name')
             ->get();
         $stats = Inventory::where('tipe', 'keluar')
@@ -54,13 +57,25 @@ class OutgoingItemsController extends Controller
 
     public function create()
     {
-        $items = Item::with(['supplier:id,nama,company_name', 'category:id,name'])
-            ->select('id', 'nama', 'stok_total', 'supplier_id', 'category_id', 'type', 'harga', 'keterangan')
+        $items = Item::with(['supplier:id,nama,company_name', 'category:id,name', 'location:id,name,kode,parent_id', 'location.parent:id,name'])
+            ->select('id', 'nama', 'stok_total', 'stok_reguler', 'supplier_id', 'category_id', 'location_id', 'type', 'harga', 'keterangan')
             ->where('stok_total', '>', 0)
             ->where('type', 'stok')
-            ->get();
+            ->get()
+            ->map(function($item) {
+                if ($item->location) {
+                    $item->location_label = $item->location->parent
+                        ? $item->location->parent->name . ' › ' . $item->location->name
+                        : $item->location->name;
+                    $item->location_kode  = $item->location->kode ?? '';
+                } else {
+                    $item->location_label = '';
+                    $item->location_kode  = '';
+                }
+                return $item;
+            });
         $users = User::select('id', 'name', 'email')
-            ->where('role', '!=', 'admin')
+            ->where('role', 'user')
             ->orderBy('name')
             ->get();
 
@@ -74,7 +89,10 @@ class OutgoingItemsController extends Controller
             'items.*.item_id' => 'required|exists:items,id',
             'items.*.quantity' => 'required|integer|min:1',
             'status' => 'required|in:to_production',
-            'user_select' => 'required|exists:users,id',
+            'user_select' => [
+                'required',
+                Rule::exists('users', 'id')->where(fn ($q) => $q->where('role', 'user')),
+            ],
             'keterangan' => 'nullable|string|max:500',
         ]);
         $selectedUser = User::findOrFail($validated['user_select']);
@@ -91,16 +109,8 @@ class OutgoingItemsController extends Controller
 
         DB::transaction(function () use ($validated, $selectedUser) {
             foreach ($validated['items'] as $itemData) {
-                $item = Item::findOrFail($itemData['item_id']);
-                \Log::info('Creating outgoing item', [
-                    'item_id' => $item->id,
-                    'item_name' => $item->nama,
-                    'jumlah' => $itemData['quantity'],
-                    'stok_before' => [
-                        'stok_reguler' => $item->stok_reguler,
-                        'stok_total' => $item->stok_total
-                    ]
-                ]);
+                $item = Item::lockForUpdate()->findOrFail($itemData['item_id']);
+
                 Inventory::create([
                     'item_id' => $itemData['item_id'],
                     'tipe' => 'keluar',
@@ -111,26 +121,28 @@ class OutgoingItemsController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
-                $updateResult = DB::table('items')
+
+                DB::table('items')
                     ->where('id', $item->id)
                     ->update([
                         'stok_reguler' => DB::raw('stok_reguler - ' . $itemData['quantity']),
                         'stok_total' => DB::raw('stok_total - ' . $itemData['quantity']),
-                        'updated_at' => now()
+                        'updated_at' => now(),
                     ]);
-                $updatedItem = DB::table('items')->where('id', $item->id)->first();
-                \Log::info('Stock updated', [
-                    'item_id' => $item->id,
-                    'update_result' => $updateResult,
-                    'stok_after' => [
-                        'stok_reguler' => $updatedItem->stok_reguler,
-                        'stok_total' => $updatedItem->stok_total
-                    ]
-                ]);
+
+                // Trigger low-stock notification if needed
+                $item->refresh()->checkAndNotifyLowStock();
             }
         });
         $totalItems = count($validated['items']);
-        return redirect()->route('admin.outgoing.index')->with('success', "Berhasil mencatat {$totalItems} item barang keluar");
+
+        AuditLogger::log(
+            'outgoing.created',
+            'Barang Keluar',
+            "Pencatatan {$totalItems} item barang keluar untuk {$selectedUser->name}"
+        );
+
+        return panel_redirect('outgoing.index')->with('success', "Berhasil mencatat {$totalItems} item barang keluar");
     }
 
     public function show($id)
@@ -150,7 +162,7 @@ class OutgoingItemsController extends Controller
             ->where('type', 'stok')
             ->get();
         $users = User::select('id', 'name', 'email')
-            ->where('role', '!=', 'admin')
+            ->where('role', 'user')
             ->orderBy('name')
             ->get();
 
@@ -164,7 +176,10 @@ class OutgoingItemsController extends Controller
         $validated = $request->validate([
             'item_id' => 'required|exists:items,id',
             'jumlah' => 'required|integer|min:1',
-            'user_id' => 'required|exists:users,id',
+            'user_id' => [
+                'required',
+                Rule::exists('users', 'id')->where(fn ($q) => $q->where('role', 'user')),
+            ],
             'keterangan' => 'nullable|string|max:1000',
         ]);
 
@@ -177,28 +192,36 @@ class OutgoingItemsController extends Controller
                 ->update([
                     'stok_reguler' => DB::raw('stok_reguler + ' . $outgoingItem->jumlah),
                     'stok_total' => DB::raw('stok_total + ' . $outgoingItem->jumlah),
-                    'updated_at' => now()
+                    'updated_at' => now(),
                 ]);
+
             $newItem = $newItem->fresh();
             if ($newItem->stok_total < $validated['jumlah']) {
                 throw new \Exception('Stok tidak mencukupi untuk item yang dipilih');
             }
+
             $outgoingItem->update($validated);
+
             DB::table('items')
                 ->where('id', $newItem->id)
                 ->update([
                     'stok_reguler' => DB::raw('stok_reguler - ' . $validated['jumlah']),
                     'stok_total' => DB::raw('stok_total - ' . $validated['jumlah']),
-                    'updated_at' => now()
+                    'updated_at' => now(),
                 ]);
+
+            // Trigger low-stock notification for the new item if needed
+            $newItem->refresh()->checkAndNotifyLowStock();
         });
 
-        return redirect()->route('admin.outgoing.index')->with('success', 'Data barang keluar berhasil diperbarui');
+        return panel_redirect('outgoing.index')->with('success', 'Data barang keluar berhasil diperbarui');
     }
 
     public function destroy($id)
     {
         $outgoingItem = Inventory::where('tipe', 'keluar')->findOrFail($id);
+        $itemName = optional($outgoingItem->item)->nama ?? '(Tidak diketahui)';
+        $jumlah   = $outgoingItem->jumlah;
 
         DB::transaction(function () use ($outgoingItem) {
             DB::table('items')
@@ -210,7 +233,39 @@ class OutgoingItemsController extends Controller
                 ]);
             $outgoingItem->delete();
         });
-        return redirect()->route('admin.outgoing.index')->with('success', 'Data barang keluar berhasil dihapus');
+
+        AuditLogger::log(
+            'outgoing.deleted',
+            'Barang Keluar',
+            "Catatan barang keluar \"{$itemName}\" (+{$jumlah} dikembalikan ke stok) dihapus"
+        );
+
+        return panel_redirect('outgoing.index')->with('success', 'Data barang keluar berhasil dihapus');
+    }
+
+    public function returnItem(Request $request, $id)
+    {
+        $outgoingItem = Inventory::where('tipe', 'keluar')->findOrFail($id);
+
+        if ($outgoingItem->status === 'returned') {
+            return back()->withErrors(['error' => 'Barang ini sudah dikembalikan sebelumnya.']);
+        }
+
+        DB::transaction(function () use ($outgoingItem) {
+            // Restore stock
+            DB::table('items')
+                ->where('id', $outgoingItem->item_id)
+                ->update([
+                    'stok_reguler' => DB::raw('stok_reguler + ' . $outgoingItem->jumlah),
+                    'stok_total' => DB::raw('stok_total + ' . $outgoingItem->jumlah),
+                    'updated_at' => now(),
+                ]);
+
+            // Mark inventory record as returned
+            $outgoingItem->update(['status' => 'returned']);
+        });
+
+        return back()->with('success', 'Barang berhasil dikembalikan dan stok telah dipulihkan.');
     }
 
     public function bulkDelete(Request $request)
@@ -234,7 +289,7 @@ class OutgoingItemsController extends Controller
                 $outgoingItem->delete();
             }
         });
-        return redirect()->route('admin.outgoing.index')->with('success', 'Data barang keluar terpilih berhasil dihapus');
+        return panel_redirect('outgoing.index')->with('success', 'Data barang keluar terpilih berhasil dihapus');
     }
 
     public function searchUsers(Request $request)
@@ -254,7 +309,7 @@ class OutgoingItemsController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'display' => $user->name.' (ID: '.$user->id.') - '.$user->email,
+                'display' => $user->name . ' (ID: ' . $user->id . ') - ' . $user->email,
             ];
         }));
     }

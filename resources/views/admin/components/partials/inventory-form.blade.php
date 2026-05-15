@@ -1,4 +1,4 @@
-@extends('admin.layouts.dashboard')
+﻿@extends('admin.layouts.dashboard')
 
 @section('content')
     <div class="form min-h-screen space-y-6">
@@ -7,7 +7,7 @@
 
             <div class="flex items-center gap-2">
                 <x-search placeholder="Search items..." />
-                <a href="{{ route('admin.inventory.add') }}" class="link-primary py-2 text-sm">
+                <a href="{{ route($routePrefix . '.inventory.add') }}" class="link-primary py-2 text-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-300">
                         <path
