@@ -28,6 +28,8 @@ use App\Http\Controllers\LogisticsController;
 use App\Http\Controllers\ToolingKitController;
 use App\Http\Controllers\UserProcurementController;
 use App\Http\Controllers\SignatureController;
+use App\Http\Controllers\SafetyController;
+use App\Http\Controllers\DefectScannerController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AccessController::class, 'showLoginForm'])->name('loginform');
@@ -277,6 +279,26 @@ Route::prefix('admin')->middleware('auth', RoleMiddleware::class.':admin')->name
     Route::prefix('borrowing-requests')->name('borrowing-requests.')->group(function () {
         Route::get('/{id}/bap', [SignatureController::class, 'showBap'])->name('bap');
         Route::post('/{id}/sign', [SignatureController::class, 'sign'])->name('sign');
+    });
+
+    // Modul K3 Safety Interlock & Digital APD Induction (K3 Lab Teknik)
+    Route::prefix('safety')->name('safety.')->group(function () {
+        Route::get('/', [SafetyController::class, 'index'])->name('index');
+        Route::post('/item/{item}/update', [SafetyController::class, 'updateItemSafety'])->name('update-item');
+        Route::post('/verify/{borrowingRequest}', [SafetyController::class, 'verifyPhysicalApd'])->name('verify-apd');
+        Route::post('/incidents', [SafetyController::class, 'storeIncident'])->name('store-incident');
+        Route::post('/incidents/{incident}/status', [SafetyController::class, 'updateIncidentStatus'])->name('update-incident');
+    });
+
+    // ── AI Defect & Wear Scanner (Computer Vision)
+    Route::prefix('defect-scanner')->name('defect-scanner.')->group(function () {
+        Route::get('/',                               [DefectScannerController::class, 'index'])->name('index');
+        Route::get('/scan',                           [DefectScannerController::class, 'scan'])->name('scan');
+        Route::get('/scan/{borrowingRequest}',        [DefectScannerController::class, 'scan'])->name('scan-br');
+        Route::post('/analyze',                       [DefectScannerController::class, 'analyze'])->name('analyze');
+        Route::get('/{inspection}',                   [DefectScannerController::class, 'show'])->name('show');
+        Route::post('/{inspection}/issue-bak',        [DefectScannerController::class, 'issueBak'])->name('issue-bak');
+        Route::get('/{inspection}/bak',               [DefectScannerController::class, 'bak'])->name('bak');
     });
 });
 
