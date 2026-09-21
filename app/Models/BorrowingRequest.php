@@ -24,15 +24,28 @@ class BorrowingRequest extends Model
         'approved_at',
         'completed_at',
         'overdue_notified_at',
+        // Tahap 4 – Digital Signature BAP
+        'bap_token',
+        'signature_data',
+        'signed_by_name',
+        'signed_at',
+        'bap_number',
     ];
 
     protected $casts = [
-        'tanggal_pinjam' => 'date',
+        'tanggal_pinjam'          => 'date',
         'tanggal_kembali_rencana' => 'date',
-        'approved_at' => 'datetime',
-        'completed_at' => 'datetime',
-        'overdue_notified_at' => 'datetime',
+        'approved_at'             => 'datetime',
+        'completed_at'            => 'datetime',
+        'overdue_notified_at'     => 'datetime',
+        'signed_at'               => 'datetime',
     ];
+
+    /** Returns true if the BAP has been digitally signed. */
+    public function isSigned(): bool
+    {
+        return ! is_null($this->signed_at);
+    }
 
     public function user()
     {

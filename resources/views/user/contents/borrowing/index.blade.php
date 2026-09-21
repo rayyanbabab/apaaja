@@ -70,6 +70,60 @@
         </div>
     @endif
 
+    {{-- ── Tooling Kits (Paket Job Order SPK) ── --}}
+    @if(isset($toolingKits) && $toolingKits->count() > 0)
+        <div class="bg-gradient-to-br from-amber-500/10 via-amber-50 to-orange-50/60 rounded-2xl border border-amber-200/80 p-5 space-y-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 00-2 2v2a2 2 0 002 2m0 0h14m-14 0a2 2 0 002 2v2a2 2 0 01-2 2M5 9V7a2 2 0 012-2h6a2 2 0 012 2v2M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2"/></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-gray-900">Paket Perkakas Job Order (SPK)</h2>
+                        <p class="text-xs text-gray-500">Pinjam seperangkat alat pemesinan lengkap sekaligus dengan 1 klik</p>
+                    </div>
+                </div>
+                <span class="text-[11px] font-semibold text-amber-800 bg-amber-100/80 border border-amber-200 px-2.5 py-1 rounded-full">
+                    Standar Manufaktur
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
+                @foreach($toolingKits as $kit)
+                <div class="bg-white rounded-xl border border-amber-200/70 p-4 shadow-sm flex flex-col justify-between space-y-3 hover:shadow-md transition-shadow">
+                    <div>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="font-mono text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded">{{ $kit->kode }}</span>
+                            <span class="text-[11px] text-gray-400">{{ $kit->target_machine ?? 'Mesin Umum' }}</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-gray-900 mt-1">{{ $kit->nama }}</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">{{ $kit->deskripsi }}</p>
+
+                        <div class="mt-2.5 pt-2 border-t border-gray-100 text-[11px] text-gray-600 space-y-1">
+                            <p class="font-semibold text-gray-700">Termasuk:</p>
+                            @foreach($kit->kitItems as $kItem)
+                                <div class="flex items-center justify-between text-[11px] text-gray-600">
+                                    <span class="truncate">&bull; {{ $kItem->item->nama ?? '-' }}</span>
+                                    <span class="font-bold text-gray-800">{{ $kItem->jumlah }}x</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ route('user.borrowing.kit.borrow', $kit->id) }}" class="pt-2">
+                        @csrf
+                        <button type="submit"
+                                class="w-full py-2 px-3 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all duration-150 flex items-center justify-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            Pinjam 1 Paket ke Keranjang
+                        </button>
+                    </form>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     {{-- ── Items Grid ── --}}
     @if($items->count() > 0)
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">

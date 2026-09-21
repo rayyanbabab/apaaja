@@ -28,6 +28,12 @@ class BorrowingCartController extends Controller
             'jumlah' => 'required|integer|min:1',
         ]);
         $item = Item::findOrFail($validated['item_id']);
+
+        if (!$item->canBeBorrowedForManufacturing()) {
+            $dueStr = $item->calibration_due_date ? $item->calibration_due_date->format('d/m/Y') : '-';
+            return back()->withErrors(['error' => "Alat ukur presisi '{$item->nama}' tidak dapat dipinjam karena masa berlaku sertifikat kalibrasi telah kedaluwarsa ({$dueStr}). Harap lakukan kalibrasi ulang untuk menjamin toleransi produk."]);
+        }
+
         if ($item->stok_peminjaman < $validated['jumlah']) {
             return back()->withErrors(['error' => 'Stok peminjaman tidak mencukupi. Stok tersedia: '.$item->stok_peminjaman]);
         }
@@ -122,6 +128,10 @@ class BorrowingCartController extends Controller
             $batchId = uniqid('BATCH-'.Auth::id().'-', true);
             
             foreach ($cartItems as $cartItem) {
+                if (!$cartItem->item->canBeBorrowedForManufacturing()) {
+                    DB::rollBack();
+                    return back()->withErrors(['error' => "Alat ukur presisi '{$cartItem->item->nama}' sudah melewati batas masa berlaku kalibrasi. Hapus dari keranjang untuk melanjutkan."]);
+                }
                 if ($cartItem->item->stok_peminjaman < $cartItem->jumlah) {
                     DB::rollBack();
                     return back()->withErrors(['error' => 'Stok '.$cartItem->item->nama.' tidak mencukupi.']);

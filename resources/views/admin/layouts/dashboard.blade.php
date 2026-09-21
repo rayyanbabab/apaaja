@@ -33,12 +33,52 @@
     <!-- Sidebar Controller -->
     <script>
         function sidebarData() {
+            const isMasterActive = {{ Route::is($routePrefix . '.categories.*', $routePrefix . '.suppliers.*', $routePrefix . '.locations.*') ? 'true' : 'false' }};
+            const isInventoryActive = {{ (
+                Route::is($routePrefix . '.inventory.*') ||
+                Route::is($routePrefix . '.incoming.*') ||
+                Route::is($routePrefix . '.outgoing.*') ||
+                Route::is($routePrefix . '.maintenance.*') ||
+                Route::is($routePrefix . '.stock-opnames.*') ||
+                Route::is($routePrefix . '.calibration.*') ||
+                Route::is($routePrefix . '.logistics.*') ||
+                Route::is($routePrefix . '.tooling-kits.*') ||
+                Route::is($routePrefix . '.bap.*') ||
+                Route::is($routePrefix . '.borrowing-requests.bap')
+            ) ? 'true' : 'false' }};
+            const isBorrowingActive = {{ (
+                Route::is($routePrefix . '.borrowings.*') ||
+                (Route::is($routePrefix . '.borrowing-requests.*') && !Route::is($routePrefix . '.borrowing-requests.bap'))
+            ) ? 'true' : 'false' }};
+            const isUsersActive = {{ Route::is($routePrefix . '.content.*') ? 'true' : 'false' }};
+
             return {
-                masterDataOpen: {{ Route::is($routePrefix . '.categories.*', $routePrefix . '.suppliers.*', $routePrefix . '.locations.*') ? 'true' : 'false' }},
-                inventoryOpen: {{ Route::is($routePrefix . '.inventory.*', $routePrefix . '.incoming.*', $routePrefix . '.outgoing.*', $routePrefix . '.maintenance.*', $routePrefix . '.stock-opnames.*') ? 'true' : 'false' }},
-                borrowingOpen: {{ Route::is($routePrefix . '.borrowings.*', $routePrefix . '.borrowing-requests.*') ? 'true' : 'false' }},
-                usersOpen: {{ Route::is($routePrefix . '.content.listusers', $routePrefix . '.content.createusers') ? 'true' : 'false' }},
-                init() {}
+                masterDataOpen: isMasterActive || (localStorage.getItem('artilia_sidebar_master') === 'true'),
+                inventoryOpen: isInventoryActive || (localStorage.getItem('artilia_sidebar_inv') === 'true'),
+                borrowingOpen: isBorrowingActive || (localStorage.getItem('artilia_sidebar_borrow') === 'true'),
+                usersOpen: isUsersActive || (localStorage.getItem('artilia_sidebar_users') === 'true'),
+
+                init() {
+                    // Watch for user toggling and save to localStorage
+                    this.$watch('masterDataOpen', val => localStorage.setItem('artilia_sidebar_master', val));
+                    this.$watch('inventoryOpen', val => localStorage.setItem('artilia_sidebar_inv', val));
+                    this.$watch('borrowingOpen', val => localStorage.setItem('artilia_sidebar_borrow', val));
+                    this.$watch('usersOpen', val => localStorage.setItem('artilia_sidebar_users', val));
+
+                    // Never collapse the menu that contains the current active page
+                    if (isMasterActive) this.masterDataOpen = true;
+                    if (isInventoryActive) this.inventoryOpen = true;
+                    if (isBorrowingActive) this.borrowingOpen = true;
+                    if (isUsersActive) this.usersOpen = true;
+
+                    // Automatically scroll the active element into view inside the sidebar
+                    this.$nextTick(() => {
+                        const activeDesktop = document.querySelector('.desktop-sidebar [data-active="true"]');
+                        if (activeDesktop) {
+                            activeDesktop.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                        }
+                    });
+                }
             }
         }
     </script>
@@ -360,6 +400,37 @@
         html.dark .mobile-hamburger-container .text-emerald-700 { color: #6ee7b7 !important; }
         html.dark .mobile-hamburger-container .text-blue-600 { color: #60a5fa !important; }
         html.dark .mobile-hamburger-container .text-emerald-600 { color: #34d399 !important; }
+
+        /* ── Explicit Active Item Highlight [data-active="true"] ── */
+        .sidebar-container a[data-active="true"],
+        .sidebar-container .pl-7 a[data-active="true"],
+        .mobile-hamburger-container a[data-active="true"],
+        .mobile-hamburger-container .pl-7 a[data-active="true"] {
+            color: #1d4ed8 !important;
+            background-color: #eff6ff !important;
+            font-weight: 600 !important;
+            border-left: 3px solid #2563eb !important;
+            padding-left: calc(0.75rem - 3px) !important;
+        }
+        .sidebar-container a[data-active="true"] svg,
+        .mobile-hamburger-container a[data-active="true"] svg {
+            color: #2563eb !important;
+        }
+
+        html.dark .sidebar-container a[data-active="true"],
+        html.dark .sidebar-container .pl-7 a[data-active="true"],
+        html.dark .mobile-hamburger-container a[data-active="true"],
+        html.dark .mobile-hamburger-container .pl-7 a[data-active="true"] {
+            color: #93c5fd !important;
+            background-color: rgba(37, 99, 235, 0.22) !important;
+            font-weight: 600 !important;
+            border-left: 3px solid #60a5fa !important;
+            padding-left: calc(0.75rem - 3px) !important;
+        }
+        html.dark .sidebar-container a[data-active="true"] svg,
+        html.dark .mobile-hamburger-container a[data-active="true"] svg {
+            color: #60a5fa !important;
+        }
 
         /* User mobile hamburger active states */
         html.dark .user-mobile-hamburger .bg-blue-50   { background-color: rgba(59,130,246,0.28) !important; }

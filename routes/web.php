@@ -23,7 +23,11 @@ use App\Http\Controllers\UsersAccountController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\AdminProcurementController;
+use App\Http\Controllers\CalibrationController;
+use App\Http\Controllers\LogisticsController;
+use App\Http\Controllers\ToolingKitController;
 use App\Http\Controllers\UserProcurementController;
+use App\Http\Controllers\SignatureController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AccessController::class, 'showLoginForm'])->name('loginform');
@@ -31,6 +35,9 @@ Route::get('/', [AccessController::class, 'showLoginForm'])->name('loginform');
 Route::get('/login', [AccessController::class, 'showLoginForm']);
 Route::post('/login', [AccessController::class, 'login'])->name('login');
 Route::post('/logout', [AccessController::class, 'logout'])->name('logout');
+
+// Public BAP QR verification (No auth required)
+Route::get('/verify/bap/{token}', [SignatureController::class, 'verify'])->name('bap.verify');
 
 Route::prefix('admin')->middleware('auth', RoleMiddleware::class.':admin')->name('admin.')->group(function () {
     Route::get('/search', [InventoryController::class, 'search'])->name('search');
@@ -241,6 +248,36 @@ Route::prefix('admin')->middleware('auth', RoleMiddleware::class.':admin')->name
         Route::post('/', [MaintenanceController::class, 'store'])->name('store');
         Route::get('/{maintenance}', [MaintenanceController::class, 'show'])->name('show');
     });
+
+    // Modul Perkakas & Kalibrasi Presisi (Prodi 4P)
+    Route::prefix('calibration')->name('calibration.')->group(function () {
+        Route::get('/', [CalibrationController::class, 'index'])->name('index');
+        Route::post('/{item}/update-cert', [CalibrationController::class, 'updateCalibration'])->name('update-cert');
+        Route::post('/{item}/update-life', [CalibrationController::class, 'updateToolLife'])->name('update-life');
+        Route::post('/{item}/update-type', [CalibrationController::class, 'updateToolType'])->name('update-type');
+    });
+
+    // Modul Smart Logistics & Bin Location (Prodi Logistik)
+    Route::prefix('logistics')->name('logistics.')->group(function () {
+        Route::get('/', [LogisticsController::class, 'index'])->name('index');
+        Route::post('/{item}/convert-procurement', [LogisticsController::class, 'convertToProcurement'])->name('convert-procurement');
+        Route::post('/{item}/update-param', [LogisticsController::class, 'updateParameters'])->name('update-param');
+    });
+
+    // Modul Tooling Kit SPK Manufaktur (Prodi Manufaktur)
+    Route::prefix('tooling-kits')->name('tooling-kits.')->group(function () {
+        Route::get('/', [ToolingKitController::class, 'index'])->name('index');
+        Route::post('/', [ToolingKitController::class, 'store'])->name('store');
+        Route::post('/{toolingKit}/toggle-status', [ToolingKitController::class, 'toggleStatus'])->name('toggle-status');
+        Route::delete('/{toolingKit}', [ToolingKitController::class, 'destroy'])->name('destroy');
+    });
+
+    // Tahap 4 – Digital Signature BAP (Prodi TRPL)
+    Route::get('/bap-documents', [SignatureController::class, 'index'])->name('bap.index');
+    Route::prefix('borrowing-requests')->name('borrowing-requests.')->group(function () {
+        Route::get('/{id}/bap', [SignatureController::class, 'showBap'])->name('bap');
+        Route::post('/{id}/sign', [SignatureController::class, 'sign'])->name('sign');
+    });
 });
 
 // -------------------------------------------------------
@@ -278,6 +315,11 @@ Route::prefix('staff')->middleware('auth', RoleMiddleware::class.':operator')->n
 });
 
 // -------------------------------------------------------
+// PUBLIC: BAP QR Verification (no auth required)
+// -------------------------------------------------------
+Route::get('/verify/bap/{token}', [SignatureController::class, 'verify'])->name('bap.verify');
+
+// -------------------------------------------------------
 // SHARED ROUTES: Scanner and Quick Actions (Admin & Operator)
 // -------------------------------------------------------
 Route::middleware('auth')->group(function () {
@@ -310,6 +352,7 @@ Route::prefix('user')->middleware('auth', RoleMiddleware::class.':user')->name('
         Route::delete('/cart/{id}', [\App\Http\Controllers\BorrowingCartController::class, 'remove'])->name('cart.remove');
         Route::delete('/cart', [\App\Http\Controllers\BorrowingCartController::class, 'clear'])->name('cart.clear');
         Route::post('/cart/checkout', [\App\Http\Controllers\BorrowingCartController::class, 'checkout'])->name('cart.checkout');
+        Route::post('/kit/{toolingKit}/borrow', [ToolingKitController::class, 'borrowKit'])->name('kit.borrow');
     });
 
     // Procurement Requests (User side)

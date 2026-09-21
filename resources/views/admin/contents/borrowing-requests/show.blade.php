@@ -597,11 +597,19 @@ html.dark .br-stok-badge { background-color: rgba(59,130,246,0.2) !important; co
                     </div>
                 </div>
             </div>
-            <div class="flex justify-center">
+            <div class="flex justify-center gap-3 flex-wrap">
+                {{-- BAP Digital Signature Button --}}
+                <a href="{{ route($routePrefix . '.borrowing-requests.bap', $request->id) }}"
+                   class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                    Buka BAP Digital
+                </a>
                 <button type="button" onclick="openModal('complete-req-{{ $request->id }}')"
-                        class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     Selesaikan Peminjaman
                 </button>
@@ -609,8 +617,41 @@ html.dark .br-stok-badge { background-color: rgba(59,130,246,0.2) !important; co
         </div>
     </div>
     @endif
+
+    {{-- BAP Summary Card (for completed/signed requests) --}}
+    @if(in_array($request->status, ['completed', 'approved']) && $request->isSigned())
+    <div class="br-card mt-6 bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-indigo-50/80 to-blue-50/80 px-6 py-4 border-b border-indigo-100 flex items-center justify-between">
+            <h3 class="text-base font-bold text-indigo-900 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+                Berita Acara Peminjaman (BAP) Digital Ditandatangani
+            </h3>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                Terverifikasi
+            </span>
+        </div>
+        <div class="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+            <div class="space-y-1 text-sm">
+                <p class="text-gray-900">No. BAP: <strong class="font-mono text-indigo-700 font-bold">{{ $request->bap_number }}</strong></p>
+                <p class="text-gray-600 text-xs">Ditandatangani oleh <strong class="text-gray-800">{{ $request->signed_by_name }}</strong> pada {{ $request->signed_at?->isoFormat('D MMMM YYYY, HH:mm') }} WIB</p>
+            </div>
+            <a href="{{ route($routePrefix . '.borrowing-requests.bap', $request->id) }}"
+               class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                Lihat & Cetak BAP
+            </a>
+        </div>
+    </div>
+    @endif
+
 </div>
 </div>
+
 @endsection
 
 @push('scripts')

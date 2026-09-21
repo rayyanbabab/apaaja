@@ -22,7 +22,11 @@ class UserBorrowingController extends Controller
             ->where('stok_peminjaman', '>', 0)
             ->get();
 
-        return view('user.contents.borrowing.index', compact('items'));
+        $toolingKits = \App\Models\ToolingKit::with(['kitItems.item'])
+            ->where('is_active', true)
+            ->get();
+
+        return view('user.contents.borrowing.index', compact('items', 'toolingKits'));
     }
 
     public function myRequests()
@@ -139,6 +143,12 @@ class UserBorrowingController extends Controller
 
         // Check if item has enough borrowing stock
         $item = Item::findOrFail($validated['item_id']);
+
+        if (!$item->canBeBorrowedForManufacturing()) {
+            $dueStr = $item->calibration_due_date ? $item->calibration_due_date->format('d/m/Y') : '-';
+            return back()->withErrors(['error' => "Alat ukur presisi '{$item->nama}' tidak dapat dipinjam karena masa berlaku sertifikat kalibrasi telah kedaluwarsa ({$dueStr}). Harap lakukan kalibrasi ulang untuk menjaga standar toleransi benda kerja."]);
+        }
+
         if ($item->stok_peminjaman < $validated['jumlah']) {
             return back()->withErrors(['jumlah' => 'Stok peminjaman tidak mencukupi. Stok tersedia: '.$item->stok_peminjaman]);
         }
