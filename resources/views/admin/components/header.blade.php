@@ -1,7 +1,19 @@
         <header class="app-top-header flex h-16 items-center justify-between border-b border-gray-100 bg-white/95 backdrop-blur-sm px-3 sm:px-4 lg:px-6" style="min-width:0; overflow:visible;">
-            <!-- Left Side: User Info -->
-            <div class="flex items-center gap-3">
-                <div class="relative">
+            <!-- Left Side: Mobile Hamburger + User Info -->
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <!-- Mobile Hamburger Button (md:hidden) -->
+                <button type="button"
+                        x-data
+                        @click="$dispatch('open-mobile-menu')"
+                        onclick="window.dispatchEvent(new CustomEvent('open-mobile-menu'))"
+                        class="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 border border-gray-200/80 dark:border-slate-700 shadow-sm hover:text-gray-700 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-150 active:scale-95 flex-shrink-0 cursor-pointer"
+                        aria-label="Buka navigasi">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+
+                <div class="relative flex-shrink-0">
                     <img src="{{ Auth::user()->profil ? asset(Auth::user()->profil) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&color=4F76F6&background=EEF2FF&size=40' }}"
                         alt="{{ Auth::user()->name }}"
                         class="h-9 w-9 rounded-full object-cover ring-2 ring-gray-100"

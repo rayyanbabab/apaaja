@@ -22,7 +22,8 @@
         $rp . '.logistics.*',
         $rp . '.tooling-kits.*',
         $rp . '.bap.*',
-        $rp . '.borrowing-requests.bap'
+        $rp . '.borrowing-requests.bap',
+        $rp . '.safety.*'
     );
     $isBorrowChildActive = Route::is($rp . '.borrowings.*') ||
                            (Route::is($rp . '.borrowing-requests.*') && !Route::is($rp . '.borrowing-requests.bap'));
@@ -135,17 +136,7 @@
     }
 </style>
 
-<div class="mobile-hamburger-container" x-data="{ mobileMenuOpen: false }">
-
-    {{-- Floating Hamburger Button (top-left) --}}
-    <button type="button"
-            @click="mobileMenuOpen = true"
-            class="fixed top-3.5 left-3 z-50 inline-flex items-center justify-center p-2 rounded-xl text-gray-500 bg-white border border-gray-200/80 shadow-sm hover:text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-150 active:scale-95"
-            aria-label="Buka navigasi">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-    </button>
+<div class="mobile-hamburger-container" x-data="{ mobileMenuOpen: false }" @open-mobile-menu.window="mobileMenuOpen = true">
 
     {{-- Backdrop --}}
     <div x-show="mobileMenuOpen"
@@ -165,24 +156,27 @@
          x-transition:leave="transition ease-in-out duration-200 transform"
          x-transition:leave-start="translate-x-0"
          x-transition:leave-end="-translate-x-full"
-         class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-100 flex flex-col shadow-2xl"
+         class="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-white border-r border-gray-100 flex flex-col shadow-2xl"
          x-data="sidebarData()" x-init="init()"
          data-role="{{ $sRole }}"
          style="display:none;">
 
         {{-- Header --}}
         <div class="flex items-center justify-between h-16 px-5 border-b border-gray-100 flex-shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="flex items-center justify-center w-8 h-8 {{ $logoAccent }} rounded-lg flex-shrink-0 overflow-hidden">
+            <div class="flex items-center gap-3 w-full">
+                <div class="flex items-center justify-center w-9 h-9 {{ $logoAccent }} rounded-xl flex-shrink-0 overflow-hidden shadow-sm">
                     @if(!empty($companyLogo ?? null))
-                        <img src="{{ asset($companyLogo) }}" alt="Logo" class="h-8 w-8 object-contain">
+                        <img src="{{ asset($companyLogo) }}" alt="Logo" class="h-9 w-9 object-contain">
                     @else
-                        <img src="/inc.png" alt="Logo" class="h-6 w-auto brightness-0 invert" onerror="this.style.display='none'">
+                        <img src="/inc.png" alt="Logo" class="h-5 w-auto brightness-0 invert" onerror="this.style.display='none'">
                     @endif
                 </div>
-                <span class="text-[15px] font-bold text-gray-900 tracking-tight">{{ $companyName ?? 'Artilia' }}</span>
+                <div class="flex flex-col min-w-0 flex-1">
+                    <span class="text-[14px] font-extrabold text-gray-900 tracking-tight leading-tight">{{ $companyName ?? 'Artilia' }}</span>
+                    <span class="text-[10px] text-gray-400 font-medium leading-tight">{{ $isOp ? 'Operator' : 'Admin Panel' }}</span>
+                </div>
             </div>
-            <button @click="mobileMenuOpen = false" class="flex items-center justify-center w-7 h-7 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors flex-shrink-0">
+            <button @click="mobileMenuOpen = false" class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors flex-shrink-0" aria-label="Tutup navigasi">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -566,6 +560,32 @@
                             @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
                         </div>
                     </a>
+
+                    {{-- K3 Safety & APD Induction (PIMNAS Feature) --}}
+                    @php $isAct = Route::is($rp . '.safety.*'); @endphp
+                    <a href="{{ route($rp . '.safety.index') }}" @click="mobileMenuOpen = false"
+                       @if($isAct) data-active="true" @endif
+                       class="flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-all border-l-[3px]
+                              {{ $isAct ? $navActiveM : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                        <div class="flex items-center gap-2.5">
+                            <svg style="width:15px;height:15px;" class="{{ $isAct ? $ic5 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                            <span>K3 & Keselamatan Lab</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            @php
+                                $pendingK3Clearance = \App\Models\BorrowingRequest::whereHas('item', fn($q) => $q->whereIn('safety_risk_level', ['medium', 'high']))
+                                    ->whereIn('status', ['pending', 'approved'])
+                                    ->whereNull('safety_verified_at')
+                                    ->count();
+                            @endphp
+                            @if($pendingK3Clearance > 0)
+                                <span class="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-amber-500 rounded-full flex-shrink-0">{{ $pendingK3Clearance }}</span>
+                            @endif
+                            @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                        </div>
+                    </a>
                 </div>
             </div>
 
@@ -749,6 +769,45 @@
                 </div>
             </div>
             @endif
+
+            {{-- Digital Twin & AI Lab Tools --}}
+            <div class="pt-4 flex flex-col gap-1">
+                <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Digital Twin & AI Tools</p>
+
+                @php $isAct = Route::is($rp . '.workshop.*'); @endphp
+                <a href="{{ route($rp . '.workshop.index') }}" @click="mobileMenuOpen = false"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150 border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+                        </svg>
+                        <span>Denah Bengkel 2D</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 tracking-wide">LIVE</span>
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+
+                @php $isAct = Route::is($rp . '.defect-scanner.*'); @endphp
+                <a href="{{ route($rp . '.defect-scanner.index') }}" @click="mobileMenuOpen = false"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150 border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.867V15.13a1 1 0 01-1.447.898L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        <span>AI Defect Scanner</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-violet-100 text-violet-700 dark:bg-violet-900/60 dark:text-violet-300 tracking-wide">CV</span>
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+            </div>
 
             {{-- System --}}
             <div class="pt-4 flex flex-col gap-1">
