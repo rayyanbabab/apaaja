@@ -33,43 +33,42 @@
     <!-- Sidebar Controller -->
     <script>
         function sidebarData() {
-            const isMasterActive = {{ Route::is($routePrefix . '.categories.*', $routePrefix . '.suppliers.*', $routePrefix . '.locations.*') ? 'true' : 'false' }};
+            @php
+                $curRole = Auth::user()->role->value ?? 'user';
+                $curRp   = $routePrefix ?? ($curRole === 'operator' ? 'staff' : 'admin');
+            @endphp
+            const isMasterActive = {{ Route::is($curRp . '.categories.*', $curRp . '.suppliers.*', $curRp . '.locations.*') ? 'true' : 'false' }};
             const isInventoryActive = {{ (
-                Route::is($routePrefix . '.inventory.*') ||
-                Route::is($routePrefix . '.incoming.*') ||
-                Route::is($routePrefix . '.outgoing.*') ||
-                Route::is($routePrefix . '.maintenance.*') ||
-                Route::is($routePrefix . '.stock-opnames.*') ||
-                Route::is($routePrefix . '.calibration.*') ||
-                Route::is($routePrefix . '.logistics.*') ||
-                Route::is($routePrefix . '.tooling-kits.*') ||
-                Route::is($routePrefix . '.bap.*') ||
-                Route::is($routePrefix . '.borrowing-requests.bap')
+                Route::is($curRp . '.inventory.*') ||
+                Route::is($curRp . '.incoming.*') ||
+                Route::is($curRp . '.outgoing.*') ||
+                Route::is($curRp . '.maintenance.*') ||
+                Route::is($curRp . '.stock-opnames.*') ||
+                Route::is($curRp . '.calibration.*') ||
+                Route::is($curRp . '.logistics.*') ||
+                Route::is($curRp . '.tooling-kits.*') ||
+                Route::is($curRp . '.bap.*') ||
+                Route::is($curRp . '.borrowing-requests.bap') ||
+                Route::is($curRp . '.safety.*')
             ) ? 'true' : 'false' }};
             const isBorrowingActive = {{ (
-                Route::is($routePrefix . '.borrowings.*') ||
-                (Route::is($routePrefix . '.borrowing-requests.*') && !Route::is($routePrefix . '.borrowing-requests.bap'))
+                Route::is($curRp . '.borrowings.*') ||
+                (Route::is($curRp . '.borrowing-requests.*') && !Route::is($curRp . '.borrowing-requests.bap'))
             ) ? 'true' : 'false' }};
-            const isUsersActive = {{ Route::is($routePrefix . '.content.*') ? 'true' : 'false' }};
+            const isUsersActive = {{ Route::is($curRp . '.content.*') ? 'true' : 'false' }};
 
             return {
-                masterDataOpen: isMasterActive || (localStorage.getItem('artilia_sidebar_master') === 'true'),
-                inventoryOpen: isInventoryActive || (localStorage.getItem('artilia_sidebar_inv') === 'true'),
-                borrowingOpen: isBorrowingActive || (localStorage.getItem('artilia_sidebar_borrow') === 'true'),
-                usersOpen: isUsersActive || (localStorage.getItem('artilia_sidebar_users') === 'true'),
+                // Dropdown hanya terbuka jika halaman saat ini berada di dalam dropdown tersebut
+                masterDataOpen: isMasterActive,
+                inventoryOpen: isInventoryActive,
+                borrowingOpen: isBorrowingActive,
+                usersOpen: isUsersActive,
 
                 init() {
-                    // Watch for user toggling and save to localStorage
-                    this.$watch('masterDataOpen', val => localStorage.setItem('artilia_sidebar_master', val));
-                    this.$watch('inventoryOpen', val => localStorage.setItem('artilia_sidebar_inv', val));
-                    this.$watch('borrowingOpen', val => localStorage.setItem('artilia_sidebar_borrow', val));
-                    this.$watch('usersOpen', val => localStorage.setItem('artilia_sidebar_users', val));
-
-                    // Never collapse the menu that contains the current active page
-                    if (isMasterActive) this.masterDataOpen = true;
-                    if (isInventoryActive) this.inventoryOpen = true;
-                    if (isBorrowingActive) this.borrowingOpen = true;
-                    if (isUsersActive) this.usersOpen = true;
+                    // Bersihkan cache localStorage sebelumnya agar dropdown tidak dipaksa terbuka saat navigasi halaman
+                    ['artilia_sidebar_master', 'artilia_sidebar_inv', 'artilia_sidebar_borrow', 'artilia_sidebar_users'].forEach(k => {
+                        localStorage.removeItem(k);
+                    });
 
                     // Automatically scroll the active element into view inside the sidebar
                     this.$nextTick(() => {
@@ -617,6 +616,13 @@
             overflow: visible;
         }
 
+        /* ── Modals, Drawers & Overlays Z-Index Fix (Selalu di atas .app-top-header z-40) ── */
+        .z-\[9998\], .z-\[9999\], .z-\[10000\],
+        .modal-overlay, .drawer-overlay, .ws-drawer-overlay, .ws-modal-overlay,
+        [role="dialog"] {
+            z-index: 99999 !important;
+        }
+
         @media (min-width: 768px) {
             .main-content { margin-left: 16rem; }
             .app-top-header { left: 16rem; }
@@ -630,7 +636,7 @@
         @media (max-width: 767px) {
             .main-content { margin-left: 0; }
             .app-top-header {
-                padding-left: 3.5rem !important;
+                padding-left: 0.75rem !important;
                 padding-right: 0.75rem !important;
             }
             #toast-container.admin-toast {
@@ -717,7 +723,7 @@
         }
         @keyframes ag-fadeUp {
             from { opacity: 0; transform: translateY(14px); }
-            to   { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: none; }
         }
 
         /* 3 · Top loading bar */
@@ -1039,7 +1045,7 @@
         document.querySelectorAll(
             '.bg-white.rounded-xl, .bg-white.rounded-2xl, .bg-white.rounded-lg, .chart-card'
         ).forEach(function (el) {
-            if (!el.closest('table') && !el.closest('nav')) el.classList.add('ag-card-hover');
+            if (!el.closest('table') && !el.closest('nav') && !el.closest('header')) el.classList.add('ag-card-hover');
         });
 
         /* ── 5. Button press + ripple ── */
