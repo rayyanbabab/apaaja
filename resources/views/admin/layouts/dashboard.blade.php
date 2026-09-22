@@ -649,8 +649,32 @@
             #toast-container.admin-toast .toast-item { max-width: 100%; }
             /* Push content above bottom nav */
             .main-content main {
-                padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px)) !important;
+                padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important;
             }
+
+            /* ── Mobile Content Global Polish ── */
+            /* Ensure page content doesn't touch screen edges */
+            .main-content main > * { min-width: 0; }
+
+            /* Tables scroll naturally on mobile */
+            table { font-size: 0.8rem; }
+
+            /* Cards touch padding */
+            .rounded-2xl, .rounded-xl { border-radius: 1rem !important; }
+
+            /* Slightly reduce heading sizes for mobile */
+            h1.text-2xl, h1.text-3xl { font-size: 1.375rem !important; }
+            h2.text-xl, h2.text-2xl  { font-size: 1.125rem !important; }
+
+            /* Page header paragraph subtitle */
+            p.text-sm.text-gray-400 { font-size: 0.78rem; }
+
+            /* Stat cards in 2-col grid - comfy */
+            .grid.grid-cols-2 { gap: 0.625rem; }
+            .grid.grid-cols-2.gap-3 { gap: 0.625rem; }
+
+            /* Generous card inner padding on mobile */
+            .stat-card-inner { padding: 0.8rem 0.9rem !important; }
         }
         .overflow-x-auto {
             -webkit-overflow-scrolling: touch;
@@ -662,46 +686,50 @@
             position: fixed;
             bottom: 0; left: 0; right: 0;
             z-index: 55;
-            height: calc(3.75rem + env(safe-area-inset-bottom, 0px));
+            height: calc(3.875rem + env(safe-area-inset-bottom, 0px));
             padding-bottom: env(safe-area-inset-bottom, 0px);
             display: none;
             align-items: stretch;
-            background: rgba(255, 255, 255, 0.90);
-            backdrop-filter: blur(28px) saturate(180%) brightness(108%);
-            -webkit-backdrop-filter: blur(28px) saturate(180%) brightness(108%);
-            border-top: 1px solid rgba(0,0,0,0.07);
-            box-shadow: 0 -4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(32px) saturate(200%) brightness(108%);
+            -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(108%);
+            border-top: 1px solid rgba(0,0,0,0.06);
+            box-shadow: 0 -1px 0 rgba(0,0,0,0.04), 0 -8px 32px rgba(0,0,0,0.05);
         }
         @media (max-width: 767px)  { .mobile-bottom-nav { display: flex; } }
         @media (min-width: 768px)  { .mobile-bottom-nav { display: none !important; } }
         .bn-item {
             flex: 1; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            gap: 3px; padding: 0.3rem 0.25rem 0;
-            color: #6b7280; text-decoration: none;
-            transition: color 0.18s ease, transform 0.12s ease;
+            gap: 3px; padding: 0.35rem 0.25rem 0;
+            color: #9ca3af; text-decoration: none;
+            transition: color 0.2s ease, transform 0.12s ease;
             position: relative; background: none; border: none;
             cursor: pointer; -webkit-tap-highlight-color: transparent;
             min-height: 44px;
         }
-        .bn-item:active { transform: scale(0.88); }
-        .bn-item svg { width: 22px; height: 22px; flex-shrink: 0; transition: transform 0.15s ease; }
-        .bn-item.bn-active svg { transform: scale(1.1); }
-        .bn-label { font-size: 9.5px; font-weight: 600; letter-spacing: 0.01em; line-height: 1; white-space: nowrap; }
+        .bn-item:active { transform: scale(0.85); }
+        .bn-item svg { width: 22px; height: 22px; flex-shrink: 0; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), color 0.2s ease; }
+        .bn-item.bn-active svg { transform: scale(1.15); }
+        .bn-label { font-size: 9.5px; font-weight: 600; letter-spacing: 0.01em; line-height: 1; white-space: nowrap; transition: color 0.2s ease; }
         .bn-badge {
-            position: absolute; top: 4px; left: calc(50% + 4px);
-            min-width: 15px; height: 15px;
+            position: absolute; top: 4px; left: calc(50% + 5px);
+            min-width: 16px; height: 16px;
             background: #ef4444; color: white;
-            font-size: 8.5px; font-weight: 700;
+            font-size: 8px; font-weight: 700;
             border-radius: 99px; display: flex;
             align-items: center; justify-content: center;
-            padding: 0 3px; border: 1.5px solid rgba(255,255,255,0.95);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            padding: 0 3.5px; border: 2px solid rgba(255,255,255,0.95);
+            box-shadow: 0 1px 6px rgba(239,68,68,0.4);
         }
-        .bn-item.bn-active::after {
+        /* Active pill indicator at top */
+        .bn-item.bn-active::before {
             content: ''; position: absolute;
-            top: 0; left: 22%; right: 22%; height: 2.5px;
-            border-radius: 0 0 3px 3px;
+            top: 0; left: 50%; transform: translateX(-50%);
+            width: 24px; height: 3px;
+            border-radius: 0 0 4px 4px;
+            background: currentColor;
+            opacity: 0.9;
         }
 
         /* ══════════════════════════════════════════
@@ -827,7 +855,7 @@
     <!-- Main Content -->
     <div class="main-content content-wrapper">
         @include('admin.components.header')
-        <main class="px-3 pt-1 pb-6 sm:px-4 sm:pt-1 sm:pb-4 lg:px-6 lg:pt-1 lg:pb-6">
+        <main class="px-3.5 pt-2 pb-6 sm:px-4 sm:pt-2 sm:pb-4 lg:px-6 lg:pt-2 lg:pb-6">
             @yield('content')
         </main>
     </div>
