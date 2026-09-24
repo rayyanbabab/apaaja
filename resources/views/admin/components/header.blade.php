@@ -1,7 +1,7 @@
-        <header class="app-top-header flex h-16 items-center justify-between border-b border-gray-100 bg-white/95 backdrop-blur-sm px-3 sm:px-4 lg:px-6" style="min-width:0; overflow:visible;">
-            <!-- Left Side: Mobile Hamburger + User Info -->
+<header class="app-top-header flex h-16 items-center justify-between border-b border-gray-100 bg-white/95 backdrop-blur-sm px-3 sm:px-4 lg:px-6" style="min-width:0; overflow:visible;">
+
             <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                <!-- Mobile Hamburger Button (md:hidden) -->
+
                 <button type="button"
                         x-data
                         @click="$dispatch('open-mobile-menu')"
@@ -51,10 +51,8 @@
                 </div>
             </div>
 
-            <!-- Right Side: Actions -->
             <div class="flex items-center gap-2">
 
-                {{-- Dark Mode Toggle --}}
                 @include('admin.components.partials.dark-mode-toggle')
                 <div class="relative" x-data="notifDropdownUser('{{ route($routePrefix . '.notifications.recent') }}', '{{ route($routePrefix . '.notifications.read-all') }}', '{{ route($routePrefix . '.notifications.index') }}')" x-init="init()" @click.away="open = false">
                     <button @click="toggle()" id="admin-notif-bell"
@@ -69,7 +67,6 @@
                         class="absolute -top-1.5 -right-1.5 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white ring-2 ring-white dark:ring-slate-900"
                         style="display:none;height:18px;pointer-events:none;z-index:40;"></span>
 
-                    {{-- Dropdown --}}
                     <div x-show="open"
                         x-transition:enter="transition ease-out duration-150"
                         x-transition:enter-start="opacity-0 scale-95 translate-y-1"

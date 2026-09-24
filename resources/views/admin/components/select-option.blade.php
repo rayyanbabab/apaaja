@@ -30,7 +30,7 @@
     <button type="button" @click="open = !open" @click.away="open = false"
         class="input-form flex items-center justify-between border border-gray-300 px-4 py-2 text-left group">
         <span class='text-gray-500 text-sm' x-text="options[selected] || '{{ $placeholder }}'"></span>
-        
+
         <svg class="group-hover: h-4 w-4 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
