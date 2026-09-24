@@ -2,14 +2,12 @@
     @media (min-width: 768px) { .user-mobile-hamburger { display: none !important; } }
     @media (max-width: 767px) { .user-mobile-hamburger { display: block !important; } }
 
-    /* ── User Mobile Hamburger Button (dark) ── */
     html.dark .user-mobile-hamburger button.inline-flex {
         background-color: rgba(15,23,42,0.85) !important;
         border-color: rgba(255,255,255,0.10) !important;
         color: #94a3b8 !important;
     }
 
-    /* ── User Mobile Slide-over Sidebar (dark) ── */
     html.dark .user-mobile-hamburger .fixed.inset-y-0 {
         background-color: rgba(15,23,42,0.95) !important;
         border-color: rgba(255,255,255,0.06) !important;
@@ -26,33 +24,19 @@
     html.dark .user-mobile-hamburger .hover\:text-gray-900:hover { color: #f1f5f9 !important; }
 </style>
 
-
-<div class="user-mobile-hamburger fixed top-3.5 left-4 z-[60]"
+<div class="user-mobile-hamburger"
      x-data="{ open: false }"
      @open-mobile-menu.window="open = true">
 
-    {{-- Hamburger Button --}}
-    <button @click="open = !open"
-            class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-gray-600 bg-white shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors focus:outline-none">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="{ 'hidden': open, 'block': !open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="{ 'block': open, 'hidden': !open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-    </button>
-
-    {{-- Backdrop --}}
     <div x-show="open"
          x-transition:enter="transition-opacity ease-linear duration-200"
          x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
          x-transition:leave="transition-opacity ease-linear duration-200"
          x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-40 bg-gray-900/75 backdrop-blur-md"
+         class="fixed inset-0 bg-gray-900/75 backdrop-blur-md"
          @click="open = false"
-         style="display:none;"></div>
+         style="z-index: 9998 !important; display:none;"></div>
 
-    {{-- Slide-over Sidebar --}}
     <div x-show="open"
          x-transition:enter="transition ease-in-out duration-250 transform"
          x-transition:enter-start="-translate-x-full"
@@ -60,33 +44,33 @@
          x-transition:leave="transition ease-in-out duration-200 transform"
          x-transition:leave-start="translate-x-0"
          x-transition:leave-end="-translate-x-full"
-         class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 flex flex-col shadow-xl"
+         class="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-100 flex flex-col shadow-xl"
          x-data="userSidebarData()" x-init="init()"
-         style="display:none;">
+         style="z-index: 9999 !important; display:none;">
 
-        {{-- Header --}}
         <div class="flex items-center justify-between h-16 px-5 border-b border-gray-100 flex-shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg flex-shrink-0 overflow-hidden">
+            <div class="flex items-center gap-3 w-full">
+                <div class="flex items-center justify-center w-9 h-9 bg-blue-600 rounded-xl flex-shrink-0 overflow-hidden shadow-sm">
                     @if(!empty($companyLogo ?? null))
-                        <img src="{{ asset($companyLogo) }}" alt="Logo" class="h-8 w-8 object-contain">
+                        <img src="{{ asset($companyLogo) }}" alt="Logo" class="h-9 w-9 object-contain">
                     @else
-                        <img src="/inc.png" alt="Logo" class="h-6 w-auto brightness-0 invert" onerror="this.style.display='none'">
+                        <img src="/inc.png" alt="Logo" class="h-5 w-auto brightness-0 invert" onerror="this.style.display='none'">
                     @endif
                 </div>
-                <span class="text-[15px] font-bold text-gray-900 tracking-tight">{{ $companyName ?? 'Artilia' }}</span>
+                <div class="flex flex-col min-w-0 flex-1">
+                    <span class="text-[14px] font-extrabold text-gray-900 tracking-tight leading-tight">{{ $companyName ?? 'Artilia' }}</span>
+                    <span class="text-[10px] text-gray-400 font-medium leading-tight">Peminjam</span>
+                </div>
             </div>
-            <button @click="open = false" class="flex items-center justify-center w-7 h-7 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+            <button @click="open = false" class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors flex-shrink-0" aria-label="Tutup navigasi">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
         </div>
 
-        {{-- Navigation --}}
         <nav class="flex-1 px-3 py-4 overflow-y-auto flex flex-col gap-1">
 
-            {{-- Main --}}
             <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Main</p>
 
             <a href="{{ route('user.dashboard') }}" @click="open = false"
@@ -98,7 +82,6 @@
                 Dashboard
             </a>
 
-            {{-- Borrowing --}}
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Borrowing</p>
 
@@ -119,6 +102,18 @@
                 </button>
 
                 <div x-show="borrowingOpen" x-collapse class="mt-1 space-y-0.5 pl-7">
+                    <a href="{{ route('user.workshop.index') }}" @click="open = false"
+                       class="flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-all
+                              {{ Route::is('user.workshop.*') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                        <div class="flex items-center gap-2.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;" class="{{ Route::is('user.workshop.*') ? 'text-blue-500' : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+                            </svg>
+                            <span>Denah Bengkel</span>
+                        </div>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-blue-100 text-blue-700">2D</span>
+                    </a>
+
                     <a href="{{ route('user.borrowing.index') }}" @click="open = false"
                        class="flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg transition-all
                               {{ Route::is('user.borrowing.index') || Route::is('user.borrowing.create') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
@@ -153,7 +148,6 @@
                 </div>
             </div>
 
-            {{-- Pengadaan --}}
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Pengadaan</p>
 
@@ -173,7 +167,6 @@
                 </a>
             </div>
 
-            {{-- Account --}}
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Account</p>
 
@@ -202,8 +195,7 @@
             </div>
         </nav>
 
-                {{-- User Info & Sign Out --}}
-        <div class="flex-shrink-0 border-t border-gray-100 p-3 flex flex-col gap-3">
+        <div class="flex-shrink-0 border-t border-gray-100 p-3 flex flex-col gap-3" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));">
             <div class="flex items-center gap-3 px-2">
                 <img src="{{ Auth::user()->profil ? asset(Auth::user()->profil) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&color=4F76F6&background=EEF2FF&size=40' }}"
                     alt="{{ Auth::user()->name }}"
