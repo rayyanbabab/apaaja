@@ -2,7 +2,7 @@
 
 @section('content')
 <style>
-/* ── Profile Page Dark Mode ── */
+
 html.dark .prof-card { background-color: #1e293b !important; border-color: #334155 !important; }
 html.dark .prof-card-header { border-color: #334155 !important; }
 html.dark .prof-title { color: #f1f5f9 !important; }
@@ -15,7 +15,6 @@ html.dark .prof-name  { color: #f1f5f9 !important; }
 html.dark .prof-email { color: #94a3b8 !important; }
 html.dark .prof-status { color: #94a3b8 !important; }
 
-/* All form inputs in dark mode */
 html.dark .prof-card input[type="text"],
 html.dark .prof-card input[type="email"],
 html.dark .prof-card input[type="password"],
@@ -37,10 +36,8 @@ html.dark .prof-card textarea:focus {
     outline: none !important;
 }
 
-/* WA input has pl-9 (icon prefix) */
 html.dark .prof-card .text-gray-400 { color: #475569 !important; }
 
-/* Ganti Foto button */
 html.dark .prof-btn-photo {
     background-color: #1e293b !important;
     border-color: #334155 !important;
@@ -51,14 +48,12 @@ html.dark .prof-btn-photo:hover {
     color: #e2e8f0 !important;
 }
 
-/* Submit buttons — biru kontras */
 html.dark .prof-btn-submit {
     background-color: #2563eb !important;
     color: #ffffff !important;
 }
 html.dark .prof-btn-submit:hover { background-color: #1d4ed8 !important; }
 
-/* WA button — hijau tetap */
 html.dark .prof-btn-wa {
     background-color: #16a34a !important;
     color: #ffffff !important;
@@ -192,7 +187,7 @@ html.dark .prof-btn-wa:hover { background-color: #15803d !important; }
                     </div>
                 </form>
             </div>
-            
+
             <div class="prof-card rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div class="prof-card-header border-b border-gray-200 px-6 py-4">
                     <h3 class="prof-title text-lg font-medium text-gray-900">Edit Profil</h3>
