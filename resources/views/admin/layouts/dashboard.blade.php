@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
-    <!-- Dark Mode Anti-Flash Script (must be first) -->
+
     <script>
         (function () {
             var saved = localStorage.getItem('artilia_dark_mode');
@@ -25,12 +25,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="icon" href="/artilia.png">
 
-    <!-- Alpine.js Collapse Plugin (must load before Alpine) -->
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
-    <!-- Alpine.js -->
+
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-    <!-- Sidebar Controller -->
     <script>
         function sidebarData() {
             @php
@@ -58,19 +56,16 @@
             const isUsersActive = {{ Route::is($curRp . '.content.*') ? 'true' : 'false' }};
 
             return {
-                // Dropdown hanya terbuka jika halaman saat ini berada di dalam dropdown tersebut
                 masterDataOpen: isMasterActive,
                 inventoryOpen: isInventoryActive,
                 borrowingOpen: isBorrowingActive,
                 usersOpen: isUsersActive,
 
                 init() {
-                    // Bersihkan cache localStorage sebelumnya agar dropdown tidak dipaksa terbuka saat navigasi halaman
                     ['artilia_sidebar_master', 'artilia_sidebar_inv', 'artilia_sidebar_borrow', 'artilia_sidebar_users'].forEach(k => {
                         localStorage.removeItem(k);
                     });
 
-                    // Automatically scroll the active element into view inside the sidebar
                     this.$nextTick(() => {
                         const activeDesktop = document.querySelector('.desktop-sidebar [data-active="true"]');
                         if (activeDesktop) {
@@ -87,11 +82,9 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
 
-    {{-- PWA: Manifest & Theme --}}
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#2563eb">
 
-    {{-- PWA: Apple / iOS --}}
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Artilia">
@@ -100,14 +93,13 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
     <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-192x192.png">
 
-    {{-- PWA: Microsoft --}}
     <meta name="msapplication-TileColor" content="#2563eb">
     <meta name="msapplication-TileImage" content="/icons/icon-192x192.png">
 
     @stack('styles')
 
     <style>
-        /* ── Global Font ── */
+
         *, *::before, *::after { box-sizing: border-box; }
         body, html {
             font-family: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -115,7 +107,6 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* ── Scrollbar ── */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
@@ -123,9 +114,6 @@
         .sidebar-navigation::-webkit-scrollbar { width: 3px; }
         .sidebar-navigation::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 99px; }
 
-        /* ═══════════════════════════════════════
-           DARK MODE — CSS Custom Properties
-        ═══════════════════════════════════════ */
         :root {
             --dm-bg:           #ffffff;
             --dm-bg-secondary: #f9fafb;
@@ -155,13 +143,11 @@
             --dm-table-stripe: #1a2744;
         }
 
-        /* ── Dark mode body & background ── */
         html.dark body {
             background-color: var(--dm-bg);
             color: var(--dm-text);
         }
 
-        /* ── Sidebar ── */
         html.dark .sidebar-container {
             background-color: var(--dm-sidebar-bg) !important;
             border-color: var(--dm-border) !important;
@@ -170,7 +156,6 @@
         html.dark ::-webkit-scrollbar-thumb { background: #475569; }
         html.dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
-        /* ── Header ── */
         html.dark .app-top-header {
             background: var(--dm-header-bg) !important;
             border-color: var(--dm-border) !important;
@@ -184,7 +169,6 @@
         html.dark .app-top-header .hover\:bg-gray-100:hover { background-color: #475569 !important; }
         html.dark .app-top-header .border-gray-100 { border-color: var(--dm-border) !important; }
 
-        /* ── Dark Mode Toggle button in header ── */
         html:not(.dark) .dm-toggle-btn {
             background: #f3f4f6;
             color: #4b5563;
@@ -197,7 +181,6 @@
         }
         html.dark .dm-toggle-btn:hover { background: #475569; }
 
-        /* ── White cards / panels ── */
         html.dark .bg-white {
             background-color: var(--dm-surface) !important;
         }
@@ -205,7 +188,6 @@
         html.dark .bg-gray-100 { background-color: #334155 !important; }
         html.dark .bg-gray-200 { background-color: #475569 !important; }
 
-        /* ── Text colors ── */
         html.dark .text-gray-900 { color: var(--dm-text) !important; }
         html.dark .text-gray-800 { color: #e2e8f0 !important; }
         html.dark .text-gray-700 { color: #cbd5e1 !important; }
@@ -213,14 +195,12 @@
         html.dark .text-gray-500 { color: var(--dm-text-muted) !important; }
         html.dark .text-gray-400 { color: var(--dm-text-subtle) !important; }
 
-        /* ── Borders ── */
         html.dark .border-gray-100 { border-color: var(--dm-border) !important; }
         html.dark .border-gray-200 { border-color: #334155 !important; }
         html.dark .divide-gray-100 > * + * { border-color: var(--dm-border) !important; }
         html.dark .divide-gray-200 > * + * { border-color: #334155 !important; }
         html.dark .divide-y > * + * { border-color: var(--dm-border) !important; }
 
-        /* ── Tables ── */
         html.dark table { color: var(--dm-text); }
         html.dark thead th,
         html.dark thead td {
@@ -234,7 +214,6 @@
         html.dark tbody td { border-color: var(--dm-border) !important; }
         html.dark .divide-y.divide-gray-50 > * + * { border-color: #334155 !important; }
 
-        /* ── Forms & Inputs ── */
         html.dark input:not([type=checkbox]):not([type=radio]),
         html.dark textarea,
         html.dark select {
@@ -247,27 +226,21 @@
         html.dark label { color: var(--dm-text-muted) !important; }
         html.dark .form-label { color: var(--dm-text-muted) !important; }
 
-        /* ── Sidebar Nav items ── */
         html.dark .sidebar-container p.text-gray-400 { color: #475569 !important; }
 
-        /* ── Notification dropdown ── */
         html.dark .bg-white.rounded-2xl.border { background-color: var(--dm-surface) !important; border-color: var(--dm-border) !important; }
         html.dark .hover\:bg-gray-50:hover { background-color: #334155 !important; }
         html.dark .bg-blue-50\/40 { background-color: rgba(30,64,175,0.2) !important; }
 
-        /* ── Toasts ── */
         html.dark .toast-item.bg-white { background-color: #1e293b !important; }
         html.dark .toast-item { border-color: #334155 !important; }
         html.dark .toast-item .text-gray-900 { color: var(--dm-text) !important; }
         html.dark .toast-item .text-gray-500 { color: var(--dm-text-muted) !important; }
 
-        /* ── Badges & Rings ── */
         html.dark .ring-gray-100 { --tw-ring-color: #334155 !important; }
         html.dark .ring-1.ring-gray-200 { --tw-ring-color: #334155 !important; }
         html.dark .ring-gray-50  { --tw-ring-color: #1e293b !important; }
 
-
-        /* ── PWA banner ── */
         html.dark #pwa-banner-inner {
             background: rgba(30,41,59,0.97) !important;
             border-color: rgba(99,102,241,0.2) !important;
@@ -277,69 +250,56 @@
         html.dark .pwa-btn-dismiss { border-color: #475569 !important; color: #94a3b8 !important; }
         html.dark .pwa-btn-dismiss:hover { background: #334155 !important; }
 
-        /* ── Mobile Bottom Nav (dark) ── */
-        html.dark .mobile-bottom-nav {
-            background: rgba(15,23,42,0.92) !important;
-            border-color: rgba(255,255,255,0.06) !important;
+        html.dark .bn-inner {
+            background: rgba(15,23,42,0.95) !important;
+            border-color: rgba(255,255,255,0.08) !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06) !important;
         }
         html.dark .bn-item { color: #64748b !important; }
 
-        /* ── Sidebar skeleton shimmer (dark) ── */
         html.dark .ag-skeleton {
             background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
             background-size: 400% 100%;
             animation: ag-shimmer 1.6s ease-in-out infinite;
         }
 
-        /* ══════════════════════════════════════════════════
-           SIDEBAR DARK MODE — COMPREHENSIVE
-        ══════════════════════════════════════════════════ */
-
-        /* Sidebar container & border */
         html.dark .sidebar-container {
             background-color: #111827 !important;
             border-color: #1f2937 !important;
         }
 
-        /* Logo section border */
         html.dark .sidebar-container > div > div:first-child {
             border-color: #1f2937 !important;
         }
 
-        /* Company name text */
         html.dark .sidebar-container .text-gray-900 { color: #f1f5f9 !important; }
 
-        /* Section headers (Main, Master Data, etc.) */
         html.dark .sidebar-container p.text-gray-400 { color: #475569 !important; }
 
-        /* ── Nav links default state ── */
         html.dark .sidebar-container a.text-gray-600,
         html.dark .sidebar-container button.text-gray-600 {
             color: #94a3b8 !important;
         }
-        /* All nav link text that uses text-gray-600 */
+
         html.dark .sidebar-container a span,
         html.dark .sidebar-container button span { color: inherit; }
 
-        /* ── Nav link hover state ── */
         html.dark .sidebar-container a:hover,
         html.dark .sidebar-container button:hover {
             background-color: rgba(255,255,255,0.06) !important;
             color: #e2e8f0 !important;
         }
 
-        /* ── Icons: default (gray-400) → visible slate in dark ── */
         html.dark .sidebar-container svg.text-gray-400,
         html.dark .sidebar-container [class*="text-gray-400"] svg {
             color: #64748b !important;
         }
-        /* When hovered, lighten icon */
+
         html.dark .sidebar-container a:hover svg,
         html.dark .sidebar-container button:hover svg {
             color: #94a3b8 !important;
         }
 
-        /* ── hover:bg-gray-50 / hover:text-gray-900 overrides ── */
         html.dark .sidebar-container .hover\:bg-gray-50:hover {
             background-color: rgba(255,255,255,0.06) !important;
         }
@@ -347,7 +307,6 @@
             color: #e2e8f0 !important;
         }
 
-        /* ── Sub-menu child items (pl-7) ── */
         html.dark .sidebar-container .pl-7 a {
             color: #94a3b8 !important;
         }
@@ -356,10 +315,8 @@
             color: #e2e8f0 !important;
         }
 
-        /* ── Bottom border (logout area) ── */
         html.dark .sidebar-container .border-t { border-color: #1f2937 !important; }
 
-        /* Logout button */
         html.dark .sidebar-container button[type="submit"] {
             background-color: rgba(239,68,68,0.15) !important;
             color: #f87171 !important;
@@ -368,7 +325,6 @@
             background-color: rgba(239,68,68,0.25) !important;
         }
 
-        /* Sidebar scrollbar */
         html.dark .sidebar-navigation::-webkit-scrollbar { width: 4px; }
         html.dark .sidebar-navigation::-webkit-scrollbar-track { background: transparent; }
         html.dark .sidebar-navigation::-webkit-scrollbar-thumb {
@@ -376,13 +332,10 @@
             border-radius: 4px;
         }
 
-        /* Header icons */
         html.dark .app-top-header svg { color: inherit; }
 
-        /* Generic svg inside dark mode gets a safe fallback */
         html.dark svg[stroke="currentColor"] { color: inherit; }
 
-        /* ── Active nav state fix (sidebar & mobile) ── */
         html.dark .sidebar-container .bg-blue-50   { background-color: rgba(59,130,246,0.28) !important; }
         html.dark .sidebar-container .bg-emerald-50 { background-color: rgba(16,185,129,0.28) !important; }
         html.dark .sidebar-container .text-blue-700 { color: #93c5fd !important; }
@@ -392,7 +345,6 @@
         html.dark .sidebar-container .text-blue-500 { color: #60a5fa !important; }
         html.dark .sidebar-container .text-emerald-500 { color: #34d399 !important; }
 
-        /* Mobile hamburger active states */
         html.dark .mobile-hamburger-container .bg-blue-50   { background-color: rgba(59,130,246,0.28) !important; }
         html.dark .mobile-hamburger-container .bg-emerald-50 { background-color: rgba(16,185,129,0.28) !important; }
         html.dark .mobile-hamburger-container .text-blue-700 { color: #93c5fd !important; }
@@ -400,7 +352,6 @@
         html.dark .mobile-hamburger-container .text-blue-600 { color: #60a5fa !important; }
         html.dark .mobile-hamburger-container .text-emerald-600 { color: #34d399 !important; }
 
-        /* ── Explicit Active Item Highlight [data-active="true"] ── */
         .sidebar-container a[data-active="true"],
         .sidebar-container .pl-7 a[data-active="true"],
         .mobile-hamburger-container a[data-active="true"],
@@ -431,7 +382,6 @@
             color: #60a5fa !important;
         }
 
-        /* User mobile hamburger active states */
         html.dark .user-mobile-hamburger .bg-blue-50   { background-color: rgba(59,130,246,0.28) !important; }
         html.dark .user-mobile-hamburger .bg-orange-50 { background-color: rgba(249,115,22,0.28) !important; }
         html.dark .user-mobile-hamburger .text-blue-700 { color: #93c5fd !important; }
@@ -439,7 +389,6 @@
         html.dark .user-mobile-hamburger .text-blue-600 { color: #60a5fa !important; }
         html.dark .user-mobile-hamburger .text-orange-600 { color: #fb923c !important; }
 
-        /* ── Status badges (colored) — visible icon wrappers ── */
         html.dark .bg-green-100  { background-color: rgba(34,197,94,0.28)   !important; }
         html.dark .bg-red-100    { background-color: rgba(239,68,68,0.28)   !important; }
         html.dark .bg-yellow-100 { background-color: rgba(250,204,21,0.28)  !important; }
@@ -452,7 +401,6 @@
         html.dark .bg-amber-100  { background-color: rgba(245,158,11,0.28)  !important; }
         html.dark .bg-slate-100  { background-color: #334155 !important; }
 
-        /* Status badge text — keep colored */
         html.dark .text-green-700  { color: #6ee7b7 !important; }
         html.dark .text-red-700    { color: #fca5a5 !important; }
         html.dark .text-yellow-700 { color: #fde68a !important; }
@@ -464,7 +412,6 @@
         html.dark .text-amber-700  { color: #fde68a !important; }
         html.dark .text-blue-700   { color: #93c5fd !important; }
 
-        /* Solid colored badges — keep as is (white text on colored bg) */
         html.dark .bg-red-500,
         html.dark .bg-green-500,
         html.dark .bg-blue-500,
@@ -473,41 +420,28 @@
         html.dark .bg-purple-500,
         html.dark .bg-indigo-500 { opacity: 0.9; }
 
-        /* ── Main content area background ── */
         html.dark main { background-color: transparent !important; }
         html.dark .bg-gray-50.min-h-screen { background-color: transparent !important; }
 
-        /* ── Hover states for nav items ── */
         html.dark .hover\:bg-gray-50:hover { background-color: rgba(255,255,255,0.06) !important; }
         html.dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
         html.dark .hover\:text-gray-900:hover { color: #f1f5f9 !important; }
 
-        /* ── Ring white (avatar border) ── */
         html.dark .ring-2 { --tw-ring-opacity: 1; }
         html.dark .ring-white { --tw-ring-color: rgba(15,23,42,0.8) !important; }
 
-        /* ── Top loading bar stays blue ── */
         html.dark #ag-topbar { opacity: 1; }
 
-        /* ── bn-active item (bottom nav active) ── */
         html.dark .bn-item.bn-active { color: #60a5fa !important; }
-        html.dark .bn-item.bn-active::after { background: #60a5fa !important; }
+        html.dark .bn-item.bn-active .bn-icon-wrap { background: rgba(96,165,250,0.18) !important; }
 
-        /* ── Smooth color transitions ── */
         body, .sidebar-container, .app-top-header, .bg-white, .mobile-bottom-nav,
         input, textarea, select, table, thead, tbody, td, th {
             transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
         }
 
-        /* ══════════════════════════════════════════
-           DARK MODE — Nuclear "No White Left" Patch
-           Catches every possible white/light surface
-        ══════════════════════════════════════════ */
-
-        /* Body background */
         html.dark body { background-color: #0f172a !important; }
 
-        /* Alpha/opacity bg-white variants */
         html.dark .bg-white\/95,
         html.dark .bg-white\/90,
         html.dark .bg-white\/80,
@@ -517,44 +451,37 @@
             background-color: rgba(15,23,42,0.92) !important;
         }
 
-        /* Ring white (used on avatar, badge borders) */
         html.dark .ring-white { --tw-ring-color: #0f172a !important; }
         html.dark .ring-2.ring-white { --tw-ring-color: #1e293b !important; }
 
-        /* Badge border over dark bg */
         html.dark .bn-badge { border-color: #0f172a !important; }
 
-        /* Modals / overlays — be specific, avoid matching SVG/canvas inside charts */
         html.dark div[class*="bg-white"][class*="rounded"],
         html.dark section[class*="bg-white"][class*="rounded"],
         html.dark article[class*="bg-white"][class*="rounded"] {
             background-color: #1e293b !important;
         }
 
-        /* Popup / modal dialog backgrounds */
         html.dark .fixed.inset-0 > div[class*="bg-white"],
         html.dark .z-50 > div[class*="bg-white"],
         html.dark .z-\[9999\] div[class*="bg-white"] {
             background-color: #1e293b !important;
         }
 
-        /* ApexCharts dark mode — ONLY hide the white background rect, NOT the colored segments */
         html.dark .apexcharts-canvas .apexcharts-bg { fill: transparent !important; }
-        /* Donut center label text — light for dark mode */
+
         html.dark .apexcharts-datalabels-group text { fill: #e2e8f0 !important; }
         html.dark .apexcharts-datalabels-group tspan { fill: #e2e8f0 !important; }
         html.dark .apexcharts-pie-label { fill: #f1f5f9 !important; }
-        /* Donut stroke — use dark bg color instead of white */
+
         html.dark .apexcharts-pie path,
         html.dark .apexcharts-donut-slice-donut path { stroke: #1e293b !important; }
 
-        /* <select> arrow & option list on webkit */
         html.dark select option {
             background-color: #1e293b !important;
             color: #f1f5f9 !important;
         }
 
-        /* Flatpickr calendar (dark) */
         html.dark .flatpickr-calendar {
             background: #1e293b !important;
             border-color: #334155 !important;
@@ -575,17 +502,13 @@
         html.dark .flatpickr-prev-month:hover svg,
         html.dark .flatpickr-next-month:hover svg { fill: #f1f5f9 !important; }
 
-        /* Scrollbar track */
         html.dark ::-webkit-scrollbar-track { background: #0f172a !important; }
 
-        /* Empty state illustration containers */
         html.dark .bg-white.rounded-full { background-color: #334155 !important; }
 
-        /* Prose / typography */
         html.dark .prose { color: #cbd5e1 !important; }
         html.dark .prose h1, html.dark .prose h2, html.dark .prose h3 { color: #f1f5f9 !important; }
 
-        /* ApexCharts (dark) */
         html.dark .apexcharts-canvas .apexcharts-bg { fill: transparent !important; }
         html.dark .apexcharts-tooltip {
             background: #1e293b !important;
@@ -603,7 +526,6 @@
             --app-content-top-gap: 0.1rem;
         }
 
-        /* ── Content Layout ── */
         .main-content {
             transition: margin-left 0.3s ease-in-out;
             padding-top: calc(var(--app-header-height) + var(--app-content-top-gap));
@@ -616,7 +538,6 @@
             overflow: visible;
         }
 
-        /* ── Modals, Drawers & Overlays Z-Index Fix (Selalu di atas .app-top-header z-40) ── */
         .z-\[9998\], .z-\[9999\], .z-\[10000\],
         .modal-overlay, .drawer-overlay, .ws-drawer-overlay, .ws-modal-overlay,
         [role="dialog"] {
@@ -642,38 +563,30 @@
             #toast-container.admin-toast {
                 left: 0.75rem !important;
                 right: 0.75rem !important;
-                bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+                bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
                 max-width: none !important;
                 align-items: stretch;
             }
             #toast-container.admin-toast .toast-item { max-width: 100%; }
-            /* Push content above bottom nav */
+
             .main-content main {
-                padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important;
+                padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)) !important;
             }
 
-            /* ── Mobile Content Global Polish ── */
-            /* Ensure page content doesn't touch screen edges */
             .main-content main > * { min-width: 0; }
 
-            /* Tables scroll naturally on mobile */
             table { font-size: 0.8rem; }
 
-            /* Cards touch padding */
             .rounded-2xl, .rounded-xl { border-radius: 1rem !important; }
 
-            /* Slightly reduce heading sizes for mobile */
             h1.text-2xl, h1.text-3xl { font-size: 1.375rem !important; }
             h2.text-xl, h2.text-2xl  { font-size: 1.125rem !important; }
 
-            /* Page header paragraph subtitle */
             p.text-sm.text-gray-400 { font-size: 0.78rem; }
 
-            /* Stat cards in 2-col grid - comfy */
             .grid.grid-cols-2 { gap: 0.625rem; }
             .grid.grid-cols-2.gap-3 { gap: 0.625rem; }
 
-            /* Generous card inner padding on mobile */
             .stat-card-inner { padding: 0.8rem 0.9rem !important; }
         }
         .overflow-x-auto {
@@ -681,63 +594,108 @@
         }
         @media (max-width: 639px) { .form { padding: 0; } }
 
-        /* ── Mobile Bottom Navigation Bar ── */
         .mobile-bottom-nav {
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            z-index: 55;
-            height: calc(3.875rem + env(safe-area-inset-bottom, 0px));
-            padding-bottom: env(safe-area-inset-bottom, 0px);
+            z-index: 50;
             display: none;
-            align-items: stretch;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(32px) saturate(200%) brightness(108%);
-            -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(108%);
-            border-top: 1px solid rgba(0,0,0,0.06);
-            box-shadow: 0 -1px 0 rgba(0,0,0,0.04), 0 -8px 32px rgba(0,0,0,0.05);
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px calc(env(safe-area-inset-bottom, 0px) + 10px) 12px;
+            padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+            background: transparent;
+            pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+        }
+        .mobile-bottom-nav.bn-hidden {
+            transform: translateY(120%);
+            opacity: 0;
+            pointer-events: none !important;
+        }
+        .bn-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(40px) saturate(200%) brightness(110%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(110%);
+            border-radius: 28px;
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow:
+                0 8px 32px rgba(0,0,0,0.10),
+                0 2px 8px rgba(0,0,0,0.06),
+                inset 0 1px 0 rgba(255,255,255,0.9);
+            padding: 6px 4px;
+            pointer-events: all;
         }
         @media (max-width: 767px)  { .mobile-bottom-nav { display: flex; } }
         @media (min-width: 768px)  { .mobile-bottom-nav { display: none !important; } }
+
+        @media (max-width: 767px) {
+            .main-content main {
+                padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)) !important;
+            }
+        }
+
         .bn-item {
             flex: 1; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            gap: 3px; padding: 0.35rem 0.25rem 0;
+            gap: 2px;
+            padding: 6px 4px;
             color: #9ca3af; text-decoration: none;
-            transition: color 0.2s ease, transform 0.12s ease;
+            transition: color 0.25s cubic-bezier(0.22,1,0.36,1);
             position: relative; background: none; border: none;
             cursor: pointer; -webkit-tap-highlight-color: transparent;
-            min-height: 44px;
+            min-height: 48px;
+            border-radius: 20px;
         }
-        .bn-item:active { transform: scale(0.85); }
-        .bn-item svg { width: 22px; height: 22px; flex-shrink: 0; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), color 0.2s ease; }
-        .bn-item.bn-active svg { transform: scale(1.15); }
-        .bn-label { font-size: 9.5px; font-weight: 600; letter-spacing: 0.01em; line-height: 1; white-space: nowrap; transition: color 0.2s ease; }
+        .bn-item:active .bn-icon-wrap { transform: scale(0.88); }
+
+        .bn-icon-wrap {
+            display: flex; align-items: center; justify-content: center;
+            width: 44px; height: 28px;
+            border-radius: 14px;
+            transition:
+                background 0.3s cubic-bezier(0.22,1,0.36,1),
+                transform  0.3s cubic-bezier(0.34,1.56,0.64,1),
+                box-shadow 0.3s ease;
+            position: relative;
+        }
+        .bn-item.bn-active .bn-icon-wrap {
+            transform: translateY(-1px);
+        }
+        .bn-item svg {
+            width: 22px; height: 22px; flex-shrink: 0;
+            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), color 0.25s ease;
+            position: relative; z-index: 1;
+        }
+        .bn-item.bn-active svg { transform: scale(1.08); }
+
+        .bn-label {
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 0.01em; line-height: 1;
+            white-space: nowrap;
+            transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
+            max-height: 0; overflow: hidden; opacity: 0;
+        }
+        .bn-item.bn-active .bn-label {
+            max-height: 14px; opacity: 1;
+        }
+
         .bn-badge {
-            position: absolute; top: 4px; left: calc(50% + 5px);
-            min-width: 16px; height: 16px;
+            position: absolute; top: 0px; right: 0px;
+            min-width: 15px; height: 15px;
             background: #ef4444; color: white;
-            font-size: 8px; font-weight: 700;
+            font-size: 7.5px; font-weight: 700;
             border-radius: 99px; display: flex;
             align-items: center; justify-content: center;
-            padding: 0 3.5px; border: 2px solid rgba(255,255,255,0.95);
-            box-shadow: 0 1px 6px rgba(239,68,68,0.4);
-        }
-        /* Active pill indicator at top */
-        .bn-item.bn-active::before {
-            content: ''; position: absolute;
-            top: 0; left: 50%; transform: translateX(-50%);
-            width: 24px; height: 3px;
-            border-radius: 0 0 4px 4px;
-            background: currentColor;
-            opacity: 0.9;
+            padding: 0 3px; border: 2px solid rgba(255,255,255,0.95);
+            box-shadow: 0 1px 6px rgba(239,68,68,0.5);
+            z-index: 2;
         }
 
-        /* ══════════════════════════════════════════
-           ARTILIA ANIMATION ENGINE
-           Applies globally to every page
-        ══════════════════════════════════════════ */
-
-        /* 1 · Respect prefers-reduced-motion */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -745,7 +703,6 @@
             }
         }
 
-        /* 2 · Page enter transition */
         .main-content main {
             animation: ag-fadeUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
@@ -754,7 +711,6 @@
             to   { opacity: 1; transform: none; }
         }
 
-        /* 3 · Top loading bar */
         #ag-topbar {
             position: fixed;
             top: 0; left: 0;
@@ -769,7 +725,6 @@
         }
         #ag-topbar.ag-loading { opacity: 1; }
 
-        /* 4 · Scroll-reveal */
         .ag-reveal {
             opacity: 0;
             transform: translateY(18px);
@@ -779,13 +734,11 @@
         }
         .ag-reveal.ag-visible { opacity: 1; transform: translateY(0); }
 
-        /* 5 · Table row stagger */
         @keyframes ag-rowIn {
             from { opacity: 0; transform: translateX(-6px); }
             to   { opacity: 1; transform: translateX(0); }
         }
 
-        /* 6 · Card hover lift */
         .ag-card-hover {
             transition: transform 0.2s cubic-bezier(0.22,1,0.36,1),
                         box-shadow 0.2s cubic-bezier(0.22,1,0.36,1) !important;
@@ -796,11 +749,9 @@
             box-shadow: 0 12px 28px -6px rgba(0,0,0,0.10), 0 4px 10px -4px rgba(0,0,0,0.06) !important;
         }
 
-        /* 7 · Button / link press */
         .ag-btn-press { transition: transform 0.1s ease !important; }
         .ag-btn-press:active { transform: scale(0.96) !important; }
 
-        /* 8 · Ripple effect on buttons */
         .ag-ripple-wrap { position: relative; overflow: hidden; }
         .ag-ripple {
             position: absolute;
@@ -814,7 +765,6 @@
             to { transform: scale(4); opacity: 0; }
         }
 
-        /* 9 · Skeleton shimmer (utility) */
         @keyframes ag-shimmer {
             from { background-position: -400% 0; }
             to   { background-position:  400% 0; }
@@ -826,7 +776,6 @@
             border-radius: 6px;
         }
 
-        /* 10 · Sidebar nav link underline sweep */
         .ag-nav-link { position: relative; }
         .ag-nav-link::after {
             content: '';
@@ -839,20 +788,16 @@
         }
         .ag-nav-link:hover::after { width: 100%; }
 
-        /* 11 · Bell icon badge — never clip */
         #admin-notif-bell { overflow: visible !important; }
     </style>
 </head>
 
 <body class="min-h-screen">
 
-    <!-- Mobile Hamburger Menu (outside sidebar container) -->
     @include('admin.components.mobile-hamburger')
 
-    <!-- Sidebar -->
     @include('admin.components.sidebar-new')
 
-    <!-- Main Content -->
     <div class="main-content content-wrapper">
         @include('admin.components.header')
         <main class="px-3.5 pt-2 pb-6 sm:px-4 sm:pt-2 sm:pb-4 lg:px-6 lg:pt-2 lg:pb-6">
@@ -860,7 +805,6 @@
         </main>
     </div>
 
-    {{-- ═══ Global Toast Notifications ═══ --}}
     @if(session('success') || session('error') || session('info') || session('warning'))
     <div id="toast-container"
          x-data="toastNotif()"
@@ -968,7 +912,6 @@
         </div>
         @endif
 
-        {{-- Progress bar --}}
         <div class="pointer-events-auto h-1 bg-gray-100 rounded-full overflow-hidden -mt-1" x-show="visible" style="max-width:360px;">
             <div class="h-full bg-green-400 rounded-full transition-all ease-linear"
                  :style="`width: ${progress}%; transition-duration: ${duration}ms`"
@@ -1004,10 +947,9 @@
 
     @stack('scripts')
 
-    <!-- ═══ Artilia Global Animation Engine ═══ -->
     <script>
     (function () {
-        /* ── 1. Top navigation loading bar ── */
+
         var bar = document.createElement('div');
         bar.id = 'ag-topbar';
         document.body.prepend(bar);
@@ -1041,7 +983,6 @@
         });
         window.addEventListener('pageshow', barFinish);
 
-        /* ── 2. Scroll-reveal stagger for <main> top-level children ── */
         var main = document.querySelector('main');
         if (main) {
             var kids = Array.from(main.children);
@@ -1060,7 +1001,6 @@
             kids.forEach(function (el) { ro.observe(el); });
         }
 
-        /* ── 3. Table row stagger ── */
         document.querySelectorAll('table tbody').forEach(function (tbody) {
             tbody.querySelectorAll('tr').forEach(function (tr, i) {
                 tr.style.opacity = '0';
@@ -1069,14 +1009,12 @@
             });
         });
 
-        /* ── 4. Card hover lift ── */
         document.querySelectorAll(
             '.bg-white.rounded-xl, .bg-white.rounded-2xl, .bg-white.rounded-lg, .chart-card'
         ).forEach(function (el) {
             if (!el.closest('table') && !el.closest('nav') && !el.closest('header')) el.classList.add('ag-card-hover');
         });
 
-        /* ── 5. Button press + ripple ── */
         document.querySelectorAll('button, [type="submit"]').forEach(function (btn) {
             btn.classList.add('ag-btn-press', 'ag-ripple-wrap');
             btn.addEventListener('click', function (e) {
@@ -1092,7 +1030,6 @@
             });
         });
 
-        /* ── 6. Counter-up for stat numbers ── */
         document.querySelectorAll('[data-count]').forEach(function (el) {
             var target = parseInt(el.dataset.count, 10);
             if (isNaN(target)) return;
@@ -1110,9 +1047,6 @@
     })();
     </script>
 
-    {{-- ═══ PWA: Service Worker + Install Banner ═══ --}}
-
-    {{-- Install Banner HTML --}}
     <div id="pwa-install-banner" style="display:none;" aria-live="polite">
         <div id="pwa-banner-inner">
             <div class="pwa-banner-logo">
@@ -1127,7 +1061,7 @@
                 <button id="pwa-dismiss-btn" class="pwa-btn-dismiss">Nanti</button>
             </div>
         </div>
-        {{-- iOS instructions (shown separately) --}}
+
         <div id="pwa-ios-hint" style="display:none;">
             <p class="pwa-ios-text">
                 Tap <strong>Bagikan</strong>
@@ -1138,7 +1072,7 @@
     </div>
 
     <style>
-    /* ── PWA Install Banner ── */
+
     #pwa-install-banner {
         position: fixed;
         bottom: 0; left: 0; right: 0;
@@ -1225,7 +1159,6 @@
     }
     .pwa-btn-dismiss:hover { background: #f3f4f6; color: #6b7280; }
 
-    /* iOS hint variant */
     #pwa-ios-hint {
         padding: 0 0.5rem;
         pointer-events: all;
@@ -1238,7 +1171,6 @@
         margin: 0;
     }
 
-    /* Only show on small screens (mobile) */
     @media (min-width: 768px) {
         #pwa-install-banner { display: none !important; }
     }
@@ -1248,20 +1180,17 @@
     (function () {
         'use strict';
 
-        /* ── Service Worker ── */
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(function (reg) {
                         console.log('[Artilia PWA] Service Worker registered, scope:', reg.scope);
 
-                        // Check for SW updates
                         reg.addEventListener('updatefound', function () {
                             var newWorker = reg.installing;
                             if (newWorker) {
                                 newWorker.addEventListener('statechange', function () {
                                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                        // New version available — silent update
                                         console.log('[Artilia PWA] New version cached.');
                                     }
                                 });
@@ -1274,9 +1203,8 @@
             });
         }
 
-        /* ── Install Banner Logic ── */
         var DISMISS_KEY = 'artilia_pwa_dismissed';
-        var DISMISS_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
+        var DISMISS_TTL = 7 * 24 * 60 * 60 * 1000;
         var deferredPrompt = null;
         var banner = document.getElementById('pwa-install-banner');
         var bannerInner = document.getElementById('pwa-banner-inner');
@@ -1284,7 +1212,6 @@
 
         if (!banner) return;
 
-        /* Helper: check if dismissed recently */
         function wasDismissed() {
             try {
                 var ts = localStorage.getItem(DISMISS_KEY);
@@ -1292,13 +1219,11 @@
             } catch (_) { return false; }
         }
 
-        /* Helper: check if already installed */
         function isInstalled() {
             return window.matchMedia('(display-mode: standalone)').matches ||
                    window.navigator.standalone === true;
         }
 
-        /* Show banner with slide-up animation */
         function showBanner() {
             if (wasDismissed() || isInstalled()) return;
             banner.style.display = 'block';
@@ -1309,7 +1234,6 @@
             });
         }
 
-        /* Hide banner with slide-down animation */
         function hideBanner() {
             banner.classList.add('pwa-hiding');
             setTimeout(function () {
@@ -1318,14 +1242,12 @@
             }, 450);
         }
 
-        /* ── Android/Chrome: beforeinstallprompt ── */
         window.addEventListener('beforeinstallprompt', function (e) {
             e.preventDefault();
             deferredPrompt = e;
-            setTimeout(showBanner, 2500); // show after 2.5s
+            setTimeout(showBanner, 2500);
         });
 
-        /* Install button */
         var installBtn = document.getElementById('pwa-install-btn');
         if (installBtn) {
             installBtn.addEventListener('click', function () {
@@ -1342,7 +1264,6 @@
             });
         }
 
-        /* Dismiss button */
         var dismissBtn = document.getElementById('pwa-dismiss-btn');
         if (dismissBtn) {
             dismissBtn.addEventListener('click', function () {
@@ -1351,14 +1272,12 @@
             });
         }
 
-        /* Installed event */
         window.addEventListener('appinstalled', function () {
             console.log('[Artilia PWA] App installed!');
             hideBanner();
             deferredPrompt = null;
         });
 
-        /* ── iOS / Safari: Show manual instructions ── */
         var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
         var isSafari = /safari/i.test(navigator.userAgent) && !/chrome/i.test(navigator.userAgent);
         if (isIOS && isSafari && !isInstalled() && !wasDismissed()) {
@@ -1375,7 +1294,6 @@
     })();
     </script>
 
-    {{-- ═══ Mobile Bottom Navigation Bar ═══ --}}
     @auth
     @php
         $bnRole   = Auth::user()->role->value ?? 'admin';
@@ -1387,69 +1305,80 @@
     @endphp
     <style>
         .bn-item.bn-active { color: {{ $bnColor }}; }
-        .bn-item.bn-active::after { background: {{ $bnColor }}; }
+        .bn-item.bn-active .bn-icon-wrap { background: {{ $bnColor }}1a; }
     </style>
     <nav class="mobile-bottom-nav" aria-label="Mobile Navigation" x-data>
+      <div class="bn-inner">
 
-        {{-- Home --}}
         <a href="{{ route($bnPrefix . '.dashboard') }}"
            class="bn-item {{ Route::is($bnPrefix . '.dashboard') ? 'bn-active' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-            </svg>
+            <span class="bn-icon-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+            </span>
             <span class="bn-label">Home</span>
         </a>
 
         @if($bnIsOp)
-        {{-- Operator: Maintenance --}}
+
         <a href="{{ route($bnPrefix . '.maintenance.index') }}"
            class="bn-item {{ Route::is($bnPrefix . '.maintenance.*') ? 'bn-active' : '' }}">
-            @php $bnMaint = \App\Models\Maintenance::where('status','in_repair')->count(); @endphp
-            @if($bnMaint > 0)<span class="bn-badge">{{ $bnMaint > 9 ? '9+' : $bnMaint }}</span>@endif
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
+            <span class="bn-icon-wrap" style="position:relative">
+                @php $bnMaint = \App\Models\Maintenance::where('status','in_repair')->count(); @endphp
+                @if($bnMaint > 0)<span class="bn-badge">{{ $bnMaint > 9 ? '9+' : $bnMaint }}</span>@endif
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </span>
             <span class="bn-label">Maintenance</span>
         </a>
         @else
-        {{-- Admin: Inventory --}}
+
         <a href="{{ route($bnPrefix . '.inventory.index') }}"
            class="bn-item {{ Route::is($bnPrefix.'.inventory.*') || Route::is($bnPrefix.'.incoming.*') || Route::is($bnPrefix.'.outgoing.*') ? 'bn-active' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-            </svg>
+            <span class="bn-icon-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
+            </span>
             <span class="bn-label">Inventory</span>
         </a>
-        {{-- Admin: Borrowing --}}
+
         <a href="{{ route($bnPrefix . '.borrowing-requests.index') }}"
            class="bn-item {{ Route::is($bnPrefix.'.borrowings.*') || Route::is($bnPrefix.'.borrowing-requests.*') ? 'bn-active' : '' }}">
-            @if($bnBadge > 0)<span class="bn-badge">{{ $bnBadge > 9 ? '9+' : $bnBadge }}</span>@endif
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-            </svg>
+            <span class="bn-icon-wrap" style="position:relative">
+                @if($bnBadge > 0)<span class="bn-badge">{{ $bnBadge > 9 ? '9+' : $bnBadge }}</span>@endif
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                </svg>
+            </span>
             <span class="bn-label">Borrowing</span>
         </a>
         @endif
 
-        {{-- Notifications --}}
         <a href="{{ route($bnPrefix . '.notifications.index') }}"
            class="bn-item {{ Route::is($bnPrefix . '.notifications.*') ? 'bn-active' : '' }}">
-            @if($bnNotif > 0)<span class="bn-badge">{{ $bnNotif > 9 ? '9+' : $bnNotif }}</span>@endif
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-            </svg>
+            <span class="bn-icon-wrap" style="position:relative">
+                @if($bnNotif > 0)<span class="bn-badge">{{ $bnNotif > 9 ? '9+' : $bnNotif }}</span>@endif
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+            </span>
             <span class="bn-label">Notifikasi</span>
         </a>
 
-        {{-- More (opens hamburger sidebar) --}}
         <button type="button" class="bn-item"
                 @click="$dispatch('open-mobile-menu')" aria-label="More">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
+            <span class="bn-icon-wrap">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </span>
             <span class="bn-label">More</span>
         </button>
 
+      </div>
     </nav>
     @endauth
 </body>

@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <!-- Dark Mode Anti-Flash Script (must be first) -->
+
     <script>
         (function () {
             var saved = localStorage.getItem('artilia_dark_mode');
@@ -26,11 +26,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="icon" href="/artilia.png">
 
-    {{-- PWA: Manifest & Theme --}}
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#2563eb">
 
-    {{-- PWA: Apple / iOS --}}
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Artilia">
@@ -39,7 +37,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
     <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-192x192.png">
 
-    {{-- PWA: Microsoft --}}
     <meta name="msapplication-TileColor" content="#2563eb">
     <meta name="msapplication-TileImage" content="/icons/icon-192x192.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -61,11 +58,10 @@
         @media (min-width: 768px) {
             .main-content {
                 margin-left: 16rem;
-                /* 256px = w-64 */
+
             }
         }
 
-        /* Mobile: no sidebar offset, but add top padding for fixed header */
         @media (max-width: 767px) {
             .main-content {
                 margin-left: 0 !important;
@@ -76,7 +72,6 @@
                 padding-right: 0.75rem !important;
             }
 
-            /* Toast full-width on mobile, above bottom nav */
             #toast-container {
                 left: 0.75rem !important;
                 right: 0.75rem !important;
@@ -85,12 +80,10 @@
                 align-items: stretch;
             }
 
-            /* Push content above bottom nav */
             main {
                 padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important;
             }
 
-            /* ── Mobile Content Global Polish ── */
             main > * { min-width: 0; }
             table { font-size: 0.8rem; }
             .rounded-2xl, .rounded-xl { border-radius: 1rem !important; }
@@ -101,38 +94,33 @@
             .grid.grid-cols-2.gap-3 { gap: 0.625rem; }
         }
 
-        /* ── Modals, Drawers & Overlays Z-Index Fix ── */
         .z-\[9998\], .z-\[9999\], .z-\[10000\],
         .modal-overlay, .drawer-overlay,
         [role="dialog"] {
             z-index: 99999 !important;
         }
 
-        /* ══════════════════════════════════════════
-           DARK MODE — User Layout
-        ══════════════════════════════════════════ */
         html.dark body {
             background: linear-gradient(145deg,
                 #0f172a 0%, #1a1035 25%,
                 #0f1f3a 55%, #0d1f2d 100%) !important;
             color: #f1f5f9;
         }
-        /* Liquid Glass orbs — dark tinted */
+
         html.dark .lg-orb { opacity: 0.35 !important; }
 
-        /* Sidebar Glass (dark) */
         html.dark .sidebar-container {
             background: rgba(15,23,42,0.80) !important;
             border-right: 1px solid rgba(255,255,255,0.06) !important;
             box-shadow: 4px 0 28px rgba(0,0,0,0.4) !important;
         }
-        /* Header Glass (dark) */
+
         html.dark header {
             background: rgba(15,23,42,0.75) !important;
             border-bottom: 1px solid rgba(255,255,255,0.06) !important;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
         }
-        /* Card Glass (dark) */
+
         html.dark .lg-card {
             background: rgba(30,41,59,0.75) !important;
             border: 1px solid rgba(255,255,255,0.08) !important;
@@ -147,33 +135,33 @@
                 rgba(255,255,255,0.07) 88%,
                 transparent) !important;
         }
-        /* White cards */
+
         html.dark .bg-white { background-color: #1e293b !important; }
         html.dark .bg-gray-50 { background-color: #0f172a !important; }
         html.dark .bg-gray-100 { background-color: #334155 !important; }
         html.dark .bg-gray-200 { background-color: #475569 !important; }
-        /* Main content bg */
+
         html.dark main.bg-gray-50 { background-color: transparent !important; }
-        /* Text */
+
         html.dark .text-gray-900 { color: #f1f5f9 !important; }
         html.dark .text-gray-800 { color: #e2e8f0 !important; }
         html.dark .text-gray-700 { color: #cbd5e1 !important; }
         html.dark .text-gray-600 { color: #94a3b8 !important; }
         html.dark .text-gray-500 { color: #94a3b8 !important; }
         html.dark .text-gray-400 { color: #64748b !important; }
-        /* Borders */
+
         html.dark .border-gray-100 { border-color: rgba(255,255,255,0.08) !important; }
         html.dark .border-gray-200 { border-color: #334155 !important; }
         html.dark .divide-y > * + * { border-color: rgba(255,255,255,0.06) !important; }
         html.dark .divide-gray-50 > * + * { border-color: rgba(255,255,255,0.05) !important; }
-        /* Sidebar nav */
+
         html.dark .sidebar-container .text-gray-600 { color: #94a3b8 !important; }
         html.dark .sidebar-container .text-gray-400 { color: #475569 !important; }
         html.dark .sidebar-container .hover\:bg-gray-50:hover { background-color: rgba(255,255,255,0.06) !important; }
         html.dark .sidebar-container .hover\:text-gray-900:hover { color: #f1f5f9 !important; }
         html.dark .sidebar-container .border-t { border-color: rgba(255,255,255,0.06) !important; }
         html.dark .sidebar-container .border-b { border-color: rgba(255,255,255,0.06) !important; }
-        /* Header elements */
+
         html.dark header .text-gray-900 { color: #f1f5f9 !important; }
         html.dark header .text-gray-500 { color: #94a3b8 !important; }
         html.dark header .text-gray-400 { color: #64748b !important; }
@@ -182,7 +170,7 @@
         html.dark header .ring-gray-200 { --tw-ring-color: rgba(255,255,255,0.10) !important; }
         html.dark header .hover\:bg-gray-100:hover { background-color: rgba(255,255,255,0.12) !important; }
         html.dark header .border-gray-100 { border-color: rgba(255,255,255,0.08) !important; }
-        /* Notification dropdown (user) */
+
         html.dark header .bg-white.rounded-2xl {
             background-color: rgba(15,23,42,0.95) !important;
             border-color: rgba(255,255,255,0.10) !important;
@@ -190,7 +178,7 @@
         }
         html.dark header .hover\:bg-gray-50:hover { background-color: rgba(255,255,255,0.06) !important; }
         html.dark header .bg-blue-50\/40 { background-color: rgba(30,64,175,0.25) !important; }
-        /* Forms */
+
         html.dark input:not([type=checkbox]):not([type=radio]),
         html.dark textarea,
         html.dark select {
@@ -201,7 +189,7 @@
         html.dark input::placeholder,
         html.dark textarea::placeholder { color: #64748b !important; }
         html.dark label { color: #94a3b8 !important; }
-        /* Tables */
+
         html.dark table { color: #f1f5f9; }
         html.dark thead th, html.dark thead td {
             background-color: rgba(30,41,59,0.8) !important;
@@ -211,32 +199,29 @@
         html.dark tbody tr { border-color: rgba(255,255,255,0.06) !important; }
         html.dark tbody tr:hover { background-color: rgba(255,255,255,0.05) !important; }
         html.dark tbody td { border-color: rgba(255,255,255,0.06) !important; }
-        /* Toasts */
+
         html.dark .toast-item { background-color: rgba(15,23,42,0.95) !important; border-color: rgba(255,255,255,0.10) !important; }
         html.dark .toast-item .text-gray-900 { color: #f1f5f9 !important; }
         html.dark .toast-item .text-gray-500 { color: #94a3b8 !important; }
         html.dark .bg-gray-100.rounded-full { background-color: rgba(255,255,255,0.10) !important; }
-        /* Skeleton */
+
         html.dark .ag-skeleton {
             background: linear-gradient(90deg, rgba(30,41,59,0.8) 25%, rgba(51,65,85,0.8) 50%, rgba(30,41,59,0.8) 75%);
             background-size: 400% 100%;
         }
-        /* Ring */
+
         html.dark .ring-gray-100 { --tw-ring-color: rgba(255,255,255,0.08) !important; }
         html.dark .ring-gray-200 { --tw-ring-color: rgba(255,255,255,0.10) !important; }
-        /* Scroll */
+
         html.dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
         html.dark .sidebar-navigation::-webkit-scrollbar-track { background: transparent; }
         html.dark .sidebar-navigation::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); }
-        /* Smooth transitions */
+
         body, .sidebar-container, header, .bg-white, .mobile-bottom-nav,
         input, textarea, select, table, thead, tbody, td, th {
             transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
         }
 
-        /* ═══════════════════════════════════════
-           DARK MODE — Nuclear "No White Left"
-        ═══════════════════════════════════════ */
         html.dark .bg-white\/95,
         html.dark .bg-white\/90,
         html.dark .bg-white\/80,
@@ -248,7 +233,7 @@
         html.dark .bn-badge { border-color: #0f172a !important; }
         html.dark select option { background-color: #1e293b !important; color: #f1f5f9 !important; }
         html.dark ::-webkit-scrollbar-track { background: #0f172a !important; }
-        /* Flatpickr */
+
         html.dark .flatpickr-calendar { background: #1e293b !important; border-color: #334155 !important; box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important; }
         html.dark .flatpickr-day { color: #f1f5f9 !important; }
         html.dark .flatpickr-day:hover { background: #334155 !important; }
@@ -256,63 +241,116 @@
         html.dark .flatpickr-months, html.dark .flatpickr-weekdays { background: #0f172a !important; }
         html.dark .flatpickr-current-month, html.dark span.flatpickr-weekday { color: #94a3b8 !important; }
 
-        /* ── Mobile Bottom Navigation Bar (User) ── */
         .mobile-bottom-nav {
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            z-index: 55;
-            height: calc(3.875rem + env(safe-area-inset-bottom, 0px));
-            padding-bottom: env(safe-area-inset-bottom, 0px);
+            z-index: 50;
             display: none;
-            align-items: stretch;
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(32px) saturate(200%) brightness(108%);
-            -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(108%);
-            border-top: 1px solid rgba(255,255,255,0.55);
-            box-shadow: 0 -1px 0 rgba(0,0,0,0.04), 0 -8px 32px rgba(0,0,0,0.05);
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px calc(env(safe-area-inset-bottom, 0px) + 10px) 12px;
+            padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+            background: transparent;
+            pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
         }
-        /* Bottom nav dark */
-        html.dark .mobile-bottom-nav {
-            background: rgba(15,23,42,0.92) !important;
-            border-top: 1px solid rgba(255,255,255,0.06) !important;
-            box-shadow: 0 -4px 24px rgba(0,0,0,0.4) !important;
+        .mobile-bottom-nav.bn-hidden {
+            transform: translateY(120%);
+            opacity: 0;
+            pointer-events: none !important;
+        }
+        .bn-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(40px) saturate(200%) brightness(110%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(110%);
+            border-radius: 28px;
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow:
+                0 8px 32px rgba(0,0,0,0.10),
+                0 2px 8px rgba(0,0,0,0.06),
+                inset 0 1px 0 rgba(255,255,255,0.9);
+            padding: 6px 4px;
+            pointer-events: all;
+        }
+
+        html.dark .bn-inner {
+            background: rgba(15,23,42,0.95) !important;
+            border-color: rgba(255,255,255,0.08) !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06) !important;
         }
         html.dark .bn-item { color: #64748b !important; }
         @media (max-width: 767px)  { .mobile-bottom-nav { display: flex; } }
         @media (min-width: 768px)  { .mobile-bottom-nav { display: none !important; } }
+
+        @media (max-width: 767px) {
+            .main-content main {
+                padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)) !important;
+            }
+        }
+
         .bn-item {
             flex: 1; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            gap: 3px; padding: 0.35rem 0.25rem 0;
+            gap: 2px;
+            padding: 6px 4px;
             color: #9ca3af; text-decoration: none;
-            transition: color 0.2s ease, transform 0.12s ease;
+            transition: color 0.25s cubic-bezier(0.22,1,0.36,1);
             position: relative; background: none; border: none;
             cursor: pointer; -webkit-tap-highlight-color: transparent;
-            min-height: 44px;
+            min-height: 48px;
+            border-radius: 20px;
         }
-        .bn-item:active { transform: scale(0.85); }
+        .bn-item:active .bn-icon-wrap { transform: scale(0.88); }
         .bn-item.bn-active { color: #2563eb; }
-        .bn-item svg { width: 22px; height: 22px; flex-shrink: 0; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), color 0.2s ease; }
-        .bn-item.bn-active svg { transform: scale(1.15); }
-        .bn-label { font-size: 9.5px; font-weight: 600; letter-spacing: 0.01em; line-height: 1; white-space: nowrap; transition: color 0.2s ease; }
+        .bn-item.bn-active .bn-icon-wrap { background: rgba(37,99,235,0.12); }
+        html.dark .bn-item.bn-active .bn-icon-wrap { background: rgba(37,99,235,0.22); }
+
+        .bn-icon-wrap {
+            display: flex; align-items: center; justify-content: center;
+            width: 44px; height: 28px;
+            border-radius: 14px;
+            transition:
+                background 0.3s cubic-bezier(0.22,1,0.36,1),
+                transform  0.3s cubic-bezier(0.34,1.56,0.64,1),
+                box-shadow 0.3s ease;
+            position: relative;
+        }
+        .bn-item.bn-active .bn-icon-wrap {
+            transform: translateY(-1px);
+        }
+        .bn-item svg {
+            width: 22px; height: 22px; flex-shrink: 0;
+            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), color 0.25s ease;
+            position: relative; z-index: 1;
+        }
+        .bn-item.bn-active svg { transform: scale(1.08); }
+
+        .bn-label {
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 0.01em; line-height: 1;
+            white-space: nowrap;
+            transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
+            max-height: 0; overflow: hidden; opacity: 0;
+        }
+        .bn-item.bn-active .bn-label {
+            max-height: 14px; opacity: 1;
+        }
+
         .bn-badge {
-            position: absolute; top: 4px; left: calc(50% + 5px);
-            min-width: 16px; height: 16px;
+            position: absolute; top: 0px; right: 0px;
+            min-width: 15px; height: 15px;
             background: #ef4444; color: white;
-            font-size: 8px; font-weight: 700;
+            font-size: 7.5px; font-weight: 700;
             border-radius: 99px; display: flex;
             align-items: center; justify-content: center;
-            padding: 0 3.5px; border: 2px solid rgba(255,255,255,0.95);
-            box-shadow: 0 1px 6px rgba(239,68,68,0.4);
-        }
-        /* Active pill indicator at top */
-        .bn-item.bn-active::before {
-            content: ''; position: absolute;
-            top: 0; left: 50%; transform: translateX(-50%);
-            width: 24px; height: 3px;
-            border-radius: 0 0 4px 4px;
-            background: currentColor;
-            opacity: 0.9;
+            padding: 0 3px; border: 2px solid rgba(255,255,255,0.95);
+            box-shadow: 0 1px 6px rgba(239,68,68,0.5);
+            z-index: 2;
         }
 
         .content-wrapper {
@@ -355,10 +393,6 @@
             flex-direction: column !important;
         }
 
-        /* ════════════════════════════════════════
-           ARTILIA ANIMATION ENGINE — USER LAYOUT
-        ════════════════════════════════════════ */
-
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -366,14 +400,12 @@
             }
         }
 
-        /* Page enter */
         main { animation: ag-fadeUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
         @keyframes ag-fadeUp {
             from { opacity: 0; transform: translateY(14px); }
             to   { opacity: 1; transform: none; }
         }
 
-        /* Top loading bar */
         #ag-topbar {
             position: fixed; top: 0; left: 0;
             height: 2.5px;
@@ -385,7 +417,6 @@
         }
         #ag-topbar.ag-loading { opacity: 1; }
 
-        /* Scroll-reveal */
         .ag-reveal {
             opacity: 0; transform: translateY(18px);
             transition: opacity 0.45s cubic-bezier(0.22,1,0.36,1),
@@ -393,13 +424,11 @@
         }
         .ag-reveal.ag-visible { opacity: 1; transform: translateY(0); }
 
-        /* Table row stagger */
         @keyframes ag-rowIn {
             from { opacity: 0; transform: translateX(-6px); }
             to   { opacity: 1; transform: translateX(0); }
         }
 
-        /* Card hover lift */
         .ag-card-hover {
             transition: transform 0.2s cubic-bezier(0.22,1,0.36,1),
                         box-shadow 0.2s cubic-bezier(0.22,1,0.36,1) !important;
@@ -410,11 +439,9 @@
             box-shadow: 0 12px 28px -6px rgba(0,0,0,0.10), 0 4px 10px -4px rgba(0,0,0,0.06) !important;
         }
 
-        /* Button press */
         .ag-btn-press { transition: transform 0.1s ease !important; }
         .ag-btn-press:active { transform: scale(0.96) !important; }
 
-        /* Ripple */
         .ag-ripple-wrap { position: relative; overflow: hidden; }
         .ag-ripple {
             position: absolute; border-radius: 50%;
@@ -425,7 +452,6 @@
         }
         @keyframes ag-rippleAnim { to { transform: scale(4); opacity: 0; } }
 
-        /* Skeleton shimmer utility */
         @keyframes ag-shimmer {
             from { background-position: -400% 0; }
             to   { background-position:  400% 0; }
@@ -436,10 +462,6 @@
             animation: ag-shimmer 1.6s ease-in-out infinite;
             border-radius: 6px;
         }
-
-        /* ══════════════════════════════════════
-           LIQUID GLASS — iOS 26 Inspired
-        ══════════════════════════════════════ */
 
         body {
             background: linear-gradient(145deg,
@@ -459,10 +481,8 @@
             100% { transform: translate(0,0) scale(1); }
         }
 
-        /* Keep content above orbs */
         .hidden.md\:flex, .main-content, header, .content-wrapper { position: relative; z-index: 1; }
 
-        /* Sidebar Glass */
         .sidebar-container {
             background: rgba(255,255,255,0.65) !important;
             backdrop-filter: blur(32px) saturate(180%) brightness(110%) !important;
@@ -471,7 +491,6 @@
             box-shadow: inset 1px 0 0 rgba(255,255,255,0.7), 4px 0 28px rgba(0,0,0,0.05) !important;
         }
 
-        /* Header Glass */
         header {
             background: rgba(255,255,255,0.70) !important;
             backdrop-filter: blur(28px) saturate(160%) brightness(108%) !important;
@@ -480,7 +499,6 @@
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.90), 0 4px 20px rgba(0,0,0,0.04) !important;
         }
 
-        /* Card Glass */
         .lg-card {
             background: rgba(255,255,255,0.58) !important;
             backdrop-filter: blur(20px) saturate(150%) !important;
@@ -521,10 +539,9 @@
 </head>
 
 <body class="min-h-screen">
-    {{-- Mobile Hamburger (User) --}}
+
     @include('user.components.mobile-hamburger-user')
 
-    {{-- Desktop Sidebar --}}
     @include('user.components.sidebar-user')
 
     <div class="main-content content-wrapper">
@@ -534,7 +551,6 @@
         </main>
     </div>
 
-    {{-- ═══ Global Toast Notifications ═══ --}}
     @if(session('success') || session('error') || session('info') || session('warning'))
     <div id="toast-container"
          x-data="toastNotif()"
@@ -642,7 +658,6 @@
         </div>
         @endif
 
-        {{-- Progress bar --}}
         <div class="pointer-events-auto h-1 bg-gray-100 rounded-full overflow-hidden -mt-1" x-show="visible" style="max-width:360px;">
             <div class="h-full bg-green-400 rounded-full transition-all ease-linear"
                  :style="`width: ${progress}%; transition-duration: ${duration}ms`"></div>
@@ -677,10 +692,9 @@
 
     @stack('scripts')
 
-    <!-- ═══ Artilia Global Animation Engine ═══ -->
     <script>
     (function () {
-        /* Top navigation loading bar */
+
         var bar = document.createElement('div');
         bar.id = 'ag-topbar';
         document.body.prepend(bar);
@@ -712,7 +726,6 @@
         });
         window.addEventListener('pageshow', barFinish);
 
-        /* Scroll-reveal stagger */
         var main = document.querySelector('main');
         if (main) {
             var kids = Array.from(main.children);
@@ -731,7 +744,6 @@
             kids.forEach(function (el) { ro.observe(el); });
         }
 
-        /* Table row stagger */
         document.querySelectorAll('table tbody').forEach(function (tbody) {
             tbody.querySelectorAll('tr').forEach(function (tr, i) {
                 tr.style.opacity = '0';
@@ -740,14 +752,12 @@
             });
         });
 
-        /* Card hover lift */
         document.querySelectorAll(
             '.bg-white.rounded-xl, .bg-white.rounded-2xl, .bg-white.rounded-lg'
         ).forEach(function (el) {
             if (!el.closest('table') && !el.closest('nav') && !el.closest('header')) el.classList.add('ag-card-hover');
         });
 
-        /* Button press + ripple */
         document.querySelectorAll('button, [type="submit"]').forEach(function (btn) {
             btn.classList.add('ag-btn-press', 'ag-ripple-wrap');
             btn.addEventListener('click', function (e) {
@@ -763,7 +773,6 @@
             });
         });
 
-        /* Counter-up */
         document.querySelectorAll('[data-count]').forEach(function (el) {
             var target = parseInt(el.dataset.count, 10);
             if (isNaN(target)) return;
@@ -777,7 +786,6 @@
             requestAnimationFrame(tick);
         });
 
-        /* Liquid Glass background orbs */
         var orbData = [
             { w:700, h:600, l:'-6%',  t:'-12%', c:'rgba(99,102,241,0.16)',  d:'22s', delay:'0s'   },
             { w:550, h:700, l:'68%',  t:'-8%',  c:'rgba(14,165,233,0.13)',  d:'28s', delay:'-7s'  },
@@ -796,7 +804,6 @@
             document.body.appendChild(el);
         });
 
-        /* Apply liquid glass to cards */
         document.querySelectorAll(
             '.bg-white.rounded-xl, .bg-white.rounded-2xl, .bg-white.rounded-lg'
         ).forEach(function (el) {
@@ -808,9 +815,6 @@
     })();
     </script>
 
-    {{-- ═══ PWA: Service Worker + Install Banner ═══ --}}
-
-    {{-- Install Banner HTML --}}
     <div id="pwa-install-banner" style="display:none;" aria-live="polite">
         <div id="pwa-banner-inner">
             <div class="pwa-banner-logo">
@@ -825,7 +829,7 @@
                 <button id="pwa-dismiss-btn" class="pwa-btn-dismiss">Nanti</button>
             </div>
         </div>
-        {{-- iOS instructions (shown separately) --}}
+
         <div id="pwa-ios-hint" style="display:none;">
             <p class="pwa-ios-text">
                 Tap <strong>Bagikan</strong>
@@ -836,7 +840,7 @@
     </div>
 
     <style>
-    /* ── PWA Install Banner ── */
+
     #pwa-install-banner {
         position: fixed;
         bottom: 0; left: 0; right: 0;
@@ -923,7 +927,6 @@
     }
     .pwa-btn-dismiss:hover { background: #f3f4f6; color: #6b7280; }
 
-    /* iOS hint variant */
     #pwa-ios-hint {
         padding: 0 0.5rem;
         pointer-events: all;
@@ -936,7 +939,6 @@
         margin: 0;
     }
 
-    /* Only show on small screens (mobile) */
     @media (min-width: 768px) {
         #pwa-install-banner { display: none !important; }
     }
@@ -946,20 +948,17 @@
     (function () {
         'use strict';
 
-        /* ── Service Worker ── */
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(function (reg) {
                         console.log('[Artilia PWA] Service Worker registered, scope:', reg.scope);
 
-                        // Check for SW updates
                         reg.addEventListener('updatefound', function () {
                             var newWorker = reg.installing;
                             if (newWorker) {
                                 newWorker.addEventListener('statechange', function () {
                                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                        // New version available — silent update
                                         console.log('[Artilia PWA] New version cached.');
                                     }
                                 });
@@ -972,9 +971,8 @@
             });
         }
 
-        /* ── Install Banner Logic ── */
         var DISMISS_KEY = 'artilia_pwa_dismissed';
-        var DISMISS_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
+        var DISMISS_TTL = 7 * 24 * 60 * 60 * 1000;
         var deferredPrompt = null;
         var banner = document.getElementById('pwa-install-banner');
         var bannerInner = document.getElementById('pwa-banner-inner');
@@ -982,7 +980,6 @@
 
         if (!banner) return;
 
-        /* Helper: check if dismissed recently */
         function wasDismissed() {
             try {
                 var ts = localStorage.getItem(DISMISS_KEY);
@@ -990,13 +987,11 @@
             } catch (_) { return false; }
         }
 
-        /* Helper: check if already installed */
         function isInstalled() {
             return window.matchMedia('(display-mode: standalone)').matches ||
                    window.navigator.standalone === true;
         }
 
-        /* Show banner with slide-up animation */
         function showBanner() {
             if (wasDismissed() || isInstalled()) return;
             banner.style.display = 'block';
@@ -1007,7 +1002,6 @@
             });
         }
 
-        /* Hide banner with slide-down animation */
         function hideBanner() {
             banner.classList.add('pwa-hiding');
             setTimeout(function () {
@@ -1016,14 +1010,12 @@
             }, 450);
         }
 
-        /* ── Android/Chrome: beforeinstallprompt ── */
         window.addEventListener('beforeinstallprompt', function (e) {
             e.preventDefault();
             deferredPrompt = e;
-            setTimeout(showBanner, 2500); // show after 2.5s
+            setTimeout(showBanner, 2500);
         });
 
-        /* Install button */
         var installBtn = document.getElementById('pwa-install-btn');
         if (installBtn) {
             installBtn.addEventListener('click', function () {
@@ -1040,7 +1032,6 @@
             });
         }
 
-        /* Dismiss button */
         var dismissBtn = document.getElementById('pwa-dismiss-btn');
         if (dismissBtn) {
             dismissBtn.addEventListener('click', function () {
@@ -1049,14 +1040,12 @@
             });
         }
 
-        /* Installed event */
         window.addEventListener('appinstalled', function () {
             console.log('[Artilia PWA] App installed!');
             hideBanner();
             deferredPrompt = null;
         });
 
-        /* ── iOS / Safari: Show manual instructions ── */
         var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
         var isSafari = /safari/i.test(navigator.userAgent) && !/chrome/i.test(navigator.userAgent);
         if (isIOS && isSafari && !isInstalled() && !wasDismissed()) {
@@ -1073,61 +1062,67 @@
     })();
     </script>
 
-    {{-- ═══ Mobile Bottom Navigation Bar (User) ═══ --}}
     @auth
     @php
         $uCartBadge = $sidebarCartCount ?? 0;
         $uNotifBadge = $sidebarUserUnreadCount ?? 0;
     @endphp
     <nav class="mobile-bottom-nav" aria-label="User Mobile Navigation" x-data>
+      <div class="bn-inner">
 
-        {{-- Home --}}
         <a href="{{ route('user.dashboard') }}"
            class="bn-item {{ Route::is('user.dashboard') ? 'bn-active' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-            </svg>
+            <span class="bn-icon-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+            </span>
             <span class="bn-label">Home</span>
         </a>
 
-        {{-- Browse --}}
         <a href="{{ route('user.borrowing.index') }}"
            class="bn-item {{ Route::is('user.borrowing.index') || Route::is('user.borrowing.create') ? 'bn-active' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
+            <span class="bn-icon-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </span>
             <span class="bn-label">Browse</span>
         </a>
 
-        {{-- Cart --}}
         <a href="{{ route('user.borrowing.cart') }}"
            class="bn-item {{ Route::is('user.borrowing.cart') ? 'bn-active' : '' }}">
-            @if($uCartBadge > 0)<span class="bn-badge">{{ $uCartBadge > 9 ? '9+' : $uCartBadge }}</span>@endif
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
+            <span class="bn-icon-wrap" style="position:relative">
+                @if($uCartBadge > 0)<span class="bn-badge">{{ $uCartBadge > 9 ? '9+' : $uCartBadge }}</span>@endif
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+            </span>
             <span class="bn-label">Cart</span>
         </a>
 
-        {{-- Notifications --}}
         <a href="{{ route('user.notifications.index') }}"
            class="bn-item {{ Route::is('user.notifications.*') ? 'bn-active' : '' }}">
-            @if($uNotifBadge > 0)<span class="bn-badge">{{ $uNotifBadge > 9 ? '9+' : $uNotifBadge }}</span>@endif
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-            </svg>
+            <span class="bn-icon-wrap" style="position:relative">
+                @if($uNotifBadge > 0)<span class="bn-badge">{{ $uNotifBadge > 9 ? '9+' : $uNotifBadge }}</span>@endif
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+            </span>
             <span class="bn-label">Notifikasi</span>
         </a>
 
-        {{-- More (opens hamburger) --}}
         <button type="button" class="bn-item"
                 @click="$dispatch('open-mobile-menu')" aria-label="More">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
+            <span class="bn-icon-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </span>
             <span class="bn-label">More</span>
         </button>
 
+      </div>
     </nav>
     @endauth
     @livewireScripts

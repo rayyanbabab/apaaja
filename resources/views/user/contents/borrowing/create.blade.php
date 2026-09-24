@@ -1,47 +1,72 @@
 @extends('user.layouts.dashboard-user')
 
-@section('title', 'Submit Item Borrowing Request')
+@section('title', 'Form Pengajuan Peminjaman')
 
 @section('user')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Header -->
-    <div class="mb-8">
-        <div class="flex items-center space-x-4">
-            <a href="{{ route('user.borrowing.index') }}" 
-               class="text-gray-600 hover:text-gray-900 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
-            </a>
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Submit Item Borrowing Request</h1>
-                <p class="text-gray-600 mt-2">Complete the form below to submit a borrowing request</p>
+<div class="space-y-6">
+
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-2">
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-full px-3 py-1">
+                    <span class="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse"></span>
+                    Pengajuan Langsung
+                </span>
+                <span class="text-xs text-gray-400 dark:text-slate-400">
+                    Maksimal {{ $maxBorrowDays }} hari
+                </span>
             </div>
+            <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">Pengajuan Pinjam Alat</h1>
+            <p class="text-sm text-gray-400 dark:text-slate-400 mt-1">Lengkapi rincian tanggal dan kebutuhan peminjaman perkakas berikut</p>
+        </div>
+        <div class="flex items-center gap-2.5">
+            <a href="{{ route('user.borrowing.index') }}"
+               class="inline-flex items-center gap-2 px-3.5 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 text-gray-700 dark:text-slate-200 text-xs font-semibold rounded-xl shadow-sm transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Kembali ke Katalog
+            </a>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Item Information Card -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <!-- Item Details -->
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Item Information</h3>
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span class="text-sm font-medium text-gray-500">Item Name</span>
-                            <span class="text-sm text-gray-900 font-medium">{{ $item->nama }}</span>
+            <div class="bg-white dark:bg-slate-850 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden sticky top-20">
+                <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50">
+                    <h3 class="text-sm font-bold text-gray-900 dark:text-white">Informasi Alat</h3>
+                    <p class="text-xs text-gray-400 dark:text-slate-400">Spesifikasi barang yang akan dipinjam</p>
+                </div>
+
+                <div class="p-5 space-y-4">
+                    @if($item->gambar)
+                        <div class="w-full h-40 rounded-xl overflow-hidden bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
+                            <img src="{{ asset($item->gambar) }}" alt="{{ $item->nama }}" class="w-full h-full object-cover">
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-sm font-medium text-gray-500">Available Stock</span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    @endif
+
+                    <div class="space-y-3">
+                        <div>
+                            <span class="text-[11px] font-semibold text-gray-400 dark:text-slate-400 block">Nama Barang</span>
+                            <span class="text-sm font-bold text-gray-900 dark:text-white">{{ $item->nama }}</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-t border-gray-100 dark:border-slate-800">
+                            <span class="text-xs text-gray-500 dark:text-slate-400">Stok Peminjaman</span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300">
                                 {{ $item->stok_peminjaman }} unit
                             </span>
                         </div>
+                        @if($item->category)
+                        <div class="flex justify-between items-center py-2 border-t border-gray-100 dark:border-slate-800">
+                            <span class="text-xs text-gray-500 dark:text-slate-400">Kategori</span>
+                            <span class="text-xs font-semibold text-blue-600 dark:text-blue-400">{{ $item->category->nama }}</span>
+                        </div>
+                        @endif
                         @if($item->keterangan)
-                        <div class="pt-3 border-t border-gray-200">
-                            <span class="text-sm font-medium text-gray-500 block mb-1">Description</span>
-                            <p class="text-sm text-gray-700">{{ $item->keterangan }}</p>
+                        <div class="pt-3 border-t border-gray-100 dark:border-slate-800">
+                            <span class="text-[11px] font-semibold text-gray-400 dark:text-slate-400 block mb-1">Deskripsi / Catatan</span>
+                            <p class="text-xs text-gray-600 dark:text-slate-300 leading-relaxed">{{ $item->keterangan }}</p>
                         </div>
                         @endif
                     </div>
@@ -49,141 +74,128 @@
             </div>
         </div>
 
-        <!-- Borrowing Form -->
         <div class="lg:col-span-2">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">Borrowing Form</h3>
-                    <p class="text-sm text-gray-600 mt-1">Fill in the borrowing data completely and correctly</p>
+            <div class="bg-white dark:bg-slate-850 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-800">
+                    <h3 class="text-sm font-bold text-gray-900 dark:text-white">Formulir Peminjaman</h3>
+                    <p class="text-xs text-gray-400 dark:text-slate-400">Isi data peminjaman dengan lengkap dan benar</p>
                 </div>
-                
-                <form action="{{ route('user.borrowing.store') }}" method="POST" class="p-6">
+
+                <form action="{{ route('user.borrowing.store') }}" method="POST" class="p-5 sm:p-6 space-y-4">
                     @csrf
                     <input type="hidden" name="item_id" value="{{ $item->id }}">
 
-                    {{-- Validation Errors --}}
                     @if($errors->any())
-                    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 16px;margin-bottom:20px;">
-                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                            <svg style="width:18px;height:18px;color:#DC2626;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/40 text-rose-800 dark:text-rose-300 text-xs space-y-1">
+                        <div class="flex items-center gap-2 font-bold mb-1">
+                            <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            <span style="font-size:13px;font-weight:600;color:#991B1B;">Harap perbaiki kesalahan berikut:</span>
+                            <span>Harap perbaiki kesalahan berikut:</span>
                         </div>
-                        <ul style="margin:0;padding-left:20px;">
-                            @foreach($errors->all() as $error)
-                                <li style="font-size:13px;color:#B91C1C;margin-bottom:4px;">{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                        @foreach($errors->all() as $error)
+                            <p>&bull; {{ $error }}</p>
+                        @endforeach
                     </div>
                     @endif
 
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Jumlah Pinjam -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                         <div>
-                            <label for="jumlah" class="block text-sm font-medium text-gray-700 mb-2">
-                                Quantity to Borrow <span class="text-red-500">*</span>
+                            <label for="jumlah" class="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                                Jumlah Unit Pinjam <span class="text-rose-500">*</span>
                             </label>
-                            <input type="number" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('jumlah') border-red-300 focus:ring-red-500 focus:border-red-500 @enderror" 
-                                   id="jumlah" 
-                                   name="jumlah" 
-                                   min="1" 
+                            <input type="number"
+                                   class="w-full text-xs font-semibold px-3 py-2 border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-900 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500 transition @error('jumlah') border-rose-300 focus:ring-rose-500 @enderror"
+                                   id="jumlah"
+                                   name="jumlah"
+                                   min="1"
                                    max="{{ $item->stok_peminjaman }}"
-                                   value="{{ old('jumlah') }}" 
-                                   placeholder="Enter quantity"
+                                   value="{{ old('jumlah', 1) }}"
                                    required>
-                            <p class="text-xs text-gray-500 mt-1">Maximum: {{ $item->stok_peminjaman }} units</p>
+                            <p class="text-[11px] text-gray-400 dark:text-slate-500 mt-1">Maksimal: {{ $item->stok_peminjaman }} unit</p>
                             @error('jumlah')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                                <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Tanggal Pinjam -->
                         <div>
-                            <label for="tanggal_pinjam" class="block text-sm font-medium text-gray-700 mb-2">
-                                Borrow Date <span class="text-red-500">*</span>
+                            <label for="tanggal_pinjam" class="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                                Tanggal Mulai Pinjam <span class="text-rose-500">*</span>
                             </label>
-                            <input type="date" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('tanggal_pinjam') border-red-300 focus:ring-red-500 focus:border-red-500 @enderror" 
-                                   id="tanggal_pinjam" 
-                                   name="tanggal_pinjam" 
+                            <input type="date"
+                                   class="w-full text-xs font-semibold px-3 py-2 border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-900 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500 transition @error('tanggal_pinjam') border-rose-300 focus:ring-rose-500 @enderror"
+                                   id="tanggal_pinjam"
+                                   name="tanggal_pinjam"
                                    min="{{ date('Y-m-d') }}"
-                                   value="{{ old('tanggal_pinjam') }}" 
+                                   value="{{ old('tanggal_pinjam') }}"
                                    required>
                             @error('tanggal_pinjam')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                                <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Tanggal Kembali -->
                         <div class="md:col-span-2">
-                            <label for="tanggal_kembali_rencana" class="block text-sm font-medium text-gray-700 mb-2">
-                                Planned Return Date <span class="text-red-500">*</span>
+                            <label for="tanggal_kembali_rencana" class="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                                Rencana Pengembalian <span class="text-rose-500">*</span>
                             </label>
-                            <input type="date" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('tanggal_kembali_rencana') border-red-300 focus:ring-red-500 focus:border-red-500 @enderror" 
-                                   id="tanggal_kembali_rencana" 
-                                   name="tanggal_kembali_rencana" 
-                                   value="{{ old('tanggal_kembali_rencana') }}" 
+                            <input type="date"
+                                   class="w-full text-xs font-semibold px-3 py-2 border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-900 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500 transition @error('tanggal_kembali_rencana') border-rose-300 focus:ring-rose-500 @enderror"
+                                   id="tanggal_kembali_rencana"
+                                   name="tanggal_kembali_rencana"
+                                   value="{{ old('tanggal_kembali_rencana') }}"
                                    required>
-                            <p class="text-xs text-gray-400 mt-1">
-                                💡 Batas peminjaman maksimal <strong>{{ $maxBorrowDays }} hari</strong> dari tanggal pinjam.
+                            <p class="text-[11px] text-gray-400 dark:text-slate-500 mt-1">
+                                💡 Batas waktu peminjaman maksimal <strong>{{ $maxBorrowDays }} hari</strong>.
                             </p>
                             @error('tanggal_kembali_rencana')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                                <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <!-- Keterangan -->
-                    <div class="mt-6">
-                        <label for="keterangan" class="block text-sm font-medium text-gray-700 mb-2">
-                            Notes/Purpose of Borrowing
+                    <div>
+                        <label for="keterangan" class="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                            Tujuan &amp; Keperluan Peminjaman
                         </label>
-                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('keterangan') border-red-300 focus:ring-red-500 focus:border-red-500 @enderror" 
-                                  id="keterangan" 
-                                  name="keterangan" 
-                                  rows="3" 
-                                  placeholder="Explain the purpose or need for borrowing this item...">{{ old('keterangan') }}</textarea>
+                        <textarea class="w-full text-xs px-3 py-2 border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-900 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500 transition resize-none @error('keterangan') border-rose-300 focus:ring-rose-500 @enderror"
+                                  id="keterangan"
+                                  name="keterangan"
+                                  rows="3"
+                                  placeholder="Jelaskan kebutuhan atau praktikum penggunaan alat ini...">{{ old('keterangan') }}</textarea>
                         @error('keterangan')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                            <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <!-- Kondisi Barang -->
-                    <div class="mt-6">
-                        <label for="kondisi_pinjam" class="block text-sm font-medium text-gray-700 mb-2">
-                            Item Condition When Borrowed
+                    <div>
+                        <label for="kondisi_pinjam" class="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                            Catatan Kondisi Awal (Opsional)
                         </label>
-                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('kondisi_pinjam') border-red-300 focus:ring-red-500 focus:border-red-500 @enderror" 
-                                  id="kondisi_pinjam" 
-                                  name="kondisi_pinjam" 
-                                  rows="2" 
-                                  placeholder="Record the condition of the item when borrowed (optional)">{{ old('kondisi_pinjam') }}</textarea>
+                        <textarea class="w-full text-xs px-3 py-2 border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-900 text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500 transition resize-none @error('kondisi_pinjam') border-rose-300 focus:ring-rose-500 @enderror"
+                                  id="kondisi_pinjam"
+                                  name="kondisi_pinjam"
+                                  rows="2"
+                                  placeholder="Catat kondisi fisik atau kelengkapan jika ada catatan khusus...">{{ old('kondisi_pinjam') }}</textarea>
                         @error('kondisi_pinjam')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                            <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-8 pt-6 border-t border-gray-200">
-                        <a href="{{ route('user.borrowing.index') }}" 
-                           class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 pt-4 border-t border-gray-100 dark:border-slate-800">
+                        <a href="{{ route('user.borrowing.index') }}"
+                           class="inline-flex items-center justify-center px-4 py-2 border border-gray-200 dark:border-slate-700 rounded-xl text-xs font-bold text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                             </svg>
-                            Back
+                            Kembali
                         </a>
                         <button type="submit"
-                                style="background:#2563EB;color:#fff;border:none;cursor:pointer;"
-                                class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold shadow-sm"
-                                onmouseover="this.style.background='#1D4ED8'" onmouseout="this.style.background='#2563EB'">
+                                class="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-500/25 transition-all">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                             </svg>
-                            Submit Borrowing Request
+                            Kirim Pengajuan Peminjaman
                         </button>
                     </div>
                 </form>
@@ -207,14 +219,12 @@ document.addEventListener('DOMContentLoaded', function() {
         nextDay.setDate(nextDay.getDate() + 1);
         tanggalKembali.min = nextDay.toISOString().split('T')[0];
 
-        // Auto-set return date = pinjam + maxBorrowDays (if not already set)
         if (!tanggalKembali.value || !document.getElementById('tanggal_kembali_rencana').dataset.userEdited) {
             const defaultReturn = new Date(pinjamDate);
             defaultReturn.setDate(defaultReturn.getDate() + maxBorrowDays);
             tanggalKembali.value = defaultReturn.toISOString().split('T')[0];
         }
 
-        // Also enforce max date
         const maxDate = new Date(pinjamDate);
         maxDate.setDate(maxDate.getDate() + maxBorrowDays);
         tanggalKembali.max = maxDate.toISOString().split('T')[0];
@@ -229,7 +239,6 @@ document.addEventListener('DOMContentLoaded', function() {
         this.dataset.userEdited = '1';
     });
 
-    // Set borrow date to today by default
     if (!tanggalPinjam.value) {
         tanggalPinjam.value = new Date().toISOString().split('T')[0];
         updateKembali();
