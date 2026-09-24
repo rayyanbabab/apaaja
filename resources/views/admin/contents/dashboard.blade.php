@@ -2,7 +2,7 @@
 
 @push('styles')
 <style>
-    /* ── Stat Card Gradients ── */
+
     .stat-card-blue   { background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%); }
     .stat-card-emerald{ background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
     .stat-card-rose   { background: linear-gradient(135deg, #be123c 0%, #f43f5e 100%); }
@@ -47,11 +47,9 @@
         pointer-events: none;
     }
 
-    /* ── Section Headers ── */
     .section-title { font-size: 0.9rem; font-weight: 700; color: #111827; }
     .section-sub   { font-size: 0.72rem; color: #9ca3af; margin-top: 1px; }
 
-    /* ── Secondary stat mini cards ── */
     .mini-stat {
         background: #fff;
         border-radius: 1rem;
@@ -69,7 +67,6 @@
         transform: translateY(-1px);
     }
 
-    /* ── Quick Action Cards ── */
     .qa-card {
         display: flex;
         flex-direction: column;
@@ -94,7 +91,6 @@
         flex-shrink: 0;
     }
 
-    /* ── Chart Card ── */
     .chart-card {
         background: #fff;
         border-radius: 1.25rem;
@@ -103,7 +99,6 @@
         padding: 1.4rem 1.6rem;
     }
 
-    /* ── Chart Legend Dot ── */
     .chart-legend-dot {
         display: inline-block;
         width: 8px; height: 8px;
@@ -111,7 +106,6 @@
         flex-shrink: 0;
     }
 
-    /* ── Activity Table ── */
     .activity-table th {
         font-size: 0.67rem;
         font-weight: 700;
@@ -130,7 +124,6 @@
     .activity-table tr:last-child td { border-bottom: none; }
     .activity-table tr:hover td { background: #f9fafb; }
 
-    /* ── Pending Alert Banner ── */
     .pending-banner {
         display: flex;
         flex-direction: column;
@@ -144,7 +137,6 @@
         .pending-banner { flex-direction: row; align-items: center; }
     }
 
-    /* ── Chart Period Buttons ── */
     .period-btn {
         padding: 0.3rem 0.85rem;
         font-size: 0.71rem;
@@ -163,13 +155,9 @@
     .period-btn:not(.active) { background: transparent; color: #6b7280; }
     .period-btn:not(.active):hover { background: #e5e7eb; color: #374151; }
 
-    /* ══════════════════════════════════════════
-       DARK MODE — Dashboard Specific Classes
-    ══════════════════════════════════════════ */
     html.dark .section-title { color: #f1f5f9 !important; }
     html.dark .section-sub   { color: #64748b !important; }
 
-    /* Mini stat cards */
     html.dark .mini-stat {
         background: #1e293b !important;
         border-color: #334155 !important;
@@ -182,13 +170,11 @@
     html.dark .mini-stat .text-gray-900 { color: #f1f5f9 !important; }
     html.dark .mini-stat .text-gray-400 { color: #64748b !important; }
 
-    /* Icon bg in mini stat */
     html.dark .mini-stat .bg-blue-50   { background-color: rgba(37,99,235,0.18) !important; }
     html.dark .mini-stat .bg-amber-50  { background-color: rgba(245,158,11,0.18) !important; }
     html.dark .mini-stat .bg-pink-50   { background-color: rgba(236,72,153,0.18) !important; }
     html.dark .mini-stat .bg-emerald-50 { background-color: rgba(5,150,105,0.18) !important; }
 
-    /* Chart cards */
     html.dark .chart-card {
         background: #1e293b !important;
         border-color: #334155 !important;
@@ -202,15 +188,12 @@
     html.dark .chart-card .text-gray-500 { color: #94a3b8 !important; }
     html.dark .chart-card .text-gray-400 { color: #64748b !important; }
 
-    /* Period buttons dark */
     html.dark .bg-gray-100 { background-color: #334155 !important; }
     html.dark .period-btn:not(.active) { background: transparent; color: #94a3b8 !important; }
     html.dark .period-btn:not(.active):hover { background: #475569 !important; color: #f1f5f9 !important; }
 
-    /* Progress bar bg in legend */
     html.dark .h-1\.5.rounded-full { background-color: rgba(255,255,255,0.06) !important; }
 
-    /* Quick action cards */
     html.dark .qa-card {
         background: #1e293b !important;
         border-color: #334155 !important;
@@ -223,7 +206,6 @@
     html.dark .qa-card .text-gray-800 { color: #f1f5f9 !important; }
     html.dark .qa-card .text-gray-400 { color: #64748b !important; }
 
-    /* Icon bg in quick actions */
     html.dark .qa-icon-wrap.bg-blue-50    { background-color: rgba(37,99,235,0.18) !important; }
     html.dark .qa-icon-wrap.bg-emerald-50 { background-color: rgba(5,150,105,0.18) !important; }
     html.dark .qa-icon-wrap.bg-rose-50    { background-color: rgba(244,63,94,0.18) !important; }
@@ -234,7 +216,6 @@
     html.dark .qa-icon-wrap.bg-pink-50    { background-color: rgba(236,72,153,0.18) !important; }
     html.dark .qa-icon-wrap.bg-teal-50    { background-color: rgba(20,184,166,0.18) !important; }
 
-    /* Activity table */
     html.dark .activity-table th {
         color: #64748b !important;
         background: #0f172a !important;
@@ -246,7 +227,6 @@
     html.dark .activity-table .text-gray-500 { color: #94a3b8 !important; }
     html.dark .activity-table .text-gray-400 { color: #64748b !important; }
 
-    /* Status badges in activity table */
     html.dark .activity-table .bg-emerald-50  { background-color: rgba(5,150,105,0.18) !important; }
     html.dark .activity-table .text-emerald-700 { color: #6ee7b7 !important; }
     html.dark .activity-table .border-emerald-100 { border-color: rgba(5,150,105,0.2) !important; }
@@ -254,7 +234,6 @@
     html.dark .activity-table .text-rose-600  { color: #fca5a5 !important; }
     html.dark .activity-table .border-rose-100 { border-color: rgba(244,63,94,0.2) !important; }
 
-    /* Pending banner */
     html.dark .pending-banner {
         background: linear-gradient(135deg, rgba(120,53,15,0.25) 0%, rgba(120,53,15,0.15) 100%) !important;
         border-color: rgba(245,158,11,0.3) !important;
@@ -266,14 +245,12 @@
     html.dark .pending-banner .bg-amber-100   { background-color: rgba(245,158,11,0.18) !important; }
     html.dark .pending-banner .text-amber-600 { color: #fbbf24 !important; }
 
-    /* Page header badges */
     html.dark .bg-emerald-50.border.border-emerald-200 {
         background-color: rgba(5,150,105,0.18) !important;
         border-color: rgba(5,150,105,0.25) !important;
     }
     html.dark .text-emerald-700 { color: #6ee7b7 !important; }
 
-    /* "bg-white rounded-2xl" containers (Quick Actions wrapper, Activities wrapper) */
     html.dark .bg-white.rounded-2xl {
         background-color: #1e293b !important;
         border-color: #334155 !important;
@@ -287,7 +264,6 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    {{-- ── Pending Requests Banner ── --}}
     @if($pendingBorrowingRequests->count() > 0)
         <div class="pending-banner">
             <div class="flex items-center gap-3 flex-1 min-w-0">
@@ -322,7 +298,6 @@
         </div>
     @endif
 
-    {{-- ── Page Header ── --}}
     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
             <div class="flex items-center gap-2 mb-2">
@@ -344,10 +319,8 @@
         </a>
     </div>
 
-    {{-- ── Primary Stat Cards ── --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
 
-        {{-- Total Barang --}}
         <a href="{{ route($routePrefix . '.inventory.index') }}" class="stat-card-inner stat-card-blue">
             <div class="stat-card-blob"></div>
             <div class="stat-card-blob2"></div>
@@ -365,7 +338,6 @@
             <p class="text-[11px] font-medium text-white/70 mt-1">Total Jenis Barang</p>
         </a>
 
-        {{-- Total Masuk --}}
         <a href="{{ route($routePrefix . '.incoming.index') }}" class="stat-card-inner stat-card-emerald">
             <div class="stat-card-blob"></div>
             <div class="stat-card-blob2"></div>
@@ -383,7 +355,6 @@
             <p class="text-[11px] font-medium text-white/70 mt-1">Total Masuk</p>
         </a>
 
-        {{-- Total Keluar --}}
         <a href="{{ route($routePrefix . '.outgoing.index') }}" class="stat-card-inner stat-card-rose">
             <div class="stat-card-blob"></div>
             <div class="stat-card-blob2"></div>
@@ -401,7 +372,6 @@
             <p class="text-[11px] font-medium text-white/70 mt-1">Total Keluar</p>
         </a>
 
-        {{-- Estimasi Nilai Stok --}}
         <div class="stat-card-inner stat-card-violet" style="cursor:default;">
             <div class="stat-card-blob"></div>
             <div class="stat-card-blob2"></div>
@@ -423,7 +393,6 @@
 
     </div>
 
-    {{-- ── Secondary Stats ── --}}
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
         @php
             $secStats = [
@@ -448,10 +417,8 @@
         @endforeach
     </div>
 
-    {{-- ── Charts ── --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-        {{-- Area Chart --}}
         <div class="lg:col-span-2 chart-card">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <div>
@@ -459,7 +426,7 @@
                     <p class="section-sub">Barang masuk &amp; keluar per periode</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    {{-- Inline legend --}}
+
                     <div class="hidden sm:flex items-center gap-3">
                         <span class="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
                             <span class="chart-legend-dot" style="background:#10B981;"></span>Masuk
@@ -468,7 +435,7 @@
                             <span class="chart-legend-dot" style="background:#F43F5E;"></span>Keluar
                         </span>
                     </div>
-                    {{-- Period toggle --}}
+
                     <div class="flex gap-0.5 bg-gray-100 p-1 rounded-lg">
                         @foreach(['weekly' => 'Minggu', 'monthly' => 'Bulan', 'yearly' => 'Tahun'] as $key => $label)
                             <button onclick="updateChart('{{ $key }}')"
@@ -482,9 +449,8 @@
             <div id="chart" class="-mx-2" style="height:256px;"></div>
         </div>
 
-        {{-- Donut Chart --}}
         <div class="chart-card flex flex-col">
-            {{-- Header --}}
+
             <div class="mb-4">
                 <h3 class="section-title">Distribusi Data</h3>
                 <p class="section-sub">Proporsi tiap entitas di sistem</p>
@@ -500,14 +466,12 @@
                 ];
             @endphp
 
-            {{-- Chart + Legend side-by-side --}}
             <div class="flex items-center gap-4 flex-1">
-                {{-- Chart (kiri) --}}
+
                 <div id="pieChart" class="flex-shrink-0" style="width:160px; height:160px;"></div>
 
-                {{-- Legend (kanan) --}}
                 <div class="flex-1 min-w-0 space-y-3">
-                    {{-- Total count --}}
+
                     <div class="mb-3 pb-3 border-b border-gray-100">
                         <p class="text-2xl font-extrabold text-gray-900">{{ number_format($pieTotal) }}</p>
                         <p class="text-[11px] text-gray-400">Total records</p>
@@ -535,10 +499,8 @@
             </div>
         </div>
 
-
     </div>
 
-    {{-- ── Quick Actions ── --}}
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6" style="box-shadow:0 2px 12px -4px rgba(0,0,0,0.06);">
         <div class="flex items-center justify-between mb-5">
             <div>
@@ -576,7 +538,6 @@
         </div>
     </div>
 
-    {{-- ── Recent Activities ── --}}
     @if($transaksiTerakhir && count($transaksiTerakhir) > 0)
         <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden" style="box-shadow:0 2px 12px -4px rgba(0,0,0,0.06);">
             <div class="px-5 sm:px-6 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -721,7 +682,6 @@
     });
     chart.render();
 
-    // ── Dark mode detection helper ──
     const _isDark = () => document.documentElement.classList.contains('dark');
     const _dm = {
         labelColor:  () => _isDark() ? '#94a3b8' : '#9CA3AF',
@@ -795,11 +755,9 @@
     });
     pieChart.render();
 
-    // ── Re-render charts when dark mode toggles ──
     const _origToggle = window.toggleDarkMode;
     window.toggleDarkMode = function() {
         if (_origToggle) _origToggle();
-        // Small delay to let the class update first
         setTimeout(() => {
             pieChart.updateOptions({
                 plotOptions: { pie: { donut: { labels: {
