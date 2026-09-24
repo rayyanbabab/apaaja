@@ -82,7 +82,7 @@ class NotificationController extends Controller
         $user        = Auth::user();
         $filter      = $request->query('filter', 'all');   // all | unread
         $typeFilter  = $request->query('type', '');        // overdue, approved, etc.
-        $role        = $user->role->value ?? 'user';
+        $role        = $user->role instanceof \App\Enums\UsersRole ? $user->role->value : (string) ($user->role ?? 'user');
 
         $query = $user->notifications()->orderBy('created_at', 'desc');
 
@@ -188,7 +188,7 @@ class NotificationController extends Controller
                     ->get()
                     ->map(function ($n) use ($user) {
                         $data    = $n->data;
-                        $role    = $user->role->value ?? 'user';
+                        $role    = $user->role instanceof \App\Enums\UsersRole ? $user->role->value : (string) ($user->role ?? 'user');
                         $message = $data['message'] ?? '';
 
                         // Fix legacy overdue messages that stored negative/float day counts

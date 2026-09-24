@@ -118,10 +118,11 @@ class UsersAccountController extends Controller
         try {
             $user = User::create($userData);
 
+            $roleName = is_object($user->role) ? $user->role->value : $user->role;
             AuditLogger::log(
                 'user.created',
                 'User',
-                "User \"{$user->name}\" ({$user->email}) dengan role {$user->role->value} dibuat",
+                "User \"{$user->name}\" ({$user->email}) dengan role {$roleName} dibuat",
                 $user
             );
 

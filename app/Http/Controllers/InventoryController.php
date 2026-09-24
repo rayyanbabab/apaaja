@@ -298,14 +298,15 @@ class InventoryController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
-        $items = Item::when($query, function ($q) use ($query) {
-            $q->where('nama', 'like', "%{$query}%")
-                ->orWhere('kode', 'like', "%{$query}%");
-        })->latest()->get();
         if ($request->ajax()) {
-            return view('admin.components.partials.itemlist', compact('items'))->render();
+            $items = Item::when($query, function ($q) use ($query) {
+                $q->where('nama', 'like', "%{$query}%")
+                    ->orWhere('id', 'like', "%{$query}%");
+            })->latest()->take(20)->get();
+
+            return response()->json($items);
         }
-        return panel_redirect('inventory.index', ['query' => $query]);
+        return panel_redirect('inventory.index', ['search' => $query]);
     }
 
     public function printLabel(Item $item)
