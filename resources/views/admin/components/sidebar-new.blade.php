@@ -1,5 +1,5 @@
 @php
-    $sRole     = Auth::user()->role->value ?? 'user';
+    $sRole     = Auth::user()?->role instanceof \App\Enums\UsersRole ? Auth::user()->role->value : (string) (Auth::user()?->role ?? 'user');
     $isOp      = $sRole === 'operator';
     $rp        = $routePrefix ?? ($isOp ? 'staff' : 'admin');
 
@@ -10,7 +10,6 @@
     $ic5        = $isOp ? 'text-emerald-500'                           : 'text-blue-500';
     $icRot      = $isOp ? 'rotate-90 text-emerald-600'                 : 'rotate-90 text-blue-600';
 
-    // Submenu active child detection
     $isMasterChildActive = Route::is($rp . '.categories.*', $rp . '.suppliers.*', $rp . '.locations.*');
     $isInvChildActive    = Route::is(
         $rp . '.inventory.*',
@@ -22,7 +21,8 @@
         $rp . '.logistics.*',
         $rp . '.tooling-kits.*',
         $rp . '.bap.*',
-        $rp . '.borrowing-requests.bap'
+        $rp . '.borrowing-requests.bap',
+        $rp . '.safety.*'
     );
     $isBorrowChildActive = Route::is($rp . '.borrowings.*') ||
                            (Route::is($rp . '.borrowing-requests.*') && !Route::is($rp . '.borrowing-requests.bap'));
@@ -32,7 +32,6 @@
 <div class="desktop-sidebar hidden md:flex md:flex-shrink-0 md:w-64" x-data="sidebarData()" x-init="init()">
     <div class="sidebar-container w-64 bg-white fixed top-0 left-0 z-40 border-r border-gray-100 flex flex-col h-full shadow-sm" data-role="{{ $sRole }}">
 
-        {{-- Logo --}}
         <div class="flex items-center h-16 px-5 border-b border-gray-100 flex-shrink-0">
             <div class="flex items-center gap-3 w-full">
                 <div class="flex items-center justify-center w-9 h-9 {{ $logoAccent }} rounded-xl flex-shrink-0 overflow-hidden shadow-sm">
@@ -44,16 +43,14 @@
                 </div>
                 <div class="flex flex-col min-w-0">
                     <span class="text-[14px] font-extrabold text-gray-900 tracking-tight leading-tight">{{ $companyName ?? 'Artilia' }}</span>
-                    <span class="text-[10px] text-gray-400 font-medium leading-tight">{{ $isOp ? 'Operator' : 'Admin Panel' }}</span>
+                    <span class="text-[10px] text-gray-400 font-medium leading-tight">{{ $isOp ? 'Operator Bengkel' : 'Admin Panel' }}</span>
                 </div>
             </div>
         </div>
 
-        {{-- Navigation --}}
         <nav class="sidebar-navigation flex-1 px-3 py-4 overflow-y-auto flex flex-col gap-1">
 
         @if($isOp)
-        {{-- ═══════════════ OPERATOR NAV (Maintenance Only) ═══════════════ --}}
 
             <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Main</p>
 
@@ -85,9 +82,42 @@
                 @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
             </a>
 
-            {{-- Maintenance --}}
             <div class="pt-4 flex flex-col gap-1">
-                <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Maintenance</p>
+                <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Shopfloor & AI</p>
+
+                @php $isAct = Route::is($rp . '.workshop.*'); @endphp
+                <a href="{{ route($rp . '.workshop.index') }}"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150 border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+                        </svg>
+                        <span>Denah Bengkel 2D</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-emerald-100 text-emerald-700 tracking-wide">LIVE</span>
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+
+                @php $isAct = Route::is($rp . '.defect-scanner.*'); @endphp
+                <a href="{{ route($rp . '.defect-scanner.index') }}"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150 border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.867V15.13a1 1 0 01-1.447.898L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        <span>AI Defect Scanner</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-violet-100 text-violet-700 tracking-wide">CV</span>
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
 
                 @php $isAct = Route::is($rp . '.maintenance.*'); @endphp
                 <a href="{{ route($rp . '.maintenance.index') }}"
@@ -111,7 +141,116 @@
                 </a>
             </div>
 
-            {{-- Akun --}}
+            <div class="pt-4 flex flex-col gap-1">
+                <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Peminjaman & BAP</p>
+
+                @php $isAct = Route::is($rp . '.borrowing-requests.index') || Route::is($rp . '.borrowing-requests.pending'); @endphp
+                <a href="{{ route($rp . '.borrowing-requests.index') }}"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150 border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Persetujuan Pinjam</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        @if(($sidebarPendingRequestCount ?? 0) > 0)
+                            <span class="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-amber-500 rounded-full flex-shrink-0 animate-pulse">{{ $sidebarPendingRequestCount }}</span>
+                        @endif
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+
+                @php $isAct = Route::is($rp . '.bap.*') || Route::is($rp . '.borrowing-requests.bap'); @endphp
+                <a href="{{ route($rp . '.bap.index') }}"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150 border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                        </svg>
+                        <span>BAP Digital Signature</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        @php
+                            $unsignedBapCount = \App\Models\BorrowingRequest::whereIn('status', ['approved','completed'])->whereNull('signed_at')->count();
+                        @endphp
+                        @if($unsignedBapCount > 0)
+                            <span class="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-purple-500 rounded-full flex-shrink-0">{{ $unsignedBapCount }}</span>
+                        @endif
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+            </div>
+
+            <div class="pt-4 flex flex-col gap-1">
+                <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">K3 & Quality Control</p>
+
+                @php $isAct = Route::is($rp . '.safety.*'); @endphp
+                <a href="{{ route($rp . '.safety.index') }}"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150 border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        <span>K3 & Keselamatan Lab</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        @php
+                            $pendingK3Clearance = \App\Models\BorrowingRequest::whereHas('item', fn($q) => $q->whereIn('safety_risk_level', ['medium', 'high']))
+                                ->whereIn('status', ['pending', 'approved'])
+                                ->whereNull('safety_verified_at')
+                                ->count();
+                        @endphp
+                        @if($pendingK3Clearance > 0)
+                            <span class="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-amber-500 rounded-full flex-shrink-0" title="{{ $pendingK3Clearance }} Menunggu Verifikasi APD">{{ $pendingK3Clearance }}</span>
+                        @endif
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+
+                @php $isAct = Route::is($rp . '.calibration.*'); @endphp
+                <a href="{{ route($rp . '.calibration.index') }}"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150 border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                        </svg>
+                        <span>Kalibrasi Alat Ukur</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        @php
+                            $expiredCalibCount = \App\Models\Item::where('tool_type', 'measuring_tool')->where('calibration_status', 'expired')->count();
+                        @endphp
+                        @if($expiredCalibCount > 0)
+                            <span class="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-red-500 rounded-full flex-shrink-0 animate-pulse">{{ $expiredCalibCount }}</span>
+                        @endif
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+
+                @php $isAct = Route::is($rp . '.tooling-kits.*'); @endphp
+                <a href="{{ route($rp . '.tooling-kits.index') }}"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150 border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        <span>Tooling Kit SPK</span>
+                    </div>
+                    @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                </a>
+            </div>
+
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Akun</p>
 
@@ -150,7 +289,6 @@
             </div>
 
         @else
-        {{-- ═══════════════ ADMIN NAV (Full Menu) ═══════════════ --}}
 
             <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Main</p>
 
@@ -182,7 +320,6 @@
                 @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
             </a>
 
-            {{-- Master Data (Admin only) --}}
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Master Data</p>
 
@@ -251,7 +388,6 @@
                 </div>
             </div>
 
-            {{-- Inventory --}}
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Inventory</p>
 
@@ -364,7 +500,7 @@
                             <span>Kalibrasi & Tooling</span>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            @php 
+                            @php
                                 $expiredCalibCount = \App\Models\Item::where('tool_type', 'measuring_tool')->where('calibration_status', 'expired')->count();
                             @endphp
                             @if($expiredCalibCount > 0)
@@ -389,7 +525,6 @@
                         @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
                     </a>
 
-                    {{-- Tooling Kit SPK Manufaktur --}}
                     @php $isAct = Route::is($rp . '.tooling-kits.*'); @endphp
                     <a href="{{ route($rp . '.tooling-kits.index') }}"
                        @if($isAct) data-active="true" @endif
@@ -404,7 +539,6 @@
                         @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
                     </a>
 
-                    {{-- BAP Digital Signature (Tahap 4) --}}
                     @php $isAct = Route::is($rp . '.bap.*') || Route::is($rp . '.borrowing-requests.bap'); @endphp
                     <a href="{{ route($rp . '.bap.index') }}"
                        @if($isAct) data-active="true" @endif
@@ -426,11 +560,34 @@
                             @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
                         </div>
                     </a>
+
+                    @php $isAct = Route::is($rp . '.safety.*'); @endphp
+                    <a href="{{ route($rp . '.safety.index') }}"
+                       @if($isAct) data-active="true" @endif
+                       class="flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-all duration-150 border-l-[3px]
+                              {{ $isAct ? $navActiveM : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                        <div class="flex items-center gap-2.5">
+                            <svg style="width:15px;height:15px;" class="{{ $isAct ? $ic5 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                            <span>K3 & Keselamatan Lab</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            @php
+                                $pendingK3Clearance = \App\Models\BorrowingRequest::whereHas('item', fn($q) => $q->whereIn('safety_risk_level', ['medium', 'high']))
+                                    ->whereIn('status', ['pending', 'approved'])
+                                    ->whereNull('safety_verified_at')
+                                    ->count();
+                            @endphp
+                            @if($pendingK3Clearance > 0)
+                                <span class="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-amber-500 rounded-full flex-shrink-0" title="{{ $pendingK3Clearance }} Menunggu Verifikasi APD">{{ $pendingK3Clearance }}</span>
+                            @endif
+                            @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                        </div>
+                    </a>
                 </div>
             </div>
 
-
-            {{-- Borrowing --}}
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Borrowing</p>
 
@@ -522,7 +679,6 @@
                 </div>
             </div>
 
-            {{-- Pengadaan --}}
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Pengadaan</p>
 
@@ -547,7 +703,6 @@
                 </a>
             </div>
 
-            {{-- Management (Admin only) --}}
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Management</p>
 
@@ -571,10 +726,10 @@
                     </svg>
                 </button>
                 <div x-show="usersOpen" x-collapse class="mt-1 space-y-0.5 pl-7">
-                    @php 
-                        $isAct = Route::is($rp . '.content.listusers') || 
-                                 Route::is($rp . '.content.showusers*') || 
-                                 Route::is($rp . '.content.editusers*') || 
+                    @php
+                        $isAct = Route::is($rp . '.content.listusers') ||
+                                 Route::is($rp . '.content.showusers*') ||
+                                 Route::is($rp . '.content.editusers*') ||
                                  Route::is($rp . '.content.updateusers*') ||
                                  Route::is($rp . '.content.deleteusers') ||
                                  Route::is($rp . '.content.bulkdeleteusers') ||
@@ -609,7 +764,44 @@
                 </div>
             </div>
 
-            {{-- System --}}
+            <div class="pt-4 flex flex-col gap-1">
+                <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Digital Twin & AI Tools</p>
+
+                @php $isAct = Route::is($rp . '.workshop.*'); @endphp
+                <a href="{{ route($rp . '.workshop.index') }}"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150 border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+                        </svg>
+                        <span>Denah Bengkel 2D</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-emerald-100 text-emerald-700 tracking-wide">LIVE</span>
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+
+                @php $isAct = Route::is($rp . '.defect-scanner.*'); @endphp
+                <a href="{{ route($rp . '.defect-scanner.index') }}"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150 border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.867V15.13a1 1 0 01-1.447.898L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        <span>AI Defect Scanner</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-violet-100 text-violet-700 tracking-wide">CV</span>
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+            </div>
+
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">System</p>
 
@@ -708,7 +900,6 @@
         @endif
         </nav>
 
-        {{-- Sign Out --}}
         <div class="flex-shrink-0 p-3 border-t border-gray-100">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf

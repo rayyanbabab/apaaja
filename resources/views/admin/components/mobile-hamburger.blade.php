@@ -1,5 +1,5 @@
 @php
-    $sRole     = Auth::user()->role->value ?? 'user';
+    $sRole     = Auth::user()?->role instanceof \App\Enums\UsersRole ? Auth::user()->role->value : (string) (Auth::user()?->role ?? 'user');
     $isOp      = $sRole === 'operator';
     $rp        = $routePrefix ?? ($isOp ? 'staff' : 'admin');
 
@@ -10,7 +10,6 @@
     $ic5        = $isOp ? 'text-emerald-500'                           : 'text-blue-500';
     $icRot      = $isOp ? 'rotate-90 text-emerald-600'                 : 'rotate-90 text-blue-600';
 
-    // Submenu active child detection
     $isMasterChildActive = Route::is($rp . '.categories.*', $rp . '.suppliers.*', $rp . '.locations.*');
     $isInvChildActive    = Route::is(
         $rp . '.inventory.*',
@@ -34,11 +33,6 @@
     @media (min-width: 768px) { .mobile-hamburger-container { display: none !important; } }
     @media (max-width: 767px) { .mobile-hamburger-container { display: block !important; } }
 
-    /* ══════════════════════════════════════════════════
-       MOBILE SIDEBAR DARK MODE — COMPREHENSIVE
-    ══════════════════════════════════════════════════ */
-
-    /* ── Hamburger toggle button ── */
     html.dark .mobile-hamburger-container button.inline-flex {
         background-color: #1e293b !important;
         border-color: #334155 !important;
@@ -49,34 +43,28 @@
         color: #e2e8f0 !important;
     }
 
-    /* ── Slide-over panel ── */
     html.dark .mobile-hamburger-container .fixed.inset-y-0 {
         background-color: #111827 !important;
         border-color: #1f2937 !important;
         box-shadow: 4px 0 24px rgba(0,0,0,0.5) !important;
     }
 
-    /* ── All borders ── */
     html.dark .mobile-hamburger-container .border-b,
     html.dark .mobile-hamburger-container .border-t,
     html.dark .mobile-hamburger-container .border-r { border-color: #1f2937 !important; }
 
-    /* ── Text colors ── */
     html.dark .mobile-hamburger-container .text-gray-900 { color: #f1f5f9 !important; }
     html.dark .mobile-hamburger-container .text-gray-600 { color: #94a3b8 !important; }
     html.dark .mobile-hamburger-container .text-gray-500 { color: #cbd5e1 !important; }
     html.dark .mobile-hamburger-container .text-gray-400 { color: #64748b !important; }
 
-    /* ── Section headers ── */
     html.dark .mobile-hamburger-container p.text-gray-400 { color: #475569 !important; }
 
-    /* ── Nav links default ── */
     html.dark .mobile-hamburger-container a.text-gray-600,
     html.dark .mobile-hamburger-container button.text-gray-600 {
         color: #94a3b8 !important;
     }
 
-    /* ── Nav links hover ── */
     html.dark .mobile-hamburger-container a:hover,
     html.dark .mobile-hamburger-container nav button:hover {
         background-color: rgba(255,255,255,0.06) !important;
@@ -89,19 +77,16 @@
     html.dark .mobile-hamburger-container .hover\:text-gray-900:hover { color: #e2e8f0 !important; }
     html.dark .mobile-hamburger-container .hover\:text-gray-600:hover { color: #94a3b8 !important; }
 
-    /* ── Icons: default (gray-400) → visible in dark ── */
     html.dark .mobile-hamburger-container svg.text-gray-400 { color: #64748b !important; }
     html.dark .mobile-hamburger-container a:hover svg,
     html.dark .mobile-hamburger-container nav button:hover svg { color: #94a3b8 !important; }
 
-    /* ── Sub-menu items (pl-7) ── */
     html.dark .mobile-hamburger-container .pl-7 a { color: #94a3b8 !important; }
     html.dark .mobile-hamburger-container .pl-7 a:hover {
         background-color: rgba(255,255,255,0.06) !important;
         color: #e2e8f0 !important;
     }
 
-    /* ── Active indicator override in dark mode ── */
     html.dark .mobile-hamburger-container a[data-active="true"],
     html.dark .mobile-hamburger-container .pl-7 a[data-active="true"] {
         color: #93c5fd !important;
@@ -113,12 +98,10 @@
         color: #60a5fa !important;
     }
 
-    /* ── Close button ── */
     html.dark .mobile-hamburger-container button[\@click="mobileMenuOpen = false"].rounded-lg {
         color: #64748b !important;
     }
 
-    /* ── Logout button ── */
     html.dark .mobile-hamburger-container button[type="submit"] {
         background-color: rgba(239,68,68,0.15) !important;
         color: #f87171 !important;
@@ -127,7 +110,6 @@
         background-color: rgba(239,68,68,0.25) !important;
     }
 
-    /* ── Nav scrollbar ── */
     html.dark .mobile-hamburger-container nav::-webkit-scrollbar { width: 4px; }
     html.dark .mobile-hamburger-container nav::-webkit-scrollbar-track { background: transparent; }
     html.dark .mobile-hamburger-container nav::-webkit-scrollbar-thumb {
@@ -138,17 +120,15 @@
 
 <div class="mobile-hamburger-container" x-data="{ mobileMenuOpen: false }" @open-mobile-menu.window="mobileMenuOpen = true">
 
-    {{-- Backdrop --}}
     <div x-show="mobileMenuOpen"
          x-transition:enter="transition-opacity ease-linear duration-200"
          x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
          x-transition:leave="transition-opacity ease-linear duration-200"
          x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-40 bg-gray-900/75 backdrop-blur-md"
+         class="fixed inset-0 bg-gray-900/75 backdrop-blur-md"
          @click="mobileMenuOpen = false"
-         style="display:none;"></div>
+         style="z-index: 9998 !important; display:none;"></div>
 
-    {{-- Slide-over Sidebar --}}
     <div x-show="mobileMenuOpen"
          x-transition:enter="transition ease-in-out duration-250 transform"
          x-transition:enter-start="-translate-x-full"
@@ -156,12 +136,11 @@
          x-transition:leave="transition ease-in-out duration-200 transform"
          x-transition:leave-start="translate-x-0"
          x-transition:leave-end="-translate-x-full"
-         class="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-white border-r border-gray-100 flex flex-col shadow-2xl"
+         class="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-white border-r border-gray-100 flex flex-col shadow-2xl"
          x-data="sidebarData()" x-init="init()"
          data-role="{{ $sRole }}"
-         style="display:none;">
+         style="z-index: 9999 !important; display:none;">
 
-        {{-- Header --}}
         <div class="flex items-center justify-between h-16 px-5 border-b border-gray-100 flex-shrink-0">
             <div class="flex items-center gap-3 w-full">
                 <div class="flex items-center justify-center w-9 h-9 {{ $logoAccent }} rounded-xl flex-shrink-0 overflow-hidden shadow-sm">
@@ -183,11 +162,9 @@
             </button>
         </div>
 
-        {{-- Navigation --}}
         <nav class="flex-1 px-3 py-4 overflow-y-auto flex flex-col gap-1">
 
         @if($isOp)
-        {{-- ════════════ OPERATOR MOBILE NAV ════════════ --}}
 
             <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Main</p>
 
@@ -220,7 +197,41 @@
             </a>
 
             <div class="pt-4 flex flex-col gap-1">
-                <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Maintenance</p>
+                <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Shopfloor & AI</p>
+
+                @php $isAct = Route::is($rp . '.workshop.*'); @endphp
+                <a href="{{ route($rp . '.workshop.index') }}" @click="mobileMenuOpen = false"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+                        </svg>
+                        <span>Denah Bengkel 2D</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-emerald-100 text-emerald-700 tracking-wide">LIVE</span>
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+
+                @php $isAct = Route::is($rp . '.defect-scanner.*'); @endphp
+                <a href="{{ route($rp . '.defect-scanner.index') }}" @click="mobileMenuOpen = false"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.867V15.13a1 1 0 01-1.447.898L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        <span>AI Defect Scanner</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-violet-100 text-violet-700 tracking-wide">CV</span>
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
 
                 @php $isAct = Route::is($rp . '.maintenance.*'); @endphp
                 <a href="{{ route($rp . '.maintenance.index') }}" @click="mobileMenuOpen = false"
@@ -241,6 +252,116 @@
                         @endif
                         @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
                     </div>
+                </a>
+            </div>
+
+            <div class="pt-4 flex flex-col gap-1">
+                <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Peminjaman & BAP</p>
+
+                @php $isAct = Route::is($rp . '.borrowing-requests.index') || Route::is($rp . '.borrowing-requests.pending'); @endphp
+                <a href="{{ route($rp . '.borrowing-requests.index') }}" @click="mobileMenuOpen = false"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Persetujuan Pinjam</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        @if(($sidebarPendingRequestCount ?? 0) > 0)
+                            <span class="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-amber-500 rounded-full flex-shrink-0 animate-pulse">{{ $sidebarPendingRequestCount }}</span>
+                        @endif
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+
+                @php $isAct = Route::is($rp . '.bap.*') || Route::is($rp . '.borrowing-requests.bap'); @endphp
+                <a href="{{ route($rp . '.bap.index') }}" @click="mobileMenuOpen = false"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                        </svg>
+                        <span>BAP Digital Signature</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        @php
+                            $unsignedBapCount = \App\Models\BorrowingRequest::whereIn('status', ['approved','completed'])->whereNull('signed_at')->count();
+                        @endphp
+                        @if($unsignedBapCount > 0)
+                            <span class="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-purple-500 rounded-full flex-shrink-0">{{ $unsignedBapCount }}</span>
+                        @endif
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+            </div>
+
+            <div class="pt-4 flex flex-col gap-1">
+                <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">K3 & Quality Control</p>
+
+                @php $isAct = Route::is($rp . '.safety.*'); @endphp
+                <a href="{{ route($rp . '.safety.index') }}" @click="mobileMenuOpen = false"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        <span>K3 & Keselamatan Lab</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        @php
+                            $pendingK3Clearance = \App\Models\BorrowingRequest::whereHas('item', fn($q) => $q->whereIn('safety_risk_level', ['medium', 'high']))
+                                ->whereIn('status', ['pending', 'approved'])
+                                ->whereNull('safety_verified_at')
+                                ->count();
+                        @endphp
+                        @if($pendingK3Clearance > 0)
+                            <span class="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-amber-500 rounded-full flex-shrink-0" title="{{ $pendingK3Clearance }} Menunggu Verifikasi APD">{{ $pendingK3Clearance }}</span>
+                        @endif
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+
+                @php $isAct = Route::is($rp . '.calibration.*'); @endphp
+                <a href="{{ route($rp . '.calibration.index') }}" @click="mobileMenuOpen = false"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                        </svg>
+                        <span>Kalibrasi Alat Ukur</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        @php
+                            $expiredCalibCount = \App\Models\Item::where('tool_type', 'measuring_tool')->where('calibration_status', 'expired')->count();
+                        @endphp
+                        @if($expiredCalibCount > 0)
+                            <span class="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-red-500 rounded-full flex-shrink-0 animate-pulse">{{ $expiredCalibCount }}</span>
+                        @endif
+                        @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
+                    </div>
+                </a>
+
+                @php $isAct = Route::is($rp . '.tooling-kits.*'); @endphp
+                <a href="{{ route($rp . '.tooling-kits.index') }}" @click="mobileMenuOpen = false"
+                   @if($isAct) data-active="true" @endif
+                   class="flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-all border-l-[3px]
+                          {{ $isAct ? $navActive : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                    <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;flex-shrink:0;" class="{{ $isAct ? $ic6 : 'text-gray-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        <span>Tooling Kit SPK</span>
+                    </div>
+                    @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
                 </a>
             </div>
 
@@ -282,7 +403,6 @@
             </div>
 
         @else
-        {{-- ════════════ ADMIN MOBILE NAV ════════════ --}}
 
             <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Main</p>
 
@@ -314,7 +434,6 @@
                 @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
             </a>
 
-            {{-- Master Data (Admin only) --}}
             @if($sRole === 'admin')
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Master Data</p>
@@ -385,7 +504,6 @@
             </div>
             @endif
 
-            {{-- Inventory --}}
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Inventory</p>
 
@@ -498,7 +616,7 @@
                             <span>Kalibrasi & Tooling</span>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            @php 
+                            @php
                                 $expiredCalibCount = \App\Models\Item::where('tool_type', 'measuring_tool')->where('calibration_status', 'expired')->count();
                             @endphp
                             @if($expiredCalibCount > 0)
@@ -523,7 +641,6 @@
                         @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
                     </a>
 
-                    {{-- Tooling Kit --}}
                     @php $isAct = Route::is($rp . '.tooling-kits.*'); @endphp
                     <a href="{{ route($rp . '.tooling-kits.index') }}" @click="mobileMenuOpen = false"
                        @if($isAct) data-active="true" @endif
@@ -538,7 +655,6 @@
                         @if($isAct)<span class="w-1.5 h-1.5 rounded-full {{ $ic6 }} flex-shrink-0 animate-pulse"></span>@endif
                     </a>
 
-                    {{-- BAP Digital Signature --}}
                     @php $isAct = Route::is($rp . '.bap.*') || Route::is($rp . '.borrowing-requests.bap'); @endphp
                     <a href="{{ route($rp . '.bap.index') }}" @click="mobileMenuOpen = false"
                        @if($isAct) data-active="true" @endif
@@ -561,7 +677,6 @@
                         </div>
                     </a>
 
-                    {{-- K3 Safety & APD Induction (PIMNAS Feature) --}}
                     @php $isAct = Route::is($rp . '.safety.*'); @endphp
                     <a href="{{ route($rp . '.safety.index') }}" @click="mobileMenuOpen = false"
                        @if($isAct) data-active="true" @endif
@@ -589,7 +704,6 @@
                 </div>
             </div>
 
-            {{-- Borrowing --}}
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Borrowing</p>
 
@@ -681,7 +795,6 @@
                 </div>
             </div>
 
-            {{-- Pengadaan --}}
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Pengadaan</p>
 
@@ -706,7 +819,6 @@
                 </a>
             </div>
 
-            {{-- Management (Admin only) --}}
             @if($sRole === 'admin')
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Management</p>
@@ -731,10 +843,10 @@
                     </svg>
                 </button>
                 <div x-show="usersOpen" x-collapse class="mt-1 space-y-0.5 pl-7">
-                    @php 
-                        $isAct = Route::is($rp . '.content.listusers') || 
-                                 Route::is($rp . '.content.showusers*') || 
-                                 Route::is($rp . '.content.editusers*') || 
+                    @php
+                        $isAct = Route::is($rp . '.content.listusers') ||
+                                 Route::is($rp . '.content.showusers*') ||
+                                 Route::is($rp . '.content.editusers*') ||
                                  Route::is($rp . '.content.updateusers*') ||
                                  Route::is($rp . '.content.deleteusers') ||
                                  Route::is($rp . '.content.bulkdeleteusers') ||
@@ -770,7 +882,6 @@
             </div>
             @endif
 
-            {{-- Digital Twin & AI Lab Tools --}}
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Digital Twin & AI Tools</p>
 
@@ -809,7 +920,6 @@
                 </a>
             </div>
 
-            {{-- System --}}
             <div class="pt-4 flex flex-col gap-1">
                 <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">System</p>
 
@@ -910,8 +1020,7 @@
         @endif
         </nav>
 
-        {{-- User Info & Sign Out --}}
-        <div class="flex-shrink-0 border-t border-gray-100 p-3 flex flex-col gap-3">
+        <div class="flex-shrink-0 border-t border-gray-100 p-3 flex flex-col gap-3" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));">
             <div class="flex items-center gap-3 px-2">
                 <img src="{{ Auth::user()->profil ? asset(Auth::user()->profil) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&color=4F76F6&background=EEF2FF&size=40' }}"
                     alt="{{ Auth::user()->name }}"
