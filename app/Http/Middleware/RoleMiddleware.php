@@ -20,11 +20,21 @@ class RoleMiddleware
 
         $userRole = $user->role instanceof UsersRole
             ? $user->role->value
-            : $user->role;
+            : (string) $user->role;
 
-        if (! in_array($userRole, $roles)) {
+        $allowedRoles = [];
+        foreach ($roles as $r) {
+            foreach (explode(',', (string) $r) as $subR) {
+                $trimmed = trim($subR);
+                if ($trimmed !== '') {
+                    $allowedRoles[] = $trimmed;
+                }
+            }
+        }
+
+        if (! in_array($userRole, $allowedRoles, true)) {
             Log::warning('Unauthorized role', [
-                'expected' => implode(',', $roles),
+                'expected' => implode(',', $allowedRoles),
                 'actual'   => $userRole,
             ]);
 

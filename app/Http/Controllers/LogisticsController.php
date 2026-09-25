@@ -23,12 +23,15 @@ class LogisticsController extends Controller
 
         foreach ($sortedForABC as $item) {
             $val = $item->valuation;
+            $prevRatio = $totalValuation > 0 ? ($cumulative / $totalValuation) * 100 : 0;
             $cumulative += $val;
-            $ratio = $totalValuation > 0 ? ($cumulative / $totalValuation) * 100 : 100;
 
-            if ($ratio <= 70) {
+            // Kategori A: Kontributor 70% valuasi pertama (termasuk item nomor 1)
+            // Kategori B: Kontributor 70% - 90%
+            // Kategori C: Sisa 10% terendah
+            if ($prevRatio < 70) {
                 $abcMap[$item->id] = 'A';
-            } elseif ($ratio <= 90) {
+            } elseif ($prevRatio < 90) {
                 $abcMap[$item->id] = 'B';
             } else {
                 $abcMap[$item->id] = 'C';

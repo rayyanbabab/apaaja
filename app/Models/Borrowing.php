@@ -39,18 +39,19 @@ class Borrowing extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function isOverdue()
+    public function isOverdue(): bool
     {
         return $this->status === 'dipinjam' &&
-               $this->tanggal_kembali_rencana < now()->toDateString();
+               $this->tanggal_kembali_rencana !== null &&
+               $this->tanggal_kembali_rencana->lt(today());
     }
 
-    public function getDaysOverdue()
+    public function getDaysOverdue(): int
     {
-        if (! $this->isOverdue()) {
+        if (! $this->isOverdue() || ! $this->tanggal_kembali_rencana) {
             return 0;
         }
 
-        return (int) ceil($this->tanggal_kembali_rencana->diffInDays(now(), true));
+        return (int) ceil($this->tanggal_kembali_rencana->diffInDays(today(), true));
     }
 }

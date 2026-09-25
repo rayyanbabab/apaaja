@@ -72,7 +72,11 @@ class SignatureController extends Controller
             'approvedBy',
         ])->findOrFail($id);
 
-        return view('admin.contents.borrowing-requests.bap', compact('borrowingRequest'));
+        $role = Auth::user()?->role;
+        $roleValue = $role instanceof \App\Enums\UsersRole ? $role->value : (string) ($role ?? 'admin');
+        $routePrefix = $roleValue === 'operator' ? 'staff' : 'admin';
+
+        return view('admin.contents.borrowing-requests.bap', compact('borrowingRequest', 'routePrefix'));
     }
 
     /**
@@ -161,9 +165,9 @@ class SignatureController extends Controller
     {
         $user = Auth::user();
         if ($user) {
-            $roleValue = is_object($user->role) ? $user->role->value : $user->role;
-            if ($roleValue === 'admin') {
-                return 'admin.';
+            $roleValue = $user->role instanceof \App\Enums\UsersRole ? $user->role->value : (string) $user->role;
+            if ($roleValue === 'operator') {
+                return 'staff.';
             }
         }
 

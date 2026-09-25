@@ -6,6 +6,7 @@ use App\Models\Inventory;
 use App\Models\Item;
 use App\Models\StockOpname;
 use App\Models\StockOpnameItem;
+use App\Services\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -121,7 +122,7 @@ class StockOpnameController extends Controller
                 if ($opnameItem->actual_stok !== null && $opnameItem->variance !== 0) {
                     $item = Item::find($opnameItem->item_id);
                     if ($item) {
-                        // Create inventory history for adjustment
+                        $oldStok = $item->stok_total;
                         $tipe = $opnameItem->variance > 0 ? Inventory::TYPE_IN : Inventory::TYPE_OUT;
                         
                         Inventory::create([
@@ -133,13 +134,21 @@ class StockOpnameController extends Controller
                             'keterangan' => 'Penyesuaian stok dari Stock Opname #' . $stockOpname->id . ($opnameItem->notes ? ': ' . $opnameItem->notes : ''),
                         ]);
 
-                        // Update actual item stock
                         if ($item->type === \App\Enums\ItemType::PEMINJAMAN) {
-                            $item->stok_peminjaman = $opnameItem->actual_stok;
+                            $item->stok_peminjaman = (int) $opnameItem->actual_stok;
                         } else {
-                            $item->stok_reguler = $opnameItem->actual_stok;
+                            $item->stok_reguler = (int) $opnameItem->actual_stok;
                         }
-                        $item->updateStokTotal();
+                        $item->stok_total = (int)($item->stok_reguler ?? 0) + (int)($item->stok_peminjaman ?? 0);
+                        $item->save();
+
+                        AuditLogger::log(
+                            'item.updated',
+                            'Stock Opname',
+                            "Penyesuaian stok \"{$item->nama}\" dari {$oldStok} menjadi {$item->stok_total} (Selisih: " . ($opnameItem->variance > 0 ? '+' : '') . "{$opnameItem->variance})",
+                            $item,
+                            ['stok_lama' => $oldStok, 'stok_baru' => $item->stok_total, 'selisih' => $opnameItem->variance]
+                        );
                     }
                 }
             }
@@ -148,6 +157,13 @@ class StockOpnameController extends Controller
                 'status' => StockOpname::STATUS_COMPLETED,
                 'end_date' => now(),
             ]);
+
+            AuditLogger::log(
+                'item.updated',
+                'Stock Opname',
+                "Sesi Stock Opname #OPN-" . str_pad($stockOpname->id, 4, '0', STR_PAD_LEFT) . " diselesaikan",
+                $stockOpname
+            );
 
             DB::commit();
 

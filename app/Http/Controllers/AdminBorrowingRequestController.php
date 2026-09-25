@@ -197,8 +197,7 @@ class AdminBorrowingRequestController extends Controller
                 'status' => 'completed',
                 'completed_at' => now(),
             ]);
-            $borrowingRequest->item->increment('stok_peminjaman', $borrowingRequest->jumlah);
-            $borrowingRequest->item->updateStokTotal();
+            $borrowingRequest->item->addStok($borrowingRequest->jumlah, 'peminjaman');
 
             // Send notification to user
             $borrowingRequest->user->notify(new BorrowingCompletedNotification($borrowingRequest));

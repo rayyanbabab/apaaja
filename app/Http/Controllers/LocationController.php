@@ -47,6 +47,18 @@ class LocationController extends Controller
         return view('admin.contents.locations.create', compact('parents'));
     }
 
+    public function generateKodeAjax(Request $request)
+    {
+        $name = (string) $request->query('name', '');
+        $id   = $request->query('id') ? (int) $request->query('id') : null;
+
+        $kode = Location::generateKode($name, $id);
+
+        return response()->json([
+            'kode' => $kode,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -56,6 +68,10 @@ class LocationController extends Controller
             'parent_id' => 'nullable|exists:locations,id',
             'status'    => 'required|in:active,inactive',
         ]);
+
+        if (empty($validated['kode'])) {
+            $validated['kode'] = Location::generateKode($validated['name']);
+        }
 
         try {
             $location = Location::create($validated);
@@ -86,7 +102,6 @@ class LocationController extends Controller
 
     public function edit(Location $location)
     {
-        // Exclude self and own children to avoid circular parent
         $parents = Location::active()
             ->whereNull('parent_id')
             ->where('id', '!=', $location->id)
@@ -106,7 +121,10 @@ class LocationController extends Controller
             'status'    => 'required|in:active,inactive',
         ]);
 
-        // Prevent assigning self as parent
+        if (empty($validated['kode'])) {
+            $validated['kode'] = Location::generateKode($validated['name'], $location->id);
+        }
+
         if (isset($validated['parent_id']) && $validated['parent_id'] == $location->id) {
             return redirect()->back()
                 ->with('error', 'Lokasi tidak dapat menjadi induk dari dirinya sendiri.')

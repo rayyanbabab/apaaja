@@ -52,12 +52,12 @@ class UserBorrowingController extends Controller
             }
         }
 
-        // ── Overdue check: approved items whose return date has passed (≤ today) ──
+        // ── Overdue check: approved items whose return date has passed (< today) ──
         if (Setting::get('enable_overdue_reminder', true)) {
             $overdueItems = BorrowingRequest::with(['item'])
                 ->where('user_id', Auth::id())
                 ->where('status', 'approved')
-                ->whereDate('tanggal_kembali_rencana', '<=', now()->toDateString())
+                ->whereDate('tanggal_kembali_rencana', '<', now()->toDateString())
                 ->get();
 
             foreach ($overdueItems as $borrowing) {
@@ -126,10 +126,17 @@ class UserBorrowingController extends Controller
             'item_id' => 'required|exists:items,id',
             'jumlah' => 'required|integer|min:1',
             'tanggal_pinjam' => 'required|date|after_or_equal:today',
-            'tanggal_kembali_rencana' => 'required|date|after:tanggal_pinjam',
+            'tanggal_kembali_rencana' => 'required|date|after_or_equal:tanggal_pinjam',
             'keterangan' => 'nullable|string|max:1000',
             'kondisi_pinjam' => 'nullable|string|max:500',
         ]);
+
+        $maxBorrowDays = (int) Setting::get('max_borrow_days', 7);
+        $borrowDate = \Carbon\Carbon::parse($validated['tanggal_pinjam']);
+        $maxReturnDate = $borrowDate->copy()->addDays($maxBorrowDays);
+        if (\Carbon\Carbon::parse($validated['tanggal_kembali_rencana'])->gt($maxReturnDate)) {
+            return back()->withErrors(['tanggal_kembali_rencana' => "Tanggal rencana kembali maksimal {$maxBorrowDays} hari dari tanggal pinjam."])->withInput();
+        }
 
         // Cek batas maksimal item aktif per user
         $maxItems = Setting::get('max_items_per_user', 3);
