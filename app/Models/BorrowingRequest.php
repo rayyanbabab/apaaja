@@ -30,6 +30,11 @@ class BorrowingRequest extends Model
         'signed_by_name',
         'signed_at',
         'bap_number',
+        // K3 Safety Interlock & Physical Verification
+        'safety_agreed_at',
+        'safety_apd_checklist',
+        'safety_verified_by',
+        'safety_verified_at',
     ];
 
     protected $casts = [
@@ -39,12 +44,43 @@ class BorrowingRequest extends Model
         'completed_at'            => 'datetime',
         'overdue_notified_at'     => 'datetime',
         'signed_at'               => 'datetime',
+        'safety_agreed_at'        => 'datetime',
+        'safety_apd_checklist'    => 'array',
+        'safety_verified_at'      => 'datetime',
     ];
 
     /** Returns true if the BAP has been digitally signed. */
     public function isSigned(): bool
     {
         return ! is_null($this->signed_at);
+    }
+
+    /** Returns true if safety induction/agreement is completed */
+    public function isSafetyInductionCompleted(): bool
+    {
+        return ! is_null($this->safety_agreed_at);
+    }
+
+    /** Returns true if toolman/admin has physically verified APD at counter */
+    public function isSafetyVerified(): bool
+    {
+        return ! is_null($this->safety_verified_at);
+    }
+
+    /** Cek apakah peminjaman ini melibatkan alat beresiko K3 */
+    public function requiresSafetyClearance(): bool
+    {
+        return $this->item && $this->item->requiresSafetyInterlock();
+    }
+
+    public function safetyVerifier()
+    {
+        return $this->belongsTo(User::class, 'safety_verified_by');
+    }
+
+    public function safetyIncidents()
+    {
+        return $this->hasMany(SafetyIncident::class);
     }
 
     public function user()

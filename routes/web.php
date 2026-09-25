@@ -30,6 +30,7 @@ use App\Http\Controllers\UserProcurementController;
 use App\Http\Controllers\SignatureController;
 use App\Http\Controllers\SafetyController;
 use App\Http\Controllers\DefectScannerController;
+use App\Http\Controllers\WorkshopLayoutController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AccessController::class, 'showLoginForm'])->name('loginform');
@@ -41,7 +42,7 @@ Route::post('/logout', [AccessController::class, 'logout'])->name('logout');
 // Public BAP QR verification (No auth required)
 Route::get('/verify/bap/{token}', [SignatureController::class, 'verify'])->name('bap.verify');
 
-Route::prefix('admin')->middleware('auth', RoleMiddleware::class.':admin')->name('admin.')->group(function () {
+Route::prefix('admin')->middleware(['auth', RoleMiddleware::class.':admin,operator'])->name('admin.')->group(function () {
     Route::get('/search', [InventoryController::class, 'search'])->name('search');
 
     Route::get('/dashboard', [AccessController::class, 'showDashboard'])->name('dashboard');
@@ -105,23 +106,31 @@ Route::prefix('admin')->middleware('auth', RoleMiddleware::class.':admin')->name
     });
 
 
-    // Reports Routes
-    Route::get('/insights', [AnalyticsController::class, 'index'])->name('insights.index');
-    Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
-    Route::get('/reports/inventory', [ReportsController::class, 'inventoryReport'])->name('reports.inventory');
-    Route::get('/reports/outgoing', [ReportsController::class, 'outgoingReport'])->name('reports.outgoing');
-    Route::get('/reports/incoming', [ReportsController::class, 'incomingReport'])->name('reports.incoming');
-    Route::get('/reports/suppliers', [ReportsController::class, 'suppliersReport'])->name('reports.suppliers');
-    Route::get('/reports/borrowing', [ReportsController::class, 'borrowingReport'])->name('reports.borrowing');
-
-    // Activities Routes
-    Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
-    Route::get('/activities/export', [ActivityController::class, 'export'])->name('activities.export');
-
     // -------------------------------------------------------
-    // ADMIN-ONLY: Categories, Suppliers & Settings
+    // ADMIN-ONLY: Master Data, Settings, Opname, Import, Reports & Procurement
     // -------------------------------------------------------
     Route::middleware(RoleMiddleware::class.':admin')->group(function () {
+
+        // Reports Routes
+        Route::get('/insights', [AnalyticsController::class, 'index'])->name('insights.index');
+        Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
+        Route::get('/reports/inventory', [ReportsController::class, 'inventoryReport'])->name('reports.inventory');
+        Route::get('/reports/outgoing', [ReportsController::class, 'outgoingReport'])->name('reports.outgoing');
+        Route::get('/reports/incoming', [ReportsController::class, 'incomingReport'])->name('reports.incoming');
+        Route::get('/reports/suppliers', [ReportsController::class, 'suppliersReport'])->name('reports.suppliers');
+        Route::get('/reports/borrowing', [ReportsController::class, 'borrowingReport'])->name('reports.borrowing');
+
+        // Activities Routes
+        Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+        Route::get('/activities/export', [ActivityController::class, 'export'])->name('activities.export');
+
+        // Procurement Requests (Permintaan Pengadaan - Admin Approval)
+        Route::prefix('procurement-requests')->name('procurement-requests.')->group(function () {
+            Route::get('/', [AdminProcurementController::class, 'index'])->name('index');
+            Route::get('/{id}', [AdminProcurementController::class, 'show'])->name('show');
+            Route::post('/{id}/approve', [AdminProcurementController::class, 'approve'])->name('approve');
+            Route::post('/{id}/reject', [AdminProcurementController::class, 'reject'])->name('reject');
+        });
 
         // Categories Management
         Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
@@ -144,6 +153,7 @@ Route::prefix('admin')->middleware('auth', RoleMiddleware::class.':admin')->name
         // Locations Management
         Route::get('/locations', [LocationController::class, 'index'])->name('locations.index');
         Route::get('/locations/create', [LocationController::class, 'create'])->name('locations.create');
+        Route::get('/locations/generate-kode', [LocationController::class, 'generateKodeAjax'])->name('locations.generate-kode');
         Route::post('/locations', [LocationController::class, 'store'])->name('locations.store');
         Route::get('/locations/{location}', [LocationController::class, 'show'])->name('locations.show');
         Route::get('/locations/{location}/edit', [LocationController::class, 'edit'])->name('locations.edit');
@@ -225,13 +235,6 @@ Route::prefix('admin')->middleware('auth', RoleMiddleware::class.':admin')->name
         Route::post('/{id}/complete', [AdminBorrowingRequestController::class, 'complete'])->name('complete');
     });
 
-    // Procurement Requests (Permintaan Pengadaan)
-    Route::prefix('procurement-requests')->name('procurement-requests.')->group(function () {
-        Route::get('/', [AdminProcurementController::class, 'index'])->name('index');
-        Route::get('/{id}', [AdminProcurementController::class, 'show'])->name('show');
-        Route::post('/{id}/approve', [AdminProcurementController::class, 'approve'])->name('approve');
-        Route::post('/{id}/reject', [AdminProcurementController::class, 'reject'])->name('reject');
-    });
 
 
 
@@ -259,12 +262,8 @@ Route::prefix('admin')->middleware('auth', RoleMiddleware::class.':admin')->name
         Route::post('/{item}/update-type', [CalibrationController::class, 'updateToolType'])->name('update-type');
     });
 
-    // Modul Smart Logistics & Bin Location (Prodi Logistik)
-    Route::prefix('logistics')->name('logistics.')->group(function () {
-        Route::get('/', [LogisticsController::class, 'index'])->name('index');
-        Route::post('/{item}/convert-procurement', [LogisticsController::class, 'convertToProcurement'])->name('convert-procurement');
-        Route::post('/{item}/update-param', [LogisticsController::class, 'updateParameters'])->name('update-param');
-    });
+    // Modul Smart Logistics (Khusus Role Operator)
+    Route::get('/logistics', fn() => redirect()->route('admin.dashboard')->with('error', 'Halaman Smart Logistics (EOQ/ROP) hanya dapat diakses oleh role Operator.'));
 
     // Modul Tooling Kit SPK Manufaktur (Prodi Manufaktur)
     Route::prefix('tooling-kits')->name('tooling-kits.')->group(function () {
@@ -284,6 +283,7 @@ Route::prefix('admin')->middleware('auth', RoleMiddleware::class.':admin')->name
     // Modul K3 Safety Interlock & Digital APD Induction (K3 Lab Teknik)
     Route::prefix('safety')->name('safety.')->group(function () {
         Route::get('/', [SafetyController::class, 'index'])->name('index');
+        Route::get('/export-pdf', [SafetyController::class, 'exportAuditPdf'])->name('export-pdf');
         Route::post('/item/{item}/update', [SafetyController::class, 'updateItemSafety'])->name('update-item');
         Route::post('/verify/{borrowingRequest}', [SafetyController::class, 'verifyPhysicalApd'])->name('verify-apd');
         Route::post('/incidents', [SafetyController::class, 'storeIncident'])->name('store-incident');
@@ -300,14 +300,221 @@ Route::prefix('admin')->middleware('auth', RoleMiddleware::class.':admin')->name
         Route::post('/{inspection}/issue-bak',        [DefectScannerController::class, 'issueBak'])->name('issue-bak');
         Route::get('/{inspection}/bak',               [DefectScannerController::class, 'bak'])->name('bak');
     });
+
+    // ── Denah Interaktif Bengkel (2D Workshop Digital Twin Layout)
+    Route::prefix('workshop-layout')->name('workshop.')->group(function () {
+        Route::get('/',                    [WorkshopLayoutController::class, 'index'])->name('index');
+        Route::get('/api-data',            [WorkshopLayoutController::class, 'apiData'])->name('api-data');
+        Route::post('/nodes',              [WorkshopLayoutController::class, 'storeNode'])->name('store');
+        Route::match(['post', 'put'], '/nodes/{node}', [WorkshopLayoutController::class, 'updateNode'])->name('update');
+        Route::get('/nodes/{node?}',       fn() => redirect()->route('admin.workshop.index'));
+        Route::post('/update-positions',   [WorkshopLayoutController::class, 'updatePositions'])->name('update-positions');
+        Route::delete('/nodes/{node}',     [WorkshopLayoutController::class, 'destroyNode'])->name('destroy');
+        Route::post('/reset-default',      [WorkshopLayoutController::class, 'resetDefault'])->name('reset-default');
+        // Manajemen Zona Denah
+        Route::post('/zones',              [WorkshopLayoutController::class, 'storeZone'])->name('zones.store');
+        Route::match(['post', 'put'], '/zones/{zone}', [WorkshopLayoutController::class, 'updateZone'])->name('zones.update');
+        Route::get('/zones/{zone?}',       fn() => redirect()->route('admin.workshop.index'));
+        Route::delete('/zones/{zone}',     [WorkshopLayoutController::class, 'destroyZone'])->name('zones.destroy');
+        Route::post('/update-zone-positions', [WorkshopLayoutController::class, 'updateZonePositions'])->name('zones.update-positions');
+    });
 });
 
 // -------------------------------------------------------
-// STAFF (OPERATOR) Routes — Maintenance Only
+// STAFF (OPERATOR) Routes — Maintenance & Workshop
 // -------------------------------------------------------
 Route::prefix('staff')->middleware('auth', RoleMiddleware::class.':operator')->name('staff.')->group(function () {
 
     Route::get('/dashboard', [AccessController::class, 'showDashboard'])->name('dashboard');
+
+    // ── Denah Interaktif Bengkel (2D Workshop Digital Twin Layout)
+    Route::prefix('workshop-layout')->name('workshop.')->group(function () {
+        Route::get('/',                    [WorkshopLayoutController::class, 'index'])->name('index');
+        Route::get('/api-data',            [WorkshopLayoutController::class, 'apiData'])->name('api-data');
+        Route::post('/nodes',              [WorkshopLayoutController::class, 'storeNode'])->name('store');
+        Route::match(['post', 'put'], '/nodes/{node}', [WorkshopLayoutController::class, 'updateNode'])->name('update');
+        Route::get('/nodes/{node?}',       fn() => redirect()->route('staff.workshop.index'));
+        Route::post('/update-positions',   [WorkshopLayoutController::class, 'updatePositions'])->name('update-positions');
+        Route::delete('/nodes/{node}',     [WorkshopLayoutController::class, 'destroyNode'])->name('destroy');
+        Route::post('/reset-default',      [WorkshopLayoutController::class, 'resetDefault'])->name('reset-default');
+        // Manajemen Zona Denah
+        Route::post('/zones',              [WorkshopLayoutController::class, 'storeZone'])->name('zones.store');
+        Route::match(['post', 'put'], '/zones/{zone}', [WorkshopLayoutController::class, 'updateZone'])->name('zones.update');
+        Route::get('/zones/{zone?}',       fn() => redirect()->route('staff.workshop.index'));
+        Route::delete('/zones/{zone}',     [WorkshopLayoutController::class, 'destroyZone'])->name('zones.destroy');
+        Route::post('/update-zone-positions', [WorkshopLayoutController::class, 'updateZonePositions'])->name('zones.update-positions');
+    });
+
+    // ── AI Defect & Wear Scanner (Computer Vision)
+    Route::prefix('defect-scanner')->name('defect-scanner.')->group(function () {
+        Route::get('/',                               [DefectScannerController::class, 'index'])->name('index');
+        Route::get('/scan',                           [DefectScannerController::class, 'scan'])->name('scan');
+        Route::get('/scan/{borrowingRequest}',        [DefectScannerController::class, 'scan'])->name('scan-br');
+        Route::post('/analyze',                       [DefectScannerController::class, 'analyze'])->name('analyze');
+        Route::get('/{inspection}',                   [DefectScannerController::class, 'show'])->name('show');
+        Route::post('/{inspection}/issue-bak',        [DefectScannerController::class, 'issueBak'])->name('issue-bak');
+        Route::get('/{inspection}/bak',               [DefectScannerController::class, 'bak'])->name('bak');
+    });
+
+    // Modul K3 Safety Interlock & Digital APD Induction
+    Route::prefix('safety')->name('safety.')->group(function () {
+        Route::get('/', [SafetyController::class, 'index'])->name('index');
+        Route::get('/export-pdf', [SafetyController::class, 'exportAuditPdf'])->name('export-pdf');
+        Route::post('/item/{item}/update', [SafetyController::class, 'updateItemSafety'])->name('update-item');
+        Route::post('/verify/{borrowingRequest}', [SafetyController::class, 'verifyPhysicalApd'])->name('verify-apd');
+        Route::post('/incidents', [SafetyController::class, 'storeIncident'])->name('store-incident');
+        Route::post('/incidents/{incident}/status', [SafetyController::class, 'updateIncidentStatus'])->name('update-incident');
+    });
+
+    // Modul Perkakas & Kalibrasi Presisi (Prodi 4P)
+    Route::prefix('calibration')->name('calibration.')->group(function () {
+        Route::get('/', [CalibrationController::class, 'index'])->name('index');
+        Route::post('/{item}/update-cert', [CalibrationController::class, 'updateCalibration'])->name('update-cert');
+        Route::post('/{item}/update-life', [CalibrationController::class, 'updateToolLife'])->name('update-life');
+        Route::post('/{item}/update-type', [CalibrationController::class, 'updateToolType'])->name('update-type');
+    });
+
+    // Modul Smart Logistics & Bin Location (Prodi Logistik)
+    Route::prefix('logistics')->name('logistics.')->group(function () {
+        Route::get('/', [LogisticsController::class, 'index'])->name('index');
+        Route::post('/{item}/convert-procurement', [LogisticsController::class, 'convertToProcurement'])->name('convert-procurement');
+        Route::post('/{item}/update-param', [LogisticsController::class, 'updateParameters'])->name('update-param');
+    });
+
+    // Modul Tooling Kit SPK Manufaktur (Prodi Manufaktur)
+    Route::prefix('tooling-kits')->name('tooling-kits.')->group(function () {
+        Route::get('/', [ToolingKitController::class, 'index'])->name('index');
+        Route::post('/', [ToolingKitController::class, 'store'])->name('store');
+        Route::post('/{toolingKit}/toggle-status', [ToolingKitController::class, 'toggleStatus'])->name('toggle-status');
+        Route::delete('/{toolingKit}', [ToolingKitController::class, 'destroy'])->name('destroy');
+    });
+
+    // Digital Signature BAP (Prodi TRPL) & Peminjaman
+    Route::get('/bap-documents', [SignatureController::class, 'index'])->name('bap.index');
+    Route::prefix('borrowing-requests')->name('borrowing-requests.')->group(function () {
+        Route::get('/', [AdminBorrowingRequestController::class, 'index'])->name('index');
+        Route::get('/pending', [AdminBorrowingRequestController::class, 'pending'])->name('pending');
+        Route::get('/history', [AdminBorrowingRequestController::class, 'history'])->name('history');
+        Route::get('/{id}', [AdminBorrowingRequestController::class, 'show'])->name('show');
+        Route::post('/{id}/approve', [AdminBorrowingRequestController::class, 'approve'])->name('approve');
+        Route::post('/{id}/reject', [AdminBorrowingRequestController::class, 'reject'])->name('reject');
+        Route::post('/{id}/complete', [AdminBorrowingRequestController::class, 'complete'])->name('complete');
+        Route::get('/{id}/bap', [SignatureController::class, 'showBap'])->name('bap');
+        Route::post('/{id}/sign', [SignatureController::class, 'sign'])->name('sign');
+    });
+
+    // Conventional Borrowings Floor Counter
+    Route::prefix('borrowings')->name('borrowings.')->group(function () {
+        Route::get('/', [BorrowingController::class, 'index'])->name('index');
+        Route::get('/history', [BorrowingController::class, 'history'])->name('history');
+        Route::get('/create', [BorrowingController::class, 'create'])->name('create');
+        Route::post('/', [BorrowingController::class, 'store'])->name('store');
+        Route::get('/{borrowing}', [BorrowingController::class, 'show'])->name('show');
+        Route::get('/{borrowing}/edit', [BorrowingController::class, 'edit'])->name('edit');
+        Route::put('/{borrowing}', [BorrowingController::class, 'update'])->name('update');
+        Route::delete('/{borrowing}', [BorrowingController::class, 'destroy'])->name('destroy');
+        Route::patch('/{borrowing}/return', [BorrowingController::class, 'returnItem'])->name('return');
+    });
+
+    // Inventory View & Management for Staff
+    Route::prefix('inventory')->name('inventory.')->group(function () {
+        Route::get('/', [InventoryController::class, 'index'])->name('index');
+        Route::get('/show/{id}', [InventoryController::class, 'show'])->name('show');
+        Route::get('/edit/{id}', [InventoryController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [InventoryController::class, 'update'])->name('update');
+        Route::delete('/{id}', [InventoryController::class, 'destroy'])->name('destroy');
+        Route::get('/add-items', [InventoryController::class, 'additems'])->name('add');
+        Route::post('/store', [InventoryController::class, 'store'])->name('store');
+        Route::get('/{item}/print-label', [InventoryController::class, 'printLabel'])->name('print-label');
+        Route::get('/lookup/by-kode', [InventoryController::class, 'lookupByKode'])->name('lookup');
+        Route::prefix('tabs')->name('tab.')->group(function () {
+            Route::get('/detail', [TabsInventoryController::class, 'Detail'])->name('detail');
+            Route::get('/history', [TabsInventoryController::class, 'History'])->name('history');
+            Route::get('/history/{status}', [TabsInventoryController::class, 'historyByStatus'])->name('history.status');
+        });
+    });
+
+    // Locations Management for Staff
+    Route::prefix('locations')->name('locations.')->group(function () {
+        Route::get('/', [LocationController::class, 'index'])->name('index');
+        Route::get('/create', [LocationController::class, 'create'])->name('create');
+        Route::get('/generate-kode', [LocationController::class, 'generateKodeAjax'])->name('generate-kode');
+        Route::post('/', [LocationController::class, 'store'])->name('store');
+        Route::get('/{location}', [LocationController::class, 'show'])->name('show');
+        Route::get('/{location}/edit', [LocationController::class, 'edit'])->name('edit');
+        Route::put('/{location}', [LocationController::class, 'update'])->name('update');
+        Route::delete('/{location}', [LocationController::class, 'destroy'])->name('destroy');
+    });
+
+    // Categories Management for Staff
+    Route::prefix('categories')->name('categories.')->group(function () {
+        Route::get('/', [CategoryController::class, 'index'])->name('index');
+        Route::get('/create', [CategoryController::class, 'create'])->name('create');
+        Route::post('/', [CategoryController::class, 'store'])->name('store');
+        Route::get('/{category}', [CategoryController::class, 'show'])->name('show');
+        Route::get('/{category}/edit', [CategoryController::class, 'edit'])->name('edit');
+        Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
+        Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
+    });
+
+    // Suppliers Management for Staff
+    Route::prefix('suppliers')->name('suppliers.')->group(function () {
+        Route::get('/', [SupplierController::class, 'index'])->name('index');
+        Route::get('/create', [SupplierController::class, 'create'])->name('create');
+        Route::post('/', [SupplierController::class, 'store'])->name('store');
+        Route::get('/{supplier}', [SupplierController::class, 'show'])->name('show');
+        Route::get('/{supplier}/edit', [SupplierController::class, 'edit'])->name('edit');
+        Route::put('/{supplier}', [SupplierController::class, 'update'])->name('update');
+        Route::delete('/{supplier}', [SupplierController::class, 'destroy'])->name('destroy');
+    });
+
+    // Stock Opname for Staff
+    Route::prefix('stock-opnames')->name('stock-opnames.')->group(function () {
+        Route::get('/', [App\Http\Controllers\StockOpnameController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\StockOpnameController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\StockOpnameController::class, 'store'])->name('store');
+        Route::get('/{stockOpname}', [App\Http\Controllers\StockOpnameController::class, 'show'])->name('show');
+        Route::post('/{stockOpname}/complete', [App\Http\Controllers\StockOpnameController::class, 'complete'])->name('complete');
+        Route::post('/{stockOpname}/cancel', [App\Http\Controllers\StockOpnameController::class, 'cancel'])->name('cancel');
+        Route::patch('/items/{item}', [App\Http\Controllers\StockOpnameController::class, 'updateItem'])->name('items.update');
+    });
+
+    // Procurement Requests for Staff
+    Route::prefix('procurement-requests')->name('procurement-requests.')->group(function () {
+        Route::get('/', [AdminProcurementController::class, 'index'])->name('index');
+        Route::get('/{id}', [AdminProcurementController::class, 'show'])->name('show');
+        Route::post('/{id}/approve', [AdminProcurementController::class, 'approve'])->name('approve');
+        Route::post('/{id}/reject', [AdminProcurementController::class, 'reject'])->name('reject');
+    });
+
+    // Reports & Insights for Staff
+    Route::get('/insights', [AnalyticsController::class, 'index'])->name('insights.index');
+    Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
+    Route::get('/reports/inventory', [ReportsController::class, 'inventoryReport'])->name('reports.inventory');
+    Route::get('/reports/outgoing', [ReportsController::class, 'outgoingReport'])->name('reports.outgoing');
+    Route::get('/reports/incoming', [ReportsController::class, 'incomingReport'])->name('reports.incoming');
+    Route::get('/reports/suppliers', [ReportsController::class, 'suppliersReport'])->name('reports.suppliers');
+    Route::get('/reports/borrowing', [ReportsController::class, 'borrowingReport'])->name('reports.borrowing');
+
+    // Activities for Staff
+    Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+    Route::get('/activities/export', [ActivityController::class, 'export'])->name('activities.export');
+
+    // Incoming & Outgoing items
+    Route::prefix('incoming')->name('incoming.')->group(function () {
+        Route::get('/', [IncomingItemsController::class, 'index'])->name('index');
+        Route::get('/create', [IncomingItemsController::class, 'create'])->name('create');
+        Route::post('/', [IncomingItemsController::class, 'store'])->name('store');
+        Route::get('/{incomingItem}', [IncomingItemsController::class, 'show'])->name('show');
+    });
+
+    Route::prefix('outgoing')->name('outgoing.')->group(function () {
+        Route::get('/', [OutgoingItemsController::class, 'index'])->name('index');
+        Route::get('/create', [OutgoingItemsController::class, 'create'])->name('create');
+        Route::post('/', [OutgoingItemsController::class, 'store'])->name('store');
+        Route::get('/{outgoingItem}', [OutgoingItemsController::class, 'show'])->name('show');
+        Route::post('/{outgoingItem}/return', [OutgoingItemsController::class, 'returnItem'])->name('return');
+    });
 
     // Profile
     Route::prefix('profile')->name('profile.')->group(function () {
@@ -355,6 +562,7 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('user')->middleware('auth', RoleMiddleware::class.':user')->name('user.')->group(function () {
     Route::get('/dashboard', [AccessController::class, 'ShowDashboardUser'])->name('dashboard');
+    Route::get('/workshop-map', [WorkshopLayoutController::class, 'userIndex'])->name('workshop.index');
 
     Route::prefix('borrowing')->name('borrowing.')->group(function () {
         Route::get('/', [UserBorrowingController::class, 'index'])->name('index');

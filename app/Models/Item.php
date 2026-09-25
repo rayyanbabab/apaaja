@@ -25,6 +25,7 @@ class Item extends Model
         'harga',
         'gambar',
         'keterangan',
+        'kondisi',
         'type',
         'tool_type',
         'calibration_due_date',
@@ -39,6 +40,11 @@ class Item extends Model
         'safety_stock',
         'holding_cost',
         'order_cost',
+        // K3 Safety Interlock
+        'safety_risk_level',
+        'required_apd',
+        'safety_instruction',
+        'k3_quiz_required',
     ];
 
     protected $casts = [
@@ -55,6 +61,8 @@ class Item extends Model
         'safety_stock'         => 'integer',
         'holding_cost'         => 'integer',
         'order_cost'           => 'integer',
+        'required_apd'         => 'array',
+        'k3_quiz_required'     => 'boolean',
     ];
 
     /** Hitung Reorder Point (ROP): (Laju Pakai x Lead Time) + Safety Stock */
@@ -102,7 +110,7 @@ class Item extends Model
         if (!$this->calibration_due_date) {
             return false;
         }
-        return $this->calibration_due_date->isPast();
+        return $this->calibration_due_date->lt(today());
     }
 
     /** Cek apakah alat ukur akan kedaluwarsa dalam 14 hari */
@@ -111,16 +119,29 @@ class Item extends Model
         if ($this->tool_type !== 'measuring_tool' || !$this->calibration_due_date) {
             return false;
         }
-        return !$this->isCalibrationExpired() && $this->calibration_due_date->diffInDays(now()) <= 14;
+        return !$this->isCalibrationExpired() && $this->calibration_due_date->diffInDays(today(), false) <= 14;
     }
 
-    /** Cek apakah alat layak dipinjam untuk proses manufaktur */
+    /** Cek apakah alat layak dipinjam untuk proses manufaktur / praktikum (K3 Interlock) */
     public function canBeBorrowedForManufacturing(): bool
     {
+        // K3 Safety Interlock: Alat rusak berat ditarik otomatis dari sirkulasi
+        if ($this->kondisi === 'rusak_berat') {
+            return false;
+        }
+
+        // K3 Precision Interlock: Alat ukur kedaluwarsa kalibrasi tidak boleh dipinjam
         if ($this->tool_type === 'measuring_tool' && $this->isCalibrationExpired()) {
             return false;
         }
+
         return true;
+    }
+
+    /** Cek apakah alat terkena K3 Lockout otomatis akibat kerusakan kritis */
+    public function isK3Lockout(): bool
+    {
+        return $this->kondisi === 'rusak_berat';
     }
 
     /** Sinkronkan status kalibrasi otomatis berdasarkan tanggal */
@@ -136,9 +157,9 @@ class Item extends Model
             return;
         }
 
-        if ($this->calibration_due_date->isPast()) {
+        if ($this->calibration_due_date->lt(today())) {
             $this->calibration_status = 'expired';
-        } elseif ($this->calibration_due_date->diffInDays(now()) <= 14) {
+        } elseif ($this->calibration_due_date->diffInDays(today(), false) <= 14) {
             $this->calibration_status = 'due_soon';
         } else {
             $this->calibration_status = 'calibrated';
@@ -197,7 +218,7 @@ class Item extends Model
 
     public function updateStokTotal()
     {
-        $this->stok_total = $this->stok_reguler + $this->stok_peminjaman;
+        $this->stok_total = (int)($this->stok_reguler ?? 0) + (int)($this->stok_peminjaman ?? 0);
         $this->save();
     }
 
@@ -208,6 +229,7 @@ class Item extends Model
         } else {
             $this->increment('stok_reguler', $jumlah);
         }
+        $this->refresh();
         $this->updateStokTotal();
     }
 
@@ -218,6 +240,7 @@ class Item extends Model
         } else {
             $this->decrement('stok_reguler', $jumlah);
         }
+        $this->refresh();
         $this->updateStokTotal();
         $this->checkAndNotifyLowStock();
     }
@@ -264,4 +287,95 @@ class Item extends Model
             $staff->notify(new LowStockNotification($this, $threshold));
         }
     }
+
+    /** Relasi ke Safety Incidents */
+    public function safetyIncidents()
+    {
+        return $this->hasMany(SafetyIncident::class);
+    }
+
+    /** Cek apakah item mewajibkan interlock keselamatan (medium/high) */
+    public function requiresSafetyInterlock(): bool
+    {
+        return in_array($this->safety_risk_level, ['medium', 'high']);
+    }
+
+    public function isHighRiskSafety(): bool
+    {
+        return $this->safety_risk_level === 'high';
+    }
+
+    public function isMediumRiskSafety(): bool
+    {
+        return $this->safety_risk_level === 'medium';
+    }
+
+    /** Badge visual resiko K3 */
+    public function getRiskBadgeAttribute(): array
+    {
+        return match ($this->safety_risk_level) {
+            'high'   => ['label' => 'High Risk (Bahaya Tinggi)', 'class' => 'bg-red-500/10 text-red-500 border border-red-500/20 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800/40', 'dot' => 'bg-red-500'],
+            'medium' => ['label' => 'Medium Risk (Waspada)', 'class' => 'bg-amber-500/10 text-amber-600 border border-amber-500/20 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/40', 'dot' => 'bg-amber-500'],
+            default  => ['label' => 'Low Risk (Standar)', 'class' => 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/40', 'dot' => 'bg-emerald-500'],
+        };
+    }
+
+    /** Master Katalog APD Laboratorium Teknik */
+    public static function getApdCatalog(): array
+    {
+        return [
+            'safety_glasses' => [
+                'name' => 'Kacamata Pengaman (Safety Glasses)',
+                'icon' => 'glasses',
+                'desc' => 'Melindungi mata dari percikan gram, debu sisa bubut, atau radiasi sinar.',
+            ],
+            'wearpack' => [
+                'name' => 'Wearpack / Baju Kerja Praktik',
+                'icon' => 'shirt',
+                'desc' => 'Kain tebal anti-sobek untuk melindungi tubuh dari kontak panas dan goresan.',
+            ],
+            'safety_shoes' => [
+                'name' => 'Sepatu Pengaman (Safety Shoes)',
+                'icon' => 'footprints',
+                'desc' => 'Ujung baja pelindung benturan benda jatuh dan sol tahan oli / slip.',
+            ],
+            'face_shield' => [
+                'name' => 'Pelindung Wajah (Face Shield)',
+                'icon' => 'shield',
+                'desc' => 'Wajib untuk pengelasan, gerinda potong, atau percikan bahan kimia.',
+            ],
+            'earmuff' => [
+                'name' => 'Pelindung Telinga (Ear Muff / Ear Plug)',
+                'icon' => 'volume-x',
+                'desc' => 'Meredam kebisingan tinggi pada area mesin milling atau kompresor.',
+            ],
+            'gloves' => [
+                'name' => 'Sarung Tangan Kerja (Safety Gloves)',
+                'icon' => 'hand',
+                'desc' => 'Sarung tangan kulit / tahan panas sesuai tipe pengerjaan.',
+            ],
+            'respirator' => [
+                'name' => 'Masker / Respirator Debu & Uap',
+                'icon' => 'air-vent',
+                'desc' => 'Menyaring asap solder, uap thinner, atau serbuk logam.',
+            ],
+        ];
+    }
+
+    /** Label APD yang diwajibkan untuk item ini */
+    public function getRequiredApdDetailsAttribute(): array
+    {
+        $catalog = self::getApdCatalog();
+        $required = $this->required_apd ?? [];
+        $result = [];
+
+        foreach ($required as $apdKey) {
+            if (isset($catalog[$apdKey])) {
+                $result[$apdKey] = $catalog[$apdKey];
+            }
+        }
+
+        return $result;
+    }
 }
+
